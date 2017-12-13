@@ -3,9 +3,13 @@
 
 
 ```
-parameter_spec = ParameterSpec()
-family = ParameterFamily(parameter_spec)
-case = Case()
+parameter_spec = ParameterSpec(name='foo', value=20)
+
+family = ParameterFamily()
+family.append(parameter_spec)
+
+case = Case(family_list=family)
+
 job = case.to_job()
 
 job_cloned = job.clone()
