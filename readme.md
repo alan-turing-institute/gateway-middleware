@@ -31,3 +31,15 @@ job_shareable = job.share()
 
 
 - [ ] clone a job
+
+
+- [x] Things to investigate - Ontology (OWL, RDF), Object Store (key:value pairs storing object (pickle?) in DB).
+
+
+- Playing around in pure python classes - model_classes_no_db.py and test_ui_no_db.py (and test_param_sets.json)
+
+python -i test_ui_no_db.py
+>>> my_ui.display()
+
+
+This constructs a ParamSpecTree, and then loads values from a json file to apply to the leaf nodes.

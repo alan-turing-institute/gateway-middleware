@@ -1,0 +1,44 @@
+[
+    {
+	"name": "water",
+	"family": "fluid",
+	"parameters": [
+            {"name": "density",
+             "value": 1000.0,
+             "units": "kg/m^3"
+            },
+            {"name": "viscosity",
+             "value": 8.9e-4,
+             "units": "Pa.s"
+            }
+	]
+    },
+    {
+	"name": "oil",
+	"family": "fluid",
+	"parameters": [
+            {"name": "density",
+             "value": 800.0,
+             "units": "kg/m^3"
+            },
+            {"name": "viscosity",
+             "value": 9.9e-4,
+             "units": "Pa.s"
+            }
+	]
+    },
+        {
+	"name": "tankA",
+	"family": "tank",
+	"parameters": [
+            {"name": "width",
+             "value": 3.2,
+             "units": "m"
+            },
+            {"name": "depth",
+             "value": 4.1,
+             "units": "m"
+            }
+	]
+    }
+]
