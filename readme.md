@@ -43,3 +43,28 @@ python -i test_ui_no_db.py
 
 
 This constructs a ParamSpecTree, and then loads values from a json file to apply to the leaf nodes.
+
+
+## Trying a key/object store:  Redis
+Redis is open source, BSD licensed.
+Download tar.gz from https://redis.io/
+then unpack, cd to directory, and
+`make`
+then
+```
+cd src
+./redis-server
+```
+server will be running on localhost port 6379.
+There is a Python wrapper, that can be installed with
+`pip install redis`.
+Seems to be trivial to store/retrieve pickled items:
+```
+import redis
+import pickle
+rs = redis.Redis(host="localhost", port=6379)
+save_result = rs.set(mykey,pickle.dumps(myobj))
+retrieved_obj = pickle.loads(rs.get(mykey))
+```
+(see redis_test.py)
+
