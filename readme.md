@@ -24,7 +24,7 @@ job_shareable = job.share()
 
 
 
-- [ ] represent a parameter as a `ParameterSpec`
+- [ ] represent a parameter as a `ParamSpec`
 - [ ] associate the parameter with a case
 - [ ] generate a job from the case
 
@@ -38,9 +38,10 @@ job_shareable = job.share()
 
 - Playing around in pure python classes - model_classes_no_db.py and test_ui_no_db.py (and test_param_sets.json)
 
-python -i test_ui_no_db.py
+```
+python -i test_ui.py
 >>> my_ui.display()
-
+```
 
 This constructs a ParamSpecTree, and then loads values from a json file to apply to the leaf nodes.
 
