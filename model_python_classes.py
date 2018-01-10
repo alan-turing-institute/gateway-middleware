@@ -146,14 +146,14 @@ class ParamSpecTree(object):
 
         self.parent = parent
 
-    def add_child(self, node_name, node_class):
+#    def add_child(self, node_name, node_class):
+#
+#        self.children[node_name] = node_class(node_name)
+#        self.children[node_name].set_parent(self)
 
-        self.children[node_name] = node_class(node_name)
-        self.children[node_name].set_parent(self)
-
-#    def add_child(self,child):
-#        child.set_parent(self)
-#        self.children[child["name"]] = child
+    def add_child(self,child):
+        child.set_parent(self)
+        self.children[child.name] = child
         
     def __getitem__(self,key):
         """ 
@@ -186,8 +186,10 @@ class ParamSpecTree(object):
                         for k,v in node["values"].items():
                             child.__setattr__(k,v)
                             pass
+                        child.reset_to_default()
                         pass
-                    self.children[node["name"]] = child                    
+                    self.children[node["name"]] = child
+                    self.add_child(child)                                        
                     break
                 
     def add_child_from_json(self,input_file_obj):
@@ -201,7 +203,7 @@ class ParamSpecTree(object):
         clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
         for name,cls in clsmembers:
             if name == d["class_name"]:
-                self.add_child(d["name"],cls)
+                self.add_child(cls(d["name"]))
                 break
         
     def load_parameter_tree_from_file(self,input_file,node_name,paramset_name):
@@ -289,6 +291,10 @@ class ParamSpec(object):
         self.units = units
         self.current_val = default_val
 
+
+    def reset_to_default(self):
+        self.current_val = self.default_val
+        
     def set_val(self,value, units):
         """
         Set the current value - must give units!
@@ -366,8 +372,8 @@ class Fluid(ParamSpecTree):
     def __init__(self,name,description=None):
 
         super().__init__(name,description)
-        self.add_child("density",Density)
-        self.add_child("viscosity",Viscosity)
+        self.add_child(Density(self.name+":density"))
+        self.add_child(Viscosity(self.name+":viscosity"))
 
 
 class Tank(ParamSpecTree):
@@ -379,5 +385,5 @@ class Tank(ParamSpecTree):
     def __init__(self,name,description=None):
 
         super().__init__(name,description)
-        self.add_child("width",Length)
-        self.add_child("depth",Length)        
+        self.add_child(Length(self.name+":width"))
+        self.add_child(Length(self.name+":height"))        
