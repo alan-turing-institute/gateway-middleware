@@ -151,6 +151,10 @@ class ParamSpecTree(object):
         self.children[node_name] = node_class(node_name)
         self.children[node_name].set_parent(self)
 
+#    def add_child(self,child):
+#        child.set_parent(self)
+#        self.children[child["name"]] = child
+        
     def __getitem__(self,key):
         """ 
         Allow dict-like retrieval of children by key.

@@ -30,6 +30,9 @@ def create_test_case():
     return case
 
 
+def list_all_keys():
+    rs = redis.Redis(host="localhost", port=6379)
+    rs.keys()
     
 def save_to_redis(keyname, obj):
     """

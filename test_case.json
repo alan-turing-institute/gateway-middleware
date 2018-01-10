@@ -32,7 +32,14 @@
 			    "name" : "length",
 			    "description" : "length of the shaft",
 			    "class_name": "Length"
-			},
+			}
+		    ]
+		},
+		{
+		    "name" : "Paddle",
+		    "description" : "the flat bit",
+		    "class_name" : "ParamSpecTree",
+		    "children" : [
 			{
 			    "name" : "area",
 			    "description" : "area of the paddle",
