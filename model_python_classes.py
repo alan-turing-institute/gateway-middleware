@@ -1,10 +1,16 @@
 """
 Sketch of a data model for Blue.
+
+Should be able to create a "Case" from e.g. a json file, save it, load it etc.
+
+A Case has a "job_spec" (class ParamSpecTree) and should be able to produce "Jobs", which are the actual things that run.
+
 """
 
 import json
 import inspect
 import sys
+import uuid
 
 class UnitsDontMatchError(Exception):
 
@@ -18,6 +24,57 @@ class ValueOutsideRangeError(Exception):
         self.message = message
 
 
+
+class Param(object):
+
+    """ 
+    A parameter of an actual job, with the value chosen (and fixed).
+    """
+
+    def __init__(self,name,description,value,units):
+        self.name = name
+        self.description = description
+        self.value = value
+        self.units = units
+
+    def get_val(self):
+        """
+        return tuple (value, units)
+        """
+        return (self.value,self.units)
+        
+class Job(object):
+
+    """
+    An actual job that actually runs.
+    """
+
+    def __init__(self):
+        """
+        """
+        self.id = uuid.uuid4().hex
+        self.params = []
+        self.compute_info = None
+        self.status = "DRAFT"
+        
+
+    def set_status(self,status):
+        self.status = status
+        
+    def add_param(self,param_spec):
+        """
+        Takes in a ParamSpec object (part of a job spec) which has a range of possible values, and a current_val.
+        Use this to create a Param object that has a fixed value, and add it to this job's list.
+        """
+        new_param = Param(param_spec.name, param_spec.description, param_spec.current_val, param_spec.units)
+        self.params.append(new_param)
+
+    def set_compute_info(self, compute_info):
+        self.compute_info = compute_info
+
+        
+
+        
 class Case(object):
 
     """
@@ -29,17 +86,46 @@ class Case(object):
         self.description = description
         # job_spec is a root ParamSpecTree
         self.job_spec = None
+        self.sim_spec = None
 
+    def set_sim_spec(self,sim_spec):
+        """
+        What is the actual compute resource that we'll run on? (local cluster, azure, ..., ... )?
+        """
+        self.sim_spec = sim_spec
+        
     def set_job_spec(self,job_spec):
         self.job_spec = job_spec
 
 
-    def load(self,name):
+    def load_from_json(self,filename):
+        j = json.load(open(filename))
+        self.name = j["name"]
+        self.description = j["description"]
+        self.set_sim_spec(j["sim_spec"])
+        job_spec = ParamSpecTree(self.name, self.description)
+        job_spec.recursively_load_from_json(j["job_spec"])
+        self.set_job_spec(job_spec)
+        
+
         pass
 
     def save(self):
         pass
 
+    
+    def create_job(self, some_backend_stuff):
+        """
+        Use the job_spec to create a Job - flattening out the tree of param_spec(_tree) objects in to the job's list of Parameters.
+        """
+        new_job = Job()
+        new_job.set_compute_info(some_backend_stuff)
+        param_spec_list = self.job_spec.find_all_child_paramspecs()
+        for ps in param_spec_list:
+            new_job.add_param(ps)
+        return new_job
+
+    
         
 class ParamSpecTree(object):
 
@@ -79,6 +165,27 @@ class ParamSpecTree(object):
         found_node = False
 
 
+    def recursively_load_from_json(self, node_list):
+        """
+        Construct tree from an input dictionary d.
+        """
+        ### get a list of members of this class
+        clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+        for node in node_list:
+            for class_name,cls in clsmembers:
+                if class_name == node["class_name"]:
+                    child = cls(name=node["name"],description=node["description"])
+                    if "children" in node.keys() and isinstance(child,ParamSpecTree):
+                        child.recursively_load_from_json(node["children"])
+                        pass
+                    if "values" in node.keys() and isinstance(child,ParamSpec):
+                        for k,v in node["values"].items():
+                            child.__setattr__(k,v)
+                            pass
+                        pass
+                    self.children[node["name"]] = child                    
+                    break
+                
     def add_child_from_json(self,input_file_obj):
         """ 
         load something from json and use it to construct bits of the tree
@@ -91,7 +198,7 @@ class ParamSpecTree(object):
         for name,cls in clsmembers:
             if name == d["class_name"]:
                 self.add_child(d["name"],cls)
-
+                break
         
     def load_parameter_tree_from_file(self,input_file,node_name,paramset_name):
         """ 
@@ -145,14 +252,29 @@ class ParamSpecTree(object):
             print("Setting %s to %s" % (param["name"],param["value"]))
             self.children[param["name"]].set_val(param["value"],param["units"])
 
+    def find_all_child_paramspecs(self):
+        """ 
+        recursive function to navigate the tree, filling this object's list of ParamSpecs as it goes.
+        """
+        param_spec_list = []
+        for child in self.children.values():
+            if isinstance(child,ParamSpec):
+                param_spec_list.append(child)
+            else:
+                param_spec_list += child.find_all_child_paramspecs()
+                pass
+            pass
+        return param_spec_list
+            
 
+            
 class ParamSpec(object):
 
     """
     A parameter of the model, with min, max, default values, and units.
     """
 
-    def __init__(self,name,description,default_val,min_val,max_val,units):
+    def __init__(self,name,description,default_val=None,min_val=None,max_val=None,units=None):
 
         self.parent = None
         self.name = name
