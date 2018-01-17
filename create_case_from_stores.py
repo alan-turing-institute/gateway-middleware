@@ -104,9 +104,11 @@ if __name__ == "__main__":
     fluidA_viscosity.specs.append(fluidA_viscosity_max)
     fluidA_viscosity.specs.append(fluidA_viscosity_default)
     fluidA_viscosity.specs.append(fluidA_viscosity_units)
+    
 
-    fluid_store.fields.append(fluidA_density)
-    fluid_store.fields.append(fluidA_viscosity)
+
+    fluidA.child_field.append(fluidA_density)
+    fluidA.child_field.append(fluidA_viscosity)
     fluid_store.fields.append(fluidA)
     session.add(fluid_store)
 
@@ -115,8 +117,23 @@ if __name__ == "__main__":
 
     mycase = Case(name="MyCase")
     
-    new_case_store = session.query(Case).filter(Case.name=="tanks_R_us").first()
+    new_tank_store = session.query(Case).filter(Case.name=="tanks_R_us").first()
     
-    new_tankA = new_case_store.fields[0].deep_copy()
+    new_tankA = new_tank_store.fields[0].deep_copy()
 
+    new_fluid_store = session.query(Case).filter(Case.name=="fluids_R_us").first()
+    
+    new_fluid1 = new_fluid_store.fields[0].deep_copy()
+    new_fluid1.name = "fluid 1"
+    new_fluid1.prepend_prefix("Fluid1_")
+    new_fluid2 = new_fluid_store.fields[0].deep_copy()
+    new_fluid2.name = "fluid 2"
+    new_fluid2.prepend_prefix("Fluid2_")
+    
+    mycase.fields.append(new_tankA)
+    mycase.fields.append(new_fluid1)
+    mycase.fields.append(new_fluid2)
+
+
+#
 

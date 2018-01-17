@@ -37,6 +37,15 @@ class CaseField(Base):
             new_case_field.specs.append(spec.deep_copy())
         return new_case_field
 
+    def prepend_prefix(self, prefix):
+        for child in self.child_field:
+            child.prepend_prefix(prefix)
+        prefix_spec = [spec for spec in self.specs if spec.property_name == "prefix"]
+        if prefix_spec:
+            prefix_spec[0].property_value = prefix + prefix_spec[0].property_value
+        else:
+            self.specs.append(ParameterSpec(property_name= "prefix", property_value=prefix))
+
 Case.fields = relationship('CaseField', order_by=CaseField.case_field_id,
                            back_populates='parent_case', cascade='all, delete-orphan')
 
