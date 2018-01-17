@@ -4,7 +4,7 @@ import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 
-engine = create_engine('sqlite:///:memory:', echo=True)
+engine = create_engine('sqlite:///:memory:', echo=False)
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
@@ -20,11 +20,22 @@ class CaseField(Base):
     __tablename__ = 'case_field'
 
     case_field_id = Column(Integer, primary_key=True, autoincrement=True)
-    case_id = Column(Integer, ForeignKey('case.case_id'), nullable=False)
+    case_id = Column(Integer, ForeignKey('case.case_id'), nullable=True)
     name = Column(String, nullable=False)
-    parent = Column(String, nullable=True)
+    parent_id = Column(Integer, ForeignKey('case_field.case_field_id'), nullable=True)
 
     parent_case = relationship('Case', back_populates='fields')
+    child_field = relationship('CaseField')
+    parent_field = relationship('CaseField', remote_side=[case_field_id])
+
+    def deep_copy(self):
+        new_case_field = CaseField(
+            name = self.name)
+        for child in self.child_field:
+            new_case_field.child_field.append(child.deep_copy())
+        for spec in self.specs:
+            new_case_field.specs.append(spec.deep_copy())
+        return new_case_field
 
 Case.fields = relationship('CaseField', order_by=CaseField.case_field_id,
                            back_populates='parent_case', cascade='all, delete-orphan')
@@ -39,6 +50,13 @@ class ParameterSpec(Base):
     property_value = Column(String, nullable=False)
 
     parent_casefield = relationship('CaseField', back_populates='specs')
+
+    def deep_copy(self):
+        new_param_spec = ParameterSpec(
+            property_name = self.property_name,
+            property_value = self.property_value
+        )
+        return new_param_spec
 
 CaseField.specs = relationship('ParameterSpec', back_populates='parent_casefield', cascade='all, delete-orphan')
 
@@ -85,41 +103,34 @@ class MintStoreValues(Base):
 
 MintStore.values = relationship("MintStoreValues", back_populates="parent_mintstore", cascade="all, delete-orphan")
 
-
-
-
-
-
-
-
-
-
-
 Base.metadata.create_all(engine)
 
-density = CaseField(name="Density", parent=None)
 
-unit = ParameterSpec(property_name="Unit", property_value="Kg/s")
-mins = ParameterSpec(property_name="Min", property_value="1")
-maxs = ParameterSpec(property_name="Max", property_value="2")
+if __name__ == "__main__":
 
-density.specs.append(unit)
-density.specs.append(mins)
-density.specs.append(maxs)
+    density = CaseField(name="Density", parent=None)
 
-mixer = Case(name="Mixer")
-mixer.fields.append(density)
-mixer.fields.append(CaseField(name="Rho",parent=None))
-mixer.fields.append(CaseField(name="Tank",parent=None))
-mixer.fields.append(CaseField(name="Num_Blades",parent="Tank"))
-mixer.fields.append(CaseField(name="Blade_Angle",parent="Tank"))
+    unit = ParameterSpec(property_name="Unit", property_value="Kg/s")
+    mins = ParameterSpec(property_name="Min", property_value="1")
+    maxs = ParameterSpec(property_name="Max", property_value="2")
+    
+    density.specs.append(unit)
+    density.specs.append(mins)
+    density.specs.append(maxs)
+    
+    mixer = Case(name="Mixer")
+    mixer.fields.append(density)
+    mixer.fields.append(CaseField(name="Rho",parent=None))
+    mixer.fields.append(CaseField(name="Tank",parent=None))
+    mixer.fields.append(CaseField(name="Num_Blades",parent="Tank"))
+    mixer.fields.append(CaseField(name="Blade_Angle",parent="Tank"))
 
-session = sessionmaker(bind=engine)()
+    session = sessionmaker(bind=engine)()
+    
+    session.add(mixer)
+    
+    num_cases = session.query(Case).count()
+    num_fields = session.query(CaseField).count()
+    num_specs = session.query(ParameterSpec).count()
 
-session.add(mixer)
-
-num_cases = session.query(Case).count()
-num_fields = session.query(CaseField).count()
-num_specs = session.query(ParameterSpec).count()
-
-print("Found", num_cases,"cases", "with", num_fields, "fields", 'and', num_specs, "specs")
+    print("Found", num_cases,"cases", "with", num_fields, "fields", 'and', num_specs, "specs")
