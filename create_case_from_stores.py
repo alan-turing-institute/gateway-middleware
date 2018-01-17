@@ -134,6 +134,9 @@ if __name__ == "__main__":
     mycase.fields.append(new_fluid1)
     mycase.fields.append(new_fluid2)
 
+# test the prefix has been added
+    print("prefix to fluid2 viscosity ",mycase.fields[2].child_field[1].specs[-1].property_value)
 
-#
+# try minting a case
 
+    
