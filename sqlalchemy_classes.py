@@ -32,13 +32,13 @@ class CaseField(Base):
         new_case_field = CaseField(
             name = self.name)
         for child in self.child_fields:
-            new_case_field.child_field.append(child.deep_copy())
+            new_case_field.child_fields.append(child.deep_copy())
         for spec in self.specs:
             new_case_field.specs.append(spec.deep_copy())
         return new_case_field
 
     def prepend_prefix(self, prefix):
-        for child in self.child_field:
+        for child in self.child_fields:
             child.prepend_prefix(prefix)
         prefix_spec = [spec for spec in self.specs if spec.property_name == "prefix"]
         if prefix_spec:
