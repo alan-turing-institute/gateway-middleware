@@ -16,8 +16,8 @@ def make_tank_store(session):
 
     tankA_length = CaseField(name="length")
     tankA_width = CaseField(name="width")    
-    tankA_length_min = ParameterSpec(property_name="min", property_value="2")
-    tankA_length_max = ParameterSpec(property_name="max", property_value="4")
+    tankA_length_min = ParameterSpec(property_name="min", property_value="0.2")
+    tankA_length_max = ParameterSpec(property_name="max", property_value="40")
     tankA_length_default = ParameterSpec(property_name="default", property_value="3")
     tankA_length_units = ParameterSpec(property_name="units", property_value="m")
     tankA_length.specs.append(tankA_length_min)
@@ -25,8 +25,8 @@ def make_tank_store(session):
     tankA_length.specs.append(tankA_length_default)
     tankA_length.specs.append(tankA_length_units)
 
-    tankA_width_min = ParameterSpec(property_name="min", property_value="2")
-    tankA_width_max = ParameterSpec(property_name="max", property_value="4")
+    tankA_width_min = ParameterSpec(property_name="min", property_value="0.1")
+    tankA_width_max = ParameterSpec(property_name="max", property_value="40")
     tankA_width_default = ParameterSpec(property_name="default", property_value="3")
     tankA_width_units = ParameterSpec(property_name="units", property_value="m")
     tankA_width.specs.append(tankA_width_min)
@@ -58,7 +58,7 @@ def make_fluid_store(session):
     fluidA_density.specs.append(fluidA_density_units)
 
     fluidA_viscosity_min = ParameterSpec(property_name="min", 
-                                         property_value="0.2")
+                                         property_value="0.01")
     fluidA_viscosity_max = ParameterSpec(property_name="max", 
                                          property_value="4.")
     fluidA_viscosity_default = ParameterSpec(property_name="default", 

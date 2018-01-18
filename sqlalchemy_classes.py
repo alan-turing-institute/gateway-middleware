@@ -99,9 +99,18 @@ class MintStore(Base):
     mintstore_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String,nullable=False)
     version = Column(Integer, nullable=False)
+    
+    def deep_copy(self):
+        new_mintstore = MintStore(
+            name = self.name,
+            version= self.version
+        )
+        for val in self.values:
+            new_mintstore.values.append(val.deep_copy())
+        return new_mintstore
 
-class MintStoreValues(Base):
-    __tablename__ = "mintstorevalues"
+class MintStoreValue(Base):
+    __tablename__ = "mintstorevalue"
 
     mintstorevalue_id = Column(Integer, primary_key=True,autoincrement=True)
     mintstore_id = Column(Integer,ForeignKey('mintstore.mintstore_id'),nullable=False)
@@ -110,6 +119,16 @@ class MintStoreValues(Base):
 
     parent_mintstore = relationship("MintStore", back_populates='values')
 
-MintStore.values = relationship("MintStoreValues", back_populates="parent_mintstore", cascade="all, delete-orphan")
+    def deep_copy(self):
+        new_mint_store_val = MintStoreValue(
+            mintstore_id = self.mintstore_id,
+            parameter_name = self.parameter_name,
+            parameter_value = self.parameter_value
+        )
+        return new_mint_store_val
+
+    
+
+MintStore.values = relationship("MintStoreValue", back_populates="parent_mintstore", cascade="all, delete-orphan")
 
 Base.metadata.create_all(engine)
