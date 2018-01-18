@@ -31,7 +31,7 @@ class CaseField(Base):
     def deep_copy(self):
         new_case_field = CaseField(
             name = self.name)
-        for child in self.child_field:
+        for child in self.child_fields:
             new_case_field.child_field.append(child.deep_copy())
         for spec in self.specs:
             new_case_field.specs.append(spec.deep_copy())
