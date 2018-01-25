@@ -4,7 +4,7 @@ import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 
-engine = create_engine('sqlite:///:memory:', echo=False)
+engine = create_engine('sqlite:///test.db', echo=False)
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 

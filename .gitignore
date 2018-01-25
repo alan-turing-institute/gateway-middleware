@@ -1,0 +1,7 @@
+# IDE stuff
+
+# Python stuff
+__pycache__
+
+# Test database
+test.db

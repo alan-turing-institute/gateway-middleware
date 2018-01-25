@@ -183,4 +183,6 @@ if __name__ == "__main__":
     
     for v in minted_case.values:
         print("Minted case has %s = %s" % (v.name, v.value))
+
+    session.commit()
         
