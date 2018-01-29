@@ -89,7 +89,7 @@ class CaseHeaderSchema(ma.ModelSchema):
 class JobHeaderSchema(ma.ModelSchema):
     class Meta:
         model = Case
-        fields = ("mintedcase_id", "name", 'user', 'links')
+        fields = ("mintedcase_id", 'mintedcase_name', 'user', 'links')
     links = ma.Hyperlinks({
         'self': ma.URLFor('jobapi', job_id='<mintedcase_id>'),
         'case': ma.URLFor('caseapi', case_id='<case_id>')

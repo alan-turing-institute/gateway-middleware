@@ -18,7 +18,9 @@ pagination_args = {
 }
 
 job_args = {
-    'case_id': fields.Int(required=True)
+    'case_id': fields.Int(required=True),
+    'author': fields.Str(required=True),
+    'name': fields.Str(required=True)
 }
 
 class CasesApi(Resource):
@@ -48,12 +50,15 @@ class CaseApi(Resource):
 
 
 class JobsApi(Resource):
-    @use_kwargs(job_args, locations=('headers',))
-    def post(self, case_id):
+    @use_kwargs(job_args, locations=('json',))
+    def post(self, case_id, name, author):
         """
         Create a new job based on a case
         """
-        return { 'case': case_id }
+        new_minted_case = MintedCase(mintedcase_name=name, user=author, case_id=case_id)
+        db.session.add(new_minted_case)
+        db.session.commit()
+        return {'mintedcase_id': new_minted_case.mintedcase_id}
 
     @use_kwargs(pagination_args)
     def get(self, page, per_page):

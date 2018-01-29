@@ -73,6 +73,7 @@ CaseField.specs = db.relationship('ParameterSpec', back_populates='parent_casefi
 
 class MintedCase(Base):
     __tablename__ = 'mintedcase'
+    __table_args__ = (db.UniqueConstraint('user', 'mintedcase_name', name='unique_user_and_name'),)
 
     mintedcase_id = db.Column(db.Integer,primary_key=True, autoincrement = True)
     case_id = db.Column(db.Integer, db.ForeignKey('case.case_id'), nullable=False)
