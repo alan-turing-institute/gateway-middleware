@@ -1,5 +1,5 @@
 
-### Current status (18th Jan 5:30pm)
+### Current status (29th Jan 1:44pm)
 
 * renamed app.py to sqlalchemy_classes.py and removed everything that wasn't related to defining the classes
 * separated out lengthy code to create tank, fluid cases, and milk,water,tankX mintstore into separate modules.
@@ -14,7 +14,17 @@ python create_and_mint_case_using_stores.py
 FLASK_APP=app.py flask run
 ```
 
+The Flask app creates a server at `localhost:5000`.
+It supports the following endpoints:
+* `/case[?page=N&per_page=N]`: Get a listing of all the cases in the system.
+    * `page` gives the page of output that you are requesting. The first page is 1 (also the default)
+    * `per_page` gives the number of results per page to return
+* `/cases/<id>`: Gets the full details for a single case. This retreives the entire case and
+    serialises it for the user. 
+
 * Not yet implemented:
-   * having the minted case know what mintstore names and versions its
-values came from.
+   * having the minted case know what mintstore names and versions its values came from.
    * marshmallow serialization/deserialization of the "Minted" half of the data model.
+   * Job endpoints
+   * Storage of script data
+

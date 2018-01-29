@@ -1,16 +1,25 @@
-from flask_restful import Resource, Api, abort
+from flask_restful import Resource, Api, abort, reqparse
 
 from sqlalchemy_classes import app, db, Case
 from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema
+
+from webargs import fields
+from webargs.flaskparser import use_args
 
 api = Api(app)
 
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
 
+case_args = {
+    'page': fields.Int(missing=1, validate= lambda p: p > 0),
+    'per_page': fields.Int(missing=10, validate= lambda p: p > 0)
+}
+
 class CasesApi(Resource):
-    def get(self):
-        return case_header_schema.dump(Case.query.all(), many=True)
+    @use_args(case_args)
+    def get(self, args):
+        return case_header_schema.dump(Case.query.paginate(args['page'], args['per_page'], False).items, many=True)
 
 
 class CaseApi(Resource):
