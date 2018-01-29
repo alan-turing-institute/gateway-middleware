@@ -19,6 +19,11 @@ It supports the following endpoints:
 * `/case[?page=N&per_page=N]`: Get a listing of all the cases in the system.
     * `page` gives the page of output that you are requesting. The first page is 1 (also the default)
     * `per_page` gives the number of results per page to return
+    Rather than returning and error, the pagination will return an empty list when you ask for a page
+    that does not exist (i.e off the end). I am not returning any information about whether the
+    next page may or may not exist. This is because I am expecting this to be used as part of an
+    infinite scrolling system, where there is no explicit display to the user to ask for more 
+    (or if there a button to support error situations, returning no extra data is a valid respose).
 * `/cases/<id>`: Gets the full details for a single case. This retreives the entire case and
     serialises it for the user. 
 
