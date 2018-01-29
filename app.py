@@ -3,7 +3,7 @@ from flask_restful import Resource, Api, abort, reqparse
 from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy_classes import app, db, Case, MintedCase
-from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema, JobHeaderSchema
+from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema, JobHeaderSchema, JobSchema
 
 from webargs import fields
 from webargs.flaskparser import use_kwargs
@@ -13,6 +13,7 @@ api = Api(app)
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
 job_header_schema = JobHeaderSchema()
+job_schema = JobSchema()
 
 pagination_args = {
     'page': fields.Int(missing=1, validate= lambda p: p > 0),
@@ -78,7 +79,16 @@ class JobApi(Resource):
         """
         Get the specified job
         """        
-        return { 'job_id': job_id }
+        try:
+            job_id = int(job_id)
+        except ValueError as e:
+            print(e)
+            abort(404, message= "Sorry no such job {}". format(job_id))
+        job = MintedCase.query.get(job_id)
+        if job is not None:
+            return job_schema.dump(job)
+        else:
+            abort(404, message="Sorry, job {} not found".format(job_id))
 
 
 api.add_resource(CasesApi, '/case')

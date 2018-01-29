@@ -1,7 +1,7 @@
 
 from flask_marshmallow import Marshmallow
 
-from sqlalchemy_classes import app, Case, CaseField, ParameterSpec
+from sqlalchemy_classes import app, Case, CaseField, ParameterSpec, MintedCase, MintedValue
 
 ma = Marshmallow(app)
 
@@ -88,9 +88,19 @@ class CaseHeaderSchema(ma.ModelSchema):
 
 class JobHeaderSchema(ma.ModelSchema):
     class Meta:
-        model = Case
+        model = MintedCase
         fields = ("mintedcase_id", 'mintedcase_name', 'user', 'links')
     links = ma.Hyperlinks({
         'self': ma.URLFor('jobapi', job_id='<mintedcase_id>'),
         'case': ma.URLFor('caseapi', case_id='<case_id>')
     })
+
+class JobSchema(ma.ModelSchema):
+    class Meta:
+        model = MintedCase
+        fields = ("mintedcase_id", 'mintedcase_name', 'user', 'values')
+    values = ma.List(ma.Nested("JobValueSchema"))
+
+class JobValueSchema(ma.ModelSchema):
+    class Meta:
+        model = MintedValue
