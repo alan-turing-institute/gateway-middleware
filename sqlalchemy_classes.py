@@ -26,8 +26,8 @@ class CaseField(Base):
     parent_id = db.Column(db.Integer, db.ForeignKey('case_field.case_field_id'), nullable=True)
 
     parent_case = db.relationship('Case', back_populates='fields')
-    child_fields = db.relationship('CaseField')
-    parent_field = db.relationship('CaseField', remote_side=[case_field_id])
+    child_fields = db.relationship('CaseField', 
+                backref=db.backref('parent_field', remote_side=[case_field_id]))
 
     def deep_copy(self):
         new_case_field = CaseField(

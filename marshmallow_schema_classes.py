@@ -22,8 +22,8 @@ class ParamSpecSchema(ma.ModelSchema):
 class CaseFieldSchema(ma.ModelSchema):
     class Meta:
         model = CaseField
-        fields = ("case_field_id","case_id","name","child_field","specs")
-    child_field = ma.Nested("self",many=True)
+        fields = ("name","child_fields","specs")
+    child_fields = ma.Nested("self", many=True)
     specs = ma.List(ma.Nested("ParamSpecSchema"))
         
     def make_case_field(self,data):

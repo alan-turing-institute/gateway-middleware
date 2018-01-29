@@ -14,8 +14,6 @@ def make_mint_store(session):
     milk_viscosity = MintStoreValue(parameter_name="viscosity",
                                      parameter_value="2.3",
                                      parent_mintstore=milk)
-    # milk.values.append(milk_density)
-    # milk.values.append(milk_viscosity)
     
 
     # create water in the mintstore table
@@ -26,8 +24,7 @@ def make_mint_store(session):
     water_viscosity = MintStoreValue(parameter_name="viscosity",
                                       parameter_value="1.2",
                                       parent_mintstore=water)
-    # water.values.append(water_density)
-    # water.values.append(water_viscosity)
+
 
     tankX = MintStore(name="TankX",version="1")
     tank_width = MintStoreValue(parameter_name="width",
@@ -36,10 +33,8 @@ def make_mint_store(session):
     tank_length = MintStoreValue(parameter_name="length",
                                   parameter_value="2.56",
                                   parent_mintstore=tankX)
-    
-    # tankX.values.append(tank_width)
-    # tankX.values.append(tank_length)
 
     session.add(milk)
     session.add(water)
     session.add(tankX)
+    session.commit()

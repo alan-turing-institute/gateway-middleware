@@ -13,11 +13,18 @@ Then...
 stores.
 """
 
-from sqlalchemy_classes import *
+from sqlalchemy_classes import app, db, Case, CaseField
 
 from create_case_store import *
 
 from create_mint_store import *
+
+from flask_restful import Resource, Api, abort
+
+from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema
+
+api = Api(app)
+
 
 
 def apply_mintstore_to_case_field(mintstore, case_field):
@@ -39,8 +46,6 @@ def apply_mintstore_to_case_field(mintstore, case_field):
                 print("  Setting values for %s" % cf.name)
                 minted_value_list.append(apply_mintstore_value_to_case_field(mv,cf))
                 break
-            pass
-        pass
     return minted_value_list
                                          
 
@@ -64,19 +69,14 @@ def apply_mintstore_value_to_case_field(mintstore_value, case_field):
                 min_val = float(spec.property_value)
             except(TypeError):
                 print("Min value of %s not a number?" % case_field.name)
-                pass
         elif spec.property_name == "max":
             try:
                 max_val = float(spec.property_value)
             except(TypeError):
                 print("Max value of %s not a number?" % case_field.name)
-                pass
-            pass
 ## get prefix - will be prepended to MintedValue name
         elif spec.property_name == "prefix":
             prefix = spec.property_value
-            pass
-        pass
     if min_val and max_val:
         if mint_param_val < min_val or mint_param_val > max_val:
             raise ValueError("Out of range!")
@@ -97,8 +97,6 @@ def recursively_get_case_fields_with_specs(case_field):
 #### ^ what a horrible hack!! we only want to apply MintedStoreValues to those CaseFields
 ### that have specs, but even 'top-level' things like "tank" or "fluid" can have a prefix...
             output_list += [case_field]
-            pass
-        pass
     for child in case_field.child_fields:
         output_list += recursively_get_case_fields_with_specs(child)
     return output_list
@@ -116,7 +114,6 @@ def mint_case(name, case, user, mintstoremap = {} ):
         if not mintstore:
             raise KeyError("Mintstore %s not found in DB" % v)
         new_minted_case.values += apply_mintstore_to_case_field(mintstore,case_field)
-        pass
 
     return new_minted_case
 
@@ -126,7 +123,7 @@ if __name__ == "__main__":
     
 ## start a DB session
 
-    session = sessionmaker(bind=engine)()
+    session = db.session
 
     ########### preamble - pretend this bit is being done beforehand #######
     
@@ -161,6 +158,7 @@ if __name__ == "__main__":
     mycase.fields.append(new_fluid2)
 ### save this to the DB
     session.add(mycase)
+    session.commit()
     
 ### test the prefix has been added
 ##    print("prefix to fluid2 viscosity ",mycase.fields[2].child_field[1].specs[-1].property_value)
@@ -178,7 +176,7 @@ if __name__ == "__main__":
         "fluid 2" : "Water"
     }
     
-    minted_case = mint_case("TESTMINT",mycase, "nbarlow",mintstoremap)  
+    minted_case = mint_case("TESTMINT", mycase, "nbarlow", mintstoremap)  
     print("\n ==== Created a MintedCase ====== \n")
     
     for v in minted_case.values:
