@@ -104,7 +104,7 @@ def recursively_get_case_fields_with_specs(case_field):
 
 def mint_case(name, case, user, mintstoremap = {} ):
 
-    new_minted_case = MintedCase(mintedcase_name=name, user=user)
+    new_minted_case = MintedCase(mintedcase_name=name, user=user, parent_case=case)
 
     for k,v in mintstoremap.items():
         case_field = session.query(CaseField).filter(CaseField.name==k).first().deep_copy()

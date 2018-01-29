@@ -75,8 +75,11 @@ class MintedCase(Base):
     __tablename__ = 'mintedcase'
 
     mintedcase_id = db.Column(db.Integer,primary_key=True, autoincrement = True)
+    case_id = db.Column(db.Integer, db.ForeignKey('case.case_id'), nullable=False)
     mintedcase_name = db.Column(db.String, nullable = False)
     user = db.Column(db.String, nullable = False)
+
+    parent_case = db.relationship('Case')
 
 
 class MintedValue(Base):
