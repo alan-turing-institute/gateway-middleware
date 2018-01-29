@@ -27,8 +27,11 @@ It supports the following endpoints:
 * `/cases/<id>`: Gets the full details for a single case. This retreives the entire case and
     serialises it for the user. 
 * `/job/`: 
-    * `POST`: Create a new job. 
-        * `case_id`: header argument for what kind of job to create
+    * `GET`: See all existing jobs. Takes query arguments.
+        * `page` gives the page of output that you are requesting. The first page is 1 (also the default).
+        * `per_page` gives the number of results per page to return.
+    * `POST`: Create a new job. Takes header arguments.
+        * `case_id`: The case id for the case this job is based off.
 
 * Not yet implemented:
    * having the minted case know what mintstore names and versions its values came from.
