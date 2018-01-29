@@ -26,6 +26,9 @@ It supports the following endpoints:
     (or if there a button to support error situations, returning no extra data is a valid respose).
 * `/cases/<id>`: Gets the full details for a single case. This retreives the entire case and
     serialises it for the user. 
+* `/job/`: 
+    * `POST`: Create a new job. 
+        * `case_id`: header argument for what kind of job to create
 
 * Not yet implemented:
    * having the minted case know what mintstore names and versions its values came from.
