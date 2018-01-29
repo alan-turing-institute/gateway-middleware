@@ -10,7 +10,8 @@ and extend to Minted stuff.
 
 To run:
 ```
-python -i create_and_mint_case_using_stores.py
+python create_and_mint_case_using_stores.py
+FLASK_APP=app.py flask run
 ```
 
 * Not yet implemented:
