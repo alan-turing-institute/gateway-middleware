@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy_classes import app, db, Case, MintedCase
 from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema, JobHeaderSchema, JobSchema
 
-from webargs import fields
+from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
 
 api = Api(app)
@@ -24,6 +24,16 @@ job_args = {
     'case_id': fields.Int(required=True),
     'author': fields.Str(required=True),
     'name': fields.Str(required=True)
+}
+
+job_argument_args = {
+    'name': fields.Str(required=True),
+    'value': fields.Str(required=True)
+}
+
+job_patch_args = {
+    'name': fields.Str(),
+    'values': fields.List(fields.Nested(job_argument_args))
 }
 
 class CasesApi(Resource):
@@ -89,6 +99,17 @@ class JobApi(Resource):
             return job_schema.dump(job)
         else:
             abort(404, message="Sorry, job {} not found".format(job_id))
+
+    @use_kwargs(job_patch_args)
+    def patch(self, job_id, name, values):
+        """
+        Update the given details for this job
+        """
+        if name is missing:
+            name = ''
+        if values is missing:
+            values = ''
+        return { 'name': name, 'job_id': job_id, 'values': values}
 
 
 api.add_resource(CasesApi, '/case')
