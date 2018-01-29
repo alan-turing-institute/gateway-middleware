@@ -1,8 +1,6 @@
 
 from flask_marshmallow import Marshmallow
 
-from marshmallow import fields
-
 from sqlalchemy_classes import app, Case, CaseField, ParameterSpec
 
 ma = Marshmallow(app)
@@ -25,8 +23,8 @@ class CaseFieldSchema(ma.ModelSchema):
     class Meta:
         model = CaseField
         fields = ("case_field_id","case_id","name","child_field","specs")
-    child_field = fields.Nested("self",many=True)
-    specs = fields.List(fields.Nested("ParamSpecSchema"))
+    child_field = ma.Nested("self",many=True)
+    specs = ma.List(ma.Nested("ParamSpecSchema"))
         
     def make_case_field(self,data):
         cf = CaseField(
@@ -52,7 +50,7 @@ class CaseSchema(ma.ModelSchema):
     class Meta:
         model = Case
         fields = ("case_id","name","fields")
-    fields = fields.List(fields.Nested("CaseFieldSchema"))
+    fields = ma.List(ma.Nested("CaseFieldSchema"))
 
     def make_case(self,data):
         c = Case(
@@ -67,3 +65,23 @@ class CaseSchema(ma.ModelSchema):
                 c.fields.append(case_field)
         return c
             
+class CaseHeaderSchema(ma.ModelSchema):
+    class Meta:
+        model = Case
+        fields = ("case_id", "name", 'links')
+    links = ma.Hyperlinks({
+        'self': ma.URLFor('caseapi', case_id='<case_id>')
+    })
+
+    def make_case(self, data):
+        c = Case(
+            case_id = data.get("case_id"),
+            name = data.get("name")
+        )
+        if data.get("fields"):
+            cfs = CaseFieldSchema()
+            for child in data.get("fields"):
+                case_field = cfs.make_case_field(child)
+                case_field.case_id = c.case_id
+                c.fields.append(case_field)
+        return c

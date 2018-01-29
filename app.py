@@ -1,15 +1,16 @@
 from flask_restful import Resource, Api, abort
 
 from sqlalchemy_classes import app, db, Case
-from marshmallow_schema_classes import CaseSchema
+from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema
 
 api = Api(app)
 
 case_schema = CaseSchema()
+case_header_schema = CaseHeaderSchema()
 
 class CasesApi(Resource):
     def get(self):
-        return case_schema.dump(Case.query.all(), many=True)
+        return case_header_schema.dump(Case.query.all(), many=True)
 
 
 class CaseApi(Resource):
