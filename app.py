@@ -1,5 +1,7 @@
 from flask_restful import Resource, Api, abort, reqparse
 
+from sqlalchemy.exc import IntegrityError
+
 from sqlalchemy_classes import app, db, Case, MintedCase
 from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema, JobHeaderSchema
 
@@ -55,9 +57,13 @@ class JobsApi(Resource):
         """
         Create a new job based on a case
         """
-        new_minted_case = MintedCase(mintedcase_name=name, user=author, case_id=case_id)
-        db.session.add(new_minted_case)
-        db.session.commit()
+        try:
+            new_minted_case = MintedCase(mintedcase_name=name, user=author, case_id=case_id)
+            db.session.add(new_minted_case)
+            db.session.commit()
+        except IntegrityError as e:
+            print(e)
+            abort(404, message="Sorry, these parameters have already been used")
         return {'mintedcase_id': new_minted_case.mintedcase_id}
 
     @use_kwargs(pagination_args)
