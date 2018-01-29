@@ -1,9 +1,13 @@
 
-import marshmallow as ma
+from flask_marshmallow import Marshmallow
 
-from sqlalchemy_classes import *
+from marshmallow import fields
 
-class ParamSpecSchema(ma.Schema):
+from sqlalchemy_classes import app, Case, CaseField, ParameterSpec
+
+ma = Marshmallow(app)
+
+class ParamSpecSchema(ma.ModelSchema):
     class Meta:
         model = ParameterSpec
         fields = ("parameterspec_id","property_name","property_value")
@@ -17,12 +21,12 @@ class ParamSpecSchema(ma.Schema):
         return p
 
 
-class CaseFieldSchema(ma.Schema):
+class CaseFieldSchema(ma.ModelSchema):
     class Meta:
         model = CaseField
         fields = ("case_field_id","case_id","name","child_field","specs")
-    child_field = ma.fields.Nested("self",many=True)
-    specs = ma.fields.List(ma.fields.Nested("ParamSpecSchema"))
+    child_field = fields.Nested("self",many=True)
+    specs = fields.List(fields.Nested("ParamSpecSchema"))
         
     def make_case_field(self,data):
         cf = CaseField(
@@ -44,11 +48,11 @@ class CaseFieldSchema(ma.Schema):
 
     
      
-class CaseSchema(ma.Schema):
+class CaseSchema(ma.ModelSchema):
     class Meta:
         model = Case
         fields = ("case_id","name","fields")
-    fields = ma.fields.List(ma.fields.Nested("CaseFieldSchema"))
+    fields = fields.List(fields.Nested("CaseFieldSchema"))
 
     def make_case(self,data):
         c = Case(
