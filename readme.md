@@ -32,6 +32,22 @@ It supports the following endpoints:
         * `per_page` gives the number of results per page to return.
     * `POST`: Create a new job. Takes header arguments.
         * `case_id`: The case id for the case this job is based off.
+* `/job/<id>`:
+    * `GET`: Get the details of the current job
+    * `PATCH`: Update details of the current job. Takes a JSON object of what to replace.
+        Only replace fields that are provided. The required structure is:
+        ```json
+        {
+            "name": "New name of the job",
+            "values": [
+                {
+                    "name": "parameter name",
+                    "value": "parameter value"
+                },
+                ...
+            ]
+        }
+        ```
 
 * Not yet implemented:
    * having the minted case know what mintstore names and versions its values came from.
