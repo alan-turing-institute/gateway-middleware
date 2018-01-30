@@ -2,7 +2,7 @@ from flask_restful import Resource, Api, abort, reqparse
 
 from sqlalchemy.exc import IntegrityError
 
-from sqlalchemy_classes import app, db, Case, MintedCase
+from sqlalchemy_classes import app, db, Case, MintedCase, MintedValue
 from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema, JobHeaderSchema, JobSchema
 
 from webargs import fields, missing
@@ -113,11 +113,17 @@ class JobApi(Resource):
             abort(404, message="Sorry, job {} not found".format(job_id))
         if name is not missing:
             job.mintedcase_name = name
+        if values is not missing:
+            for value in job.values:
+                db.session.delete(value)
+            for value in values:
+                new_minted_value = MintedValue(name= value['name'], value= value['value'], parent_mintedcase=job)
+                job.values.append(new_minted_value)
         try:
             db.session.commit()
         except IntegrityError as e:
             print(e)
-            abort(404, message="Sorry. Failed to commit your requrest")
+            abort(404, message="Sorry. Failed to commit your request")
         return { 'status': 'success'}
 
 
