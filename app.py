@@ -105,11 +105,20 @@ class JobApi(Resource):
         """
         Update the given details for this job
         """
-        if name is missing:
-            name = ''
-        if values is missing:
-            values = ''
-        return { 'name': name, 'job_id': job_id, 'values': values}
+        if name is missing and values is missing:
+            # You don't actually need to change anything
+            return { 'status': 'success'}
+        job = MintedCase.query.get(job_id)
+        if job is None:
+            abort(404, message="Sorry, job {} not found".format(job_id))
+        if name is not missing:
+            job.mintedcase_name = name
+        try:
+            db.session.commit()
+        except IntegrityError as e:
+            print(e)
+            abort(404, message="Sorry. Failed to commit your requrest")
+        return { 'status': 'success'}
 
 
 api.add_resource(CasesApi, '/case')
@@ -118,4 +127,4 @@ api.add_resource(JobsApi, '/job')
 api.add_resource(JobApi, '/job/<job_id>')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
