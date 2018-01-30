@@ -1,4 +1,5 @@
 from flask_restful import Resource, Api, abort, reqparse
+from flask_cors import CORS 
 
 from sqlalchemy.exc import IntegrityError
 
@@ -9,6 +10,7 @@ from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
 
 api = Api(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
