@@ -9,9 +9,16 @@
 and extend to Minted stuff.
 
 To run:
-```
+```bash
 python create_and_mint_case_using_stores.py
 FLASK_APP=app.py flask run
+```
+
+If you want to run it through Docker you can do so with:
+
+```bash
+docker build -t sgdm .
+docker run -p 5000:5000 sgdm
 ```
 
 The Flask app creates a server at `localhost:5000`.
