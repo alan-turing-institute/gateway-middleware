@@ -1,0 +1,15 @@
+# Test database
+test.db
+
+# Generated files
+.vscode/
+__pycache__/
+
+# Unneeded files
+.gitignore
+readme.md
+.pylintrc
+
+# Temporary files
+*~
+.#*

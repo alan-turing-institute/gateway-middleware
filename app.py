@@ -16,7 +16,7 @@ from webargs.flaskparser import use_kwargs
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sg:sg@postgres/sg'
 
 init_database(app)
 
