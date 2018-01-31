@@ -1,16 +1,36 @@
-from flask_restful import Resource, Api, abort, reqparse
-from flask_cors import CORS 
+#! /usr/bin/env python3
+"""
+The main entry point for this flask app
+"""
+
+from flask import Flask
+from flask_restful import Resource, Api, abort
+from flask_cors import CORS
 
 from sqlalchemy.exc import IntegrityError
 
-from sqlalchemy_classes import app, db, Case, MintedCase, MintedValue
-from marshmallow_schema_classes import CaseSchema, CaseHeaderSchema, JobHeaderSchema, JobSchema
+from sqlalchemy_classes import init_database
 
 from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
 
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+
+init_database(app)
+
+from sqlalchemy_classes import MintedCase, MintedValue, Case, db  # noqa
+from marshmallow_schema_classes import init_marshmallow  # noqa
+
+init_marshmallow(app)
+
+from marshmallow_schema_classes import (CaseSchema, CaseHeaderSchema,
+                                        JobHeaderSchema, JobSchema)  # noqa
+
+
 api = Api(app)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r'/*': {'origins': '*'}})
 
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
@@ -18,8 +38,8 @@ job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
 
 pagination_args = {
-    'page': fields.Int(missing=1, validate= lambda p: p > 0),
-    'per_page': fields.Int(missing=10, validate= lambda p: p > 0)
+    'page': fields.Int(missing=1, validate=lambda p: p > 0),
+    'per_page': fields.Int(missing=10, validate=lambda p: p > 0)
 }
 
 job_args = {
@@ -38,13 +58,20 @@ job_patch_args = {
     'values': fields.List(fields.Nested(job_argument_args))
 }
 
+
 class CasesApi(Resource):
+    """
+    Api for /case
+    """
     @use_kwargs(pagination_args)
     def get(self, page, per_page):
         """
         Get all the cases that are in the requested range
-        """        
-        return case_header_schema.dump(Case.query.paginate(page, per_page, False).items, many=True)
+        """
+        return case_header_schema.dump(Case.query.paginate(page,
+                                                           per_page,
+                                                           False
+                                                           ).items, many=True)
 
 
 class CaseApi(Resource):
@@ -56,12 +83,12 @@ class CaseApi(Resource):
             case_id = int(case_id)
         except ValueError as e:
             print(e)
-            abort(404, message= "Sorry no such case {}". format(case_id))
+            abort(404, message='Sorry no such case {}'. format(case_id))
         case = Case.query.get(case_id)
         if case is not None:
             return case_schema.dump(case)
         else:
-            abort(404, message="Sorry, case {} not found".format(case_id))
+            abort(404, message='Sorry, case {} not found'.format(case_id))
 
 
 class JobsApi(Resource):
@@ -71,36 +98,42 @@ class JobsApi(Resource):
         Create a new job based on a case
         """
         try:
-            new_minted_case = MintedCase(mintedcase_name=name, user=author, case_id=case_id)
+            new_minted_case = MintedCase(mintedcase_name=name,
+                                         user=author, case_id=case_id)
             db.session.add(new_minted_case)
             db.session.commit()
         except IntegrityError as e:
             print(e)
-            abort(404, message="Sorry, these parameters have already been used")
+            abort(404,
+                  message='Sorry, these parameters have already been used')
         return {'mintedcase_id': new_minted_case.mintedcase_id}
 
     @use_kwargs(pagination_args)
     def get(self, page, per_page):
         """
         Get all the jobs that are in the requested range
-        """        
-        return job_header_schema.dump(MintedCase.query.paginate(page, per_page, False).items, many=True)
+        """
+        return job_header_schema.dump(MintedCase.query.paginate(page,
+                                                                per_page,
+                                                                False).items,
+                                      many=True)
+
 
 class JobApi(Resource):
     def get(self, job_id):
         """
         Get the specified job
-        """        
+        """
         try:
             job_id = int(job_id)
         except ValueError as e:
             print(e)
-            abort(404, message= "Sorry no such job {}". format(job_id))
+            abort(404, message='Sorry no such job {}'. format(job_id))
         job = MintedCase.query.get(job_id)
         if job is not None:
             return job_schema.dump(job)
         else:
-            abort(404, message="Sorry, job {} not found".format(job_id))
+            abort(404, message='Sorry, job {} not found'.format(job_id))
 
     @use_kwargs(job_patch_args)
     def patch(self, job_id, name, values):
@@ -109,24 +142,26 @@ class JobApi(Resource):
         """
         if name is missing and values is missing:
             # You don't actually need to change anything
-            return { 'status': 'success'}
+            return {'status': 'success'}
         job = MintedCase.query.get(job_id)
         if job is None:
-            abort(404, message="Sorry, job {} not found".format(job_id))
+            abort(404, message='Sorry, job {} not found'.format(job_id))
         if name is not missing:
             job.mintedcase_name = name
         if values is not missing:
             for value in job.values:
                 db.session.delete(value)
             for value in values:
-                new_minted_value = MintedValue(name= value['name'], value= value['value'], parent_mintedcase=job)
+                new_minted_value = MintedValue(name=value['name'],
+                                               value=value['value'],
+                                               parent_mintedcase=job)
                 job.values.append(new_minted_value)
         try:
             db.session.commit()
         except IntegrityError as e:
             print(e)
-            abort(404, message="Sorry. Failed to commit your request")
-        return { 'status': 'success'}
+            abort(404, message='Sorry. Failed to commit your request')
+        return {'status': 'success'}
 
 
 api.add_resource(CasesApi, '/case')
