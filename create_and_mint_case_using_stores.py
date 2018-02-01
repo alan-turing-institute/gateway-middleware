@@ -198,7 +198,7 @@ if __name__ == '__main__':
 
         # create a dictionary with the mapping between
         # the case names and the mintstore names
-        # ===> i guess the UI will have a better way of doing this in real life!
+        # => i guess the UI will have a better way of doing this in real life!
 
         mintstoremap = {
             'tankA': 'TankX',

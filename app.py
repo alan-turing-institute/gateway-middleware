@@ -64,10 +64,9 @@ class CasesApi(Resource):
         """
         Get all the cases that are in the requested range
         """
-        return case_header_schema.dump(Case.query.paginate(page,
-                                                           per_page,
-                                                           False
-                                                           ).items, many=True)
+        return case_header_schema.dump(Case.query.paginate(page, per_page,
+                                                           False).items,
+                                       many=True)
 
 
 class CaseApi(Resource):
