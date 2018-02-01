@@ -13,7 +13,10 @@ Then...
 by retrieving casefields from the Tank and Fluid stores.
 """
 
-from sqlalchemy_classes import init_database
+from sqlalchemy_classes import (init_database, db, Case, CaseField, MintStore,
+                                MintedValue, MintedCase)
+from create_case_store import make_tank_store, make_fluid_store
+from create_mint_store import make_mint_store
 
 from flask import Flask
 from flask_restful import Api
@@ -24,11 +27,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sg:sg@postgres:5432/sg'
 init_database(app)
 
 api = Api(app)
-
-from sqlalchemy_classes import (db, Case, CaseField, MintStore,
-                                MintedValue, MintedCase)  # noqa
-from create_case_store import make_tank_store, make_fluid_store  # noqa
-from create_mint_store import make_mint_store  # noqa
 
 
 def apply_mintstore_to_case_field(mintstore, case_field):

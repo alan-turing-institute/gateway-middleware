@@ -9,7 +9,10 @@ from flask_cors import CORS
 
 from sqlalchemy.exc import IntegrityError
 
-from sqlalchemy_classes import init_database
+from sqlalchemy_classes import init_database, MintedCase, MintedValue, Case, db
+from marshmallow_schema_classes import (init_marshmallow, CaseSchema,
+                                        CaseHeaderSchema,
+                                        JobHeaderSchema, JobSchema)
 
 from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
@@ -20,14 +23,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sg:sg@postgres/sg'
 
 init_database(app)
 
-from sqlalchemy_classes import MintedCase, MintedValue, Case, db  # noqa
-from marshmallow_schema_classes import init_marshmallow  # noqa
-
 init_marshmallow(app)
-
-from marshmallow_schema_classes import (CaseSchema, CaseHeaderSchema,
-                                        JobHeaderSchema, JobSchema)  # noqa
-
 
 api = Api(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
