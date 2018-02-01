@@ -17,9 +17,11 @@ FLASK_APP=app.py flask run
 If you want to run it through Docker you can do so with:
 
 ```bash
-docker build -t sgdm .
-docker run -p 5000:5000 sgdm
+docker-compose up
 ```
+
+For some odd reason to do with the way the postgres job runs (I think),
+the first time you run it, it may fail as the database may start too slowly.
 
 The Flask app creates a server at `localhost:5000`.
 It supports the following endpoints:
