@@ -12,6 +12,8 @@ services:
      - db_nw
   postgres:
     image: "postgres:latest"
+    volumes:
+     - database:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=sg
       - POSTGRES_PASSWORD=sg
@@ -21,3 +23,5 @@ services:
 networks:
   db_nw:
     driver: bridge
+volumes:
+  database:

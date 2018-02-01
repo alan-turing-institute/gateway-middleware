@@ -22,7 +22,7 @@ from flask import Flask
 from flask_restful import Api
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sg:sg@postgres:5432/sg'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sg:sg@localhost:8082/sg'
 
 init_database(app)
 
@@ -144,61 +144,73 @@ if __name__ == '__main__':
     # preamble - pretend this bit is being done before hand #################
 
     # add some cases to the Tank Store and the Fluid Store
-    make_tank_store(session)
-    make_fluid_store(session)
-    # add milk and tankX (fixed values for MintedCases) to the MintStore
-    make_mint_store(session)
+    tank = make_tank_store()
+    fluid = make_fluid_store()
 
-    # end of preamble #################
+    with app.app_context():
 
-    # create a real case, using the tank from the tank store
-    #  and the fluid from the fluid store
+        done = False
+        for case in Case.query.all():
+            done = True
+        if done:
+            print("Data already there!")
+            exit()
+        session.add(tank)
+        session.add(fluid)
+        session.commit()
+        # add milk and tankX (fixed values for MintedCases) to the MintStore
+        make_mint_store(session)
 
-    mycase = Case(name='MyCase')
+        # end of preamble #################
 
-    new_tank_store = session.query(Case). \
-        filter(Case.name == 'tanks_R_us').first()
+        # create a real case, using the tank from the tank store
+        #  and the fluid from the fluid store
 
-    new_tankA = new_tank_store.fields[0].deep_copy()
-    new_fluid_store = session.query(Case). \
-        filter(Case.name == 'fluids_R_us').first()
+        mycase = Case(name='MyCase')
 
-    new_fluid1 = new_fluid_store.fields[0].deep_copy()
-    new_fluid1.name = 'fluid 1'
-    new_fluid1.prepend_prefix('Fluid1_')
-    new_fluid2 = new_fluid_store.fields[0].deep_copy()
-    new_fluid2.name = 'fluid 2'
-    new_fluid2.prepend_prefix('Fluid2_')
+        new_tank_store = session.query(Case). \
+            filter(Case.name == 'tanks_R_us').first()
 
-    mycase.fields.append(new_tankA)
-    mycase.fields.append(new_fluid1)
-    mycase.fields.append(new_fluid2)
-    # save this to the DB
-    session.add(mycase)
-    session.commit()
+        new_tankA = new_tank_store.fields[0].deep_copy()
+        new_fluid_store = session.query(Case). \
+            filter(Case.name == 'fluids_R_us').first()
 
-    # test the prefix has been added
-    # print('prefix to fluid2 viscosity ',
-    #       mycase.fields[2].child_field[1].specs[-1].property_value)
+        new_fluid1 = new_fluid_store.fields[0].deep_copy()
+        new_fluid1.name = 'fluid 1'
+        new_fluid1.prepend_prefix('Fluid1_')
+        new_fluid2 = new_fluid_store.fields[0].deep_copy()
+        new_fluid2.name = 'fluid 2'
+        new_fluid2.prepend_prefix('Fluid2_')
 
-    ###################################################################
-    # ########################try minting a case ########################
+        mycase.fields.append(new_tankA)
+        mycase.fields.append(new_fluid1)
+        mycase.fields.append(new_fluid2)
+        # save this to the DB
+        session.add(mycase)
+        session.commit()
 
-    # create a dictionary with the mapping between
-    # the case names and the mintstore names
-    # ===> i guess the UI will have a better way of doing this in real life!
+        # test the prefix has been added
+        # print('prefix to fluid2 viscosity ',
+        #       mycase.fields[2].child_field[1].specs[-1].property_value)
 
-    mintstoremap = {
-        'tankA': 'TankX',
-        'fluid 1': 'Milk',
-        'fluid 2': 'Water'
-    }
+        ###################################################################
+        # ########################try minting a case ########################
 
-    minted_case = mint_case('TESTMINT', mycase, 'nbarlow', mintstoremap)
-    print('\n ==== Created a MintedCase ====== \n')
+        # create a dictionary with the mapping between
+        # the case names and the mintstore names
+        # ===> i guess the UI will have a better way of doing this in real life!
 
-    for v in minted_case.values:
-        print('Minted case has %s = %s' % (v.name, v.value))
+        mintstoremap = {
+            'tankA': 'TankX',
+            'fluid 1': 'Milk',
+            'fluid 2': 'Water'
+        }
 
-    session.add(minted_case)
-    session.commit()
+        minted_case = mint_case('TESTMINT', mycase, 'nbarlow', mintstoremap)
+        print('\n ==== Created a MintedCase ====== \n')
+
+        for v in minted_case.values:
+            print('Minted case has %s = %s' % (v.name, v.value))
+
+        session.add(minted_case)
+        session.commit()

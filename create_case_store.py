@@ -8,7 +8,7 @@ building a 'real-life' case.
 from sqlalchemy_classes import Case, CaseField, ParameterSpec
 
 
-def make_tank_store(session):
+def make_tank_store():
     """
     Make an example tank case containing a sample tank
     """
@@ -36,11 +36,10 @@ def make_tank_store(session):
     ParameterSpec(property_name='units', property_value='m',
                   parent_casefield=tanka_width)
 
-    session.add(tank_store)
-    session.commit()
+    return tank_store
 
 
-def make_fluid_store(session):
+def make_fluid_store():
     """
     Make an example fluid case for reusing later
     """
@@ -68,5 +67,4 @@ def make_fluid_store(session):
     ParameterSpec(property_name='units', property_value='Pa.s',
                   parent_casefield=fluida_viscosity)
 
-    session.add(fluid_store)
-    session.commit()
+    return fluid_store
