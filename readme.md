@@ -64,3 +64,27 @@ It supports the following endpoints:
    * Job endpoints
    * Storage of script data
 
+### Status 2nd Feb 2017
+#### To get middleware running on Docker
+
+1) First, install Docker (https://docs.docker.com/docker-for-mac/install/), start it up.
+2) Create conda environment, install requirements. Start up postgres server.
+```
+conda create --name flaskify
+source activate flaskify
+pip install -r requirements.txt
+docker-compose run -p "8082:5432" postgres
+```
+3) Put some data into postgres database
+```
+python create_and_mint_case_using_stores.py
+```
+4) Take down docker
+```
+docker-compose down
+```
+5) Start docker 
+```
+docker-compose up
+```
+6) Connect to docker at `http:localhose:5000`
