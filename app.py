@@ -14,6 +14,7 @@ from routes import setup_routes
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sg:sg@postgres/sg'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 init_database(app)
 

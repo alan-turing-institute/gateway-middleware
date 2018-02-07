@@ -84,15 +84,15 @@ class JobsApi(Resource):
         Create a new job based on a case
         """
         try:
-            new_minted_case = Job(name=name,
-                                  user=author, case_id=case_id)
-            db.session.add(new_minted_case)
+            new_job = Job(name=name,
+                          user=author, case_id=case_id)
+            db.session.add(new_job)
             db.session.commit()
         except IntegrityError as e:
             print(e)
             abort(404,
                   message='Sorry, these parameters have already been used')
-        return {'mintedcase_id': new_minted_case.mintedcase_id}
+        return {'job_id': new_job.id}
 
     @use_kwargs(pagination_args)
     def get(self, page, per_page):

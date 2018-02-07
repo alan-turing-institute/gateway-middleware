@@ -3,17 +3,19 @@
 The main entry point for this flask app
 """
 
-from routes import CasesApi, CaseApi
+from routes import CasesApi, CaseApi, JobsApi
 
 from .decorators import request_context
 from .fixtures import demo_app as app
 
 
-@request_context("/")
+@request_context("/case/1")
 def test_get_case(app):
     """
     Test that a basic query of gets lots of cases
     """
+    #result = app.dispatch_request()
+    #print(result)
     result = CaseApi().dispatch_request(1)
     assert(len(result.data['fields']) > 0)
     assert(result.data['id'] == 1)
@@ -39,3 +41,14 @@ def test_1_per_page_page_2(app):
     assert(len(result.data) == 1)
     assert(result.data[0]['id'] == 2)
     assert(result.data[0].get('fields') is None)
+
+
+@request_context("/job",
+                 data='{"name": "bob", "case_id": "1", "author": "bob"}',
+                 content_type='application/json', method="POST")
+def test_create_job(app):
+    """
+    Test that a job is created
+    """
+    result = JobsApi().dispatch_request()
+    assert(result['job_id'] > 0)
