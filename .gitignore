@@ -1,5 +1,6 @@
 # IDE stuff
 .vscode/
+.mypy_cache/
 
 # Python stuff
 __pycache__
