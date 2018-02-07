@@ -4,6 +4,7 @@
 
 # Python stuff
 __pycache__
+lastfailed
 
 # Test database
 test.db

@@ -10,7 +10,7 @@ from connection import init_database, init_marshmallow
 
 from routes import setup_routes, CasesApi, CaseApi
 
-from create_and_mint_case_using_stores import set_up_test_database
+from .create_and_mint_case_using_stores import set_up_test_database
 
 
 def test_something():

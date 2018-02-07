@@ -17,8 +17,8 @@ from connection import init_database
 from connection.models import (db, Case, CaseField,
                                JobParameterTemplate, JobParameter, Job)
 
-from create_case_store import make_tank_store, make_fluid_store
-from create_mint_store import make_mint_store
+from .create_case_store import make_tank_store, make_fluid_store
+from .create_mint_store import make_mint_store
 
 from flask import Flask
 from flask_restful import Api
