@@ -3,7 +3,7 @@ functions containing all the steps to create a 'MintStore' that has
 preset sets of values for known things, e.g. 'milk', 'tankX'"'
 """
 
-from sqlalchemy_classes import JobParameterTemplate, JobParameterTemplateValue
+from connection.models import JobParameterTemplate, JobParameterTemplateValue
 
 
 def make_mint_store(session):

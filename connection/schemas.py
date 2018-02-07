@@ -3,8 +3,8 @@ Set up marshmallow classes for serialising data
 """
 from flask_marshmallow import Marshmallow
 
-from sqlalchemy_classes import (Case, CaseField, ParameterSpec,
-                                Job, JobParameter)
+from .models import (Case, CaseField, ParameterSpec,
+                     Job, JobParameter)
 
 
 ma = Marshmallow()

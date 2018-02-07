@@ -6,10 +6,9 @@ from flask_restful import Resource, abort
 
 from sqlalchemy.exc import IntegrityError
 
-from sqlalchemy_classes import Job, JobParameter, Case, db
-from marshmallow_schema_classes import (CaseSchema,
-                                        CaseHeaderSchema,
-                                        JobHeaderSchema, JobSchema)
+from connection.models import Job, JobParameter, Case, db
+from connection.schemas import (CaseSchema, CaseHeaderSchema,
+                                JobHeaderSchema, JobSchema)
 
 from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
@@ -151,13 +150,3 @@ class JobApi(Resource):
             print(e)
             abort(404, message='Sorry. Failed to commit your request')
         return {'status': 'success'}
-
-
-def setup_routes(api):
-    """
-    Set up the routes for these api end points
-    """
-    api.add_resource(CasesApi, '/case')
-    api.add_resource(CaseApi, '/case/<case_id>')
-    api.add_resource(JobsApi, '/job')
-    api.add_resource(JobApi, '/job/<job_id>')

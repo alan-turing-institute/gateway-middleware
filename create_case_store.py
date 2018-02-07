@@ -5,7 +5,7 @@ that a case-builder could pull things out of (e.g. here, tanka, fluida) when
 building a 'real-life' case.
 """
 
-from sqlalchemy_classes import Case, CaseField, ParameterSpec
+from connection.models import Case, CaseField, ParameterSpec
 
 
 def make_tank_store():

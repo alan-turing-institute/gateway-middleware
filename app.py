@@ -7,8 +7,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
 
-from sqlalchemy_classes import init_database
-from marshmallow_schema_classes import init_marshmallow
+from connection import init_database, init_marshmallow
 
 from routes import setup_routes
 
