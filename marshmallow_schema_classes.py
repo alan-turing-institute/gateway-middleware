@@ -4,10 +4,10 @@ Set up marshmallow classes for serialising data
 from flask_marshmallow import Marshmallow
 
 from sqlalchemy_classes import (Case, CaseField, ParameterSpec,
-                                MintedCase, MintedValue)
+                                Job, JobParameter)
 
 
-ma = Marshmallow()  # pylint: disable=C0103
+ma = Marshmallow()
 
 
 class ParamSpecSchema(ma.ModelSchema):
@@ -19,13 +19,13 @@ class ParamSpecSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = ParameterSpec
-        fields = ('parameterspec_id', 'property_name', 'property_value')
+        fields = ('id', 'name', 'value')
 
     def make_param_spec(self, data):
         return ParameterSpec(
-            parameterspec_id=data.get('parameterspec_id'),
-            property_name=data.get('property_name'),
-            property_value=data.get('property_value')
+            id=data.get('id'),
+            name=data.get('name'),
+            value=data.get('value')
             )
 
 
@@ -70,19 +70,19 @@ class CaseSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = Case
-        fields = ('case_id', 'name', 'fields')
+        fields = ('id', 'name', 'fields')
     fields = ma.List(ma.Nested('CaseFieldSchema'))
 
     def make_case(self, data):
         case = Case(
-                   case_id=data.get('case_id'),
+                   cid=data.get('id'),
                    name=data.get('name')
         )
         if data.get('fields'):
             cfs = CaseFieldSchema()
             for child in data.get('fields'):
                 case_field = cfs.make_case_field(child)
-                case_field.case_id = case.case_id
+                case_field.case_id = case.id
                 case.fields.append(case_field)
         return case
 
@@ -97,9 +97,9 @@ class CaseHeaderSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = Case
-        fields = ('case_id', 'name', 'links')
+        fields = ('id', 'name', 'links')
     links = ma.Hyperlinks({
-        'self': ma.URLFor('caseapi', case_id='<case_id>')
+        'self': ma.URLFor('caseapi', case_id='<id>')
     })
 
 
@@ -112,10 +112,10 @@ class JobHeaderSchema(ma.ModelSchema):
         """
         Specification of what to use from the original class
         """
-        model = MintedCase
-        fields = ('mintedcase_id', 'mintedcase_name', 'user', 'links')
+        model = Job
+        fields = ('id', 'name', 'user', 'links')
     links = ma.Hyperlinks({
-        'self': ma.URLFor('jobapi', job_id='<mintedcase_id>'),
+        'self': ma.URLFor('jobapi', job_id='<id>'),
         'case': ma.URLFor('caseapi', case_id='<case_id>')
     })
 
@@ -128,8 +128,8 @@ class JobSchema(ma.ModelSchema):
         """
         Specification of what to use from the original class
         """
-        model = MintedCase
-        fields = ('mintedcase_id', 'mintedcase_name', 'user', 'values')
+        model = Job
+        fields = ('id', 'name', 'user', 'values')
     values = ma.List(ma.Nested('JobValueSchema'))
 
 
@@ -141,7 +141,7 @@ class JobValueSchema(ma.ModelSchema):
         """
         Specification of what to use from the original class
         """
-        model = MintedValue
+        model = JobParameter
 
 
 def init_marshmallow(app):

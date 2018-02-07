@@ -3,7 +3,7 @@ functions containing all the steps to create a 'MintStore' that has
 preset sets of values for known things, e.g. 'milk', 'tankX'"'
 """
 
-from sqlalchemy_classes import MintStore, MintStoreValue
+from sqlalchemy_classes import JobParameterTemplate, JobParameterTemplateValue
 
 
 def make_mint_store(session):
@@ -11,24 +11,24 @@ def make_mint_store(session):
     Create some example mint store values
     """
     # create milk in the mintstore table
-    milk = MintStore(name='Milk', version='1')
-    MintStoreValue(parameter_name='density', parameter_value='1003.3',
-                   parent_mintstore=milk)
-    MintStoreValue(parameter_name='viscosity', parameter_value='2.3',
-                   parent_mintstore=milk)
+    milk = JobParameterTemplate(name='Milk', version='1')
+    JobParameterTemplateValue(name='density', value='1003.3',
+                              parent_template=milk)
+    JobParameterTemplateValue(name='viscosity', value='2.3',
+                              parent_template=milk)
 
     # create water in the mintstore table
-    water = MintStore(name='Water', version='1')
-    MintStoreValue(parameter_name='density', parameter_value='999.99',
-                   parent_mintstore=water)
-    MintStoreValue(parameter_name='viscosity', parameter_value='1.2',
-                   parent_mintstore=water)
+    water = JobParameterTemplate(name='Water', version='1')
+    JobParameterTemplateValue(name='density', value='999.99',
+                              parent_template=water)
+    JobParameterTemplateValue(name='viscosity', value='1.2',
+                              parent_template=water)
 
-    tankx = MintStore(name='TankX', version='1')
-    MintStoreValue(parameter_name='width', parameter_value='3.35',
-                   parent_mintstore=tankx)
-    MintStoreValue(parameter_name='length', parameter_value='2.56',
-                   parent_mintstore=tankx)
+    tankx = JobParameterTemplate(name='TankX', version='1')
+    JobParameterTemplateValue(name='width', value='3.35',
+                              parent_template=tankx)
+    JobParameterTemplateValue(name='length', value='2.56',
+                              parent_template=tankx)
 
     session.add(milk)
     session.add(water)

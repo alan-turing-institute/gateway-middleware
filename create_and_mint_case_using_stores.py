@@ -4,8 +4,8 @@
 main function, doing the following:
 * create Cases in the DB that are stores of Tank and Fluid casefields.
 (calling functions in create_case_store.py)
-* create a MintStore in the DB containing preset sets of values called
-'milk' and 'tankA' (calling functions in create_mintstore.py)
+* create a JobParameterTemplate in the DB containing preset sets of values
+called 'milk' and 'tankA' (calling functions in create_mintstore.py)
 
 Then...
 
@@ -13,8 +13,8 @@ Then...
 by retrieving casefields from the Tank and Fluid stores.
 """
 
-from sqlalchemy_classes import (init_database, db, Case, CaseField, MintStore,
-                                MintedValue, MintedCase)
+from sqlalchemy_classes import (init_database, db, Case, CaseField,
+                                JobParameterTemplate, JobParameter, Job)
 from create_case_store import make_tank_store, make_fluid_store
 from create_mint_store import make_mint_store
 
@@ -41,7 +41,7 @@ def apply_mintstore_to_case_field(mintstore, case_field):
     # double loop.... is there not a better way?
     for mv in mintstore_vals:
         for cf in case_fields_with_specs:
-            if mv.parameter_name == cf.name:
+            if mv.name == cf.name:
                 print('  Setting values for %s' % cf.name)
                 minted_value_list.append(
                     apply_mintstore_value_to_case_field(mv, cf))
@@ -55,35 +55,35 @@ def apply_mintstore_value_to_case_field(mintstore_value, case_field):
     """
     # output will be a minted value.  name will come from the case_field
     try:
-        mint_param_val = float(mintstore_value.parameter_value)
+        mint_param_val = float(mintstore_value.value)
     except(TypeError):
         print("Value of %s doesn't seem to be a number" %
-              mintstore_value.parameter_name)
+              mintstore_value.name)
         return None
     min_val = None
     max_val = None
     prefix = ""
     for spec in case_field.specs:
         # check mintstore value against min, max
-        if spec.property_name == 'min':
+        if spec.name == 'min':
             try:
-                min_val = float(spec.property_value)
+                min_val = float(spec.value)
             except(TypeError):
                 print('Min value of %s not a number?' % case_field.name)
-        elif spec.property_name == 'max':
+        elif spec.name == 'max':
             try:
-                max_val = float(spec.property_value)
+                max_val = float(spec.value)
             except(TypeError):
                 print('Max value of %s not a number?' % case_field.name)
-        elif spec.property_name == 'prefix':
-            # get prefix - will be prepended to MintedValue name
-            prefix = spec.property_value
+        elif spec.name == 'prefix':
+            # get prefix - will be prepended to JobParameter name
+            prefix = spec.value
     if min_val and max_val:
         if mint_param_val < min_val or mint_param_val > max_val:
             raise ValueError('Out of range!')
         else:
-            mv = MintedValue(name=prefix + case_field.name,
-                             value=str(mint_param_val))
+            mv = JobParameter(name=prefix + case_field.name,
+                              value=str(mint_param_val))
             return mv
     # something went wrong - maybe something wasn't a number etc.
     # (though we should support non-number parameters!)
@@ -97,7 +97,7 @@ def recursively_get_case_fields_with_specs(case_field):
     output_list = []
     if len(case_field.specs) > 0:
         if not (len(case_field.specs) == 1 and
-                case_field.specs[0].property_name == 'prefix'):
+                case_field.specs[0].name == 'prefix'):
             # ^ what a horrible hack!! we only want to apply
             # MintedStoreValues to those CaseFields
             # that have specs, but even 'top-level' things like
@@ -112,8 +112,8 @@ def mint_case(session, name, case, user, mintstoremap={}):
     """
     Turn a case into a job by minting it
     """
-    new_minted_case = MintedCase(mintedcase_name=name, user=user,
-                                 parent_case=case)
+    new_minted_case = Job(name=name, user=user,
+                          parent_case=case)
 
     for (k, v) in mintstoremap.items():
         print(k, ",", v)
@@ -121,8 +121,8 @@ def mint_case(session, name, case, user, mintstoremap={}):
             filter(CaseField.name == k).first().deep_copy()
         if not case_field:
             raise KeyError('CaseField %s not found in DB' % k)
-        mintstore = session.query(MintStore). \
-            filter(MintStore.name == v).first().deep_copy()
+        mintstore = session.query(JobParameterTemplate). \
+            filter(JobParameterTemplate.name == v).first().deep_copy()
         if not mintstore:
             raise KeyError('Mintstore %s not found in DB' % v)
         new_minted_case.values += apply_mintstore_to_case_field(mintstore,
@@ -151,7 +151,7 @@ def set_up_test_database():
     session.add(tank)
     session.add(fluid)
     session.commit()
-    # add milk and tankX (fixed values for MintedCases) to the MintStore
+    # add milk and tankX (fixed values for Jobs) to the JobParameterTemplate
     make_mint_store(session)
 
     # end of preamble #################
@@ -201,7 +201,7 @@ def set_up_test_database():
 
     minted_case = mint_case(session, 'TESTMINT',
                             mycase, 'nbarlow', mintstoremap)
-    print('\n ==== Created a MintedCase ====== \n')
+    print('\n ==== Created a Job ====== \n')
 
     for v in minted_case.values:
         print('Minted case has %s = %s' % (v.name, v.value))

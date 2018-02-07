@@ -6,7 +6,7 @@ from flask_restful import Resource, abort
 
 from sqlalchemy.exc import IntegrityError
 
-from sqlalchemy_classes import MintedCase, MintedValue, Case, db
+from sqlalchemy_classes import Job, JobParameter, Case, db
 from marshmallow_schema_classes import (CaseSchema,
                                         CaseHeaderSchema,
                                         JobHeaderSchema, JobSchema)
@@ -85,8 +85,8 @@ class JobsApi(Resource):
         Create a new job based on a case
         """
         try:
-            new_minted_case = MintedCase(mintedcase_name=name,
-                                         user=author, case_id=case_id)
+            new_minted_case = Job(name=name,
+                                  user=author, case_id=case_id)
             db.session.add(new_minted_case)
             db.session.commit()
         except IntegrityError as e:
@@ -100,9 +100,8 @@ class JobsApi(Resource):
         """
         Get all the jobs that are in the requested range
         """
-        return job_header_schema.dump(MintedCase.query.paginate(page,
-                                                                per_page,
-                                                                False).items,
+        return job_header_schema.dump(Job.query.paginate(page, per_page,
+                                                         False).items,
                                       many=True)
 
 
@@ -119,7 +118,7 @@ class JobApi(Resource):
         except ValueError as e:
             print(e)
             abort(404, message='Sorry no such job {}'. format(job_id))
-        job = MintedCase.query.get(job_id)
+        job = Job.query.get(job_id)
         if job is not None:
             return job_schema.dump(job)
         else:
@@ -133,7 +132,7 @@ class JobApi(Resource):
         if name is missing and values is missing:
             # You don't actually need to change anything
             return {'status': 'success'}
-        job = MintedCase.query.get(job_id)
+        job = Job.query.get(job_id)
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
         if name is not missing:
@@ -142,9 +141,9 @@ class JobApi(Resource):
             for value in job.values:
                 db.session.delete(value)
             for value in values:
-                new_minted_value = MintedValue(name=value['name'],
-                                               value=value['value'],
-                                               parent_mintedcase=job)
+                new_minted_value = JobParameter(name=value['name'],
+                                                value=value['value'],
+                                                parent_job=job)
                 job.values.append(new_minted_value)
         try:
             db.session.commit()

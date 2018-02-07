@@ -17,23 +17,23 @@ def make_tank_store():
     tanka = CaseField(name='tankA', parent_case=tank_store)
 
     tanka_length = CaseField(name='length', parent_field=tanka)
-    ParameterSpec(property_name='min', property_value='0.2',
+    ParameterSpec(name='min', value='0.2',
                   parent_casefield=tanka_length)
-    ParameterSpec(property_name='max', property_value='40',
+    ParameterSpec(name='max', value='40',
                   parent_casefield=tanka_length)
-    ParameterSpec(property_name='default', property_value='3',
+    ParameterSpec(name='default', value='3',
                   parent_casefield=tanka_length)
-    ParameterSpec(property_name='units', property_value='m',
+    ParameterSpec(name='units', value='m',
                   parent_casefield=tanka_length)
 
     tanka_width = CaseField(name='width', parent_field=tanka)
-    ParameterSpec(property_name='min', property_value='0.1',
+    ParameterSpec(name='min', value='0.1',
                   parent_casefield=tanka_width)
-    ParameterSpec(property_name='max', property_value='40',
+    ParameterSpec(name='max', value='40',
                   parent_casefield=tanka_width)
-    ParameterSpec(property_name='default', property_value='3',
+    ParameterSpec(name='default', value='3',
                   parent_casefield=tanka_width)
-    ParameterSpec(property_name='units', property_value='m',
+    ParameterSpec(name='units', value='m',
                   parent_casefield=tanka_width)
 
     return tank_store
@@ -48,23 +48,23 @@ def make_fluid_store():
     fluida = CaseField(name='fluidA', parent_case=fluid_store)
 
     fluida_density = CaseField(name='density', parent_field=fluida)
-    ParameterSpec(property_name='min', property_value='200',
+    ParameterSpec(name='min', value='200',
                   parent_casefield=fluida_density)
-    ParameterSpec(property_name='max', property_value='4000',
+    ParameterSpec(name='max', value='4000',
                   parent_casefield=fluida_density)
-    ParameterSpec(property_name='default', property_value='1000',
+    ParameterSpec(name='default', value='1000',
                   parent_casefield=fluida_density)
-    ParameterSpec(property_name='units', property_value='kg/m^3',
+    ParameterSpec(name='units', value='kg/m^3',
                   parent_casefield=fluida_density)
 
     fluida_viscosity = CaseField(name='viscosity', parent_field=fluida)
-    ParameterSpec(property_name='min', property_value='0.01',
+    ParameterSpec(name='min', value='0.01',
                   parent_casefield=fluida_viscosity)
-    ParameterSpec(property_name='max', property_value='4.',
+    ParameterSpec(name='max', value='4.',
                   parent_casefield=fluida_viscosity)
-    ParameterSpec(property_name='default', property_value='1',
+    ParameterSpec(name='default', value='1',
                   parent_casefield=fluida_viscosity)
-    ParameterSpec(property_name='units', property_value='Pa.s',
+    ParameterSpec(name='units', value='Pa.s',
                   parent_casefield=fluida_viscosity)
 
     return fluid_store

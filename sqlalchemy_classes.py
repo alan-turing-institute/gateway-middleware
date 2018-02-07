@@ -5,9 +5,9 @@ to store Cases and Jobs
 
 from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()  # pylint: disable=C0103
+db = SQLAlchemy()
 
-Base = db.Model  # pylint: disable=C0103
+Base = db.Model
 
 
 class Case(Base):
@@ -16,7 +16,7 @@ class Case(Base):
     """
     __tablename__ = 'case'
 
-    case_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
 
 
@@ -26,20 +26,20 @@ class CaseField(Base):
     """
     __tablename__ = 'case_field'
 
-    case_field_id = db.Column(db.Integer, primary_key=True,
-                              autoincrement=True)
-    case_id = db.Column(db.Integer, db.ForeignKey('case.case_id'),
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('case.id'),
                         nullable=True)
     name = db.Column(db.String, nullable=False)
     parent_id = db.Column(db.Integer,
-                          db.ForeignKey('case_field.case_field_id'),
+                          db.ForeignKey('case_field.id'),
                           nullable=True)
 
     parent_case = db.relationship('Case', back_populates='fields')
     child_fields = db.relationship('CaseField',
                                    backref=db.
                                    backref('parent_field',
-                                           remote_side=[case_field_id]))
+                                           remote_side=[id]))
 
     def deep_copy(self):
         new_case_field = CaseField(
@@ -54,17 +54,17 @@ class CaseField(Base):
         for child in self.child_fields:
             child.prepend_prefix(prefix)
         prefix_spec = [spec for spec in self.specs if
-                       spec.property_name == 'prefix']
+                       spec.name == 'prefix']
         if prefix_spec:
-            prefix_spec[0].property_value = prefix + \
-                                            prefix_spec[0].property_value
+            prefix_spec[0].value = prefix + \
+                                            prefix_spec[0].value
         else:
-            self.specs.append(ParameterSpec(property_name='prefix',
-                                            property_value=prefix))
+            self.specs.append(ParameterSpec(name='prefix',
+                                            value=prefix))
 
 
 Case.fields = db.relationship('CaseField',
-                              order_by=CaseField.case_field_id,
+                              order_by=CaseField.id,
                               back_populates='parent_case',
                               cascade='all, delete-orphan')
 
@@ -76,20 +76,20 @@ class ParameterSpec(Base):
     """
     __tablename__ = 'parameterspec'
 
-    parameterspec_id = db.Column(db.Integer, primary_key=True,
-                                 autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
     casefield_id = db.Column(db.Integer,
-                             db.ForeignKey('case_field.case_field_id'),
+                             db.ForeignKey('case_field.id'),
                              nullable=False)
-    property_name = db.Column(db.String, nullable=False)
-    property_value = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    value = db.Column(db.String, nullable=False)
 
     parent_casefield = db.relationship('CaseField', back_populates='specs')
 
     def deep_copy(self):
         new_param_spec = ParameterSpec(
-            property_name=self.property_name,
-            property_value=self.property_value
+            name=self.name,
+            value=self.value
         )
         return new_param_spec
 
@@ -99,67 +99,67 @@ CaseField.specs = db.relationship('ParameterSpec',
                                   cascade='all, delete-orphan')
 
 
-class MintedCase(Base):
+class Job(Base):
     """
-    A minted case is a job, or an instance of a case for a
+    A job is an instance of a case for a
     specific user with chosen values
     """
-    __tablename__ = 'mintedcase'
-    __table_args__ = (db.UniqueConstraint('user', 'mintedcase_name',
+    __tablename__ = 'job'
+    __table_args__ = (db.UniqueConstraint('user', 'name',
                       name='unique_user_and_name'),)
 
-    mintedcase_id = db.Column(db.Integer, primary_key=True,
-                              autoincrement=True)
-    case_id = db.Column(db.Integer, db.ForeignKey('case.case_id'),
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('case.id'),
                         nullable=False)
-    mintedcase_name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
     user = db.Column(db.String, nullable=False)
 
     parent_case = db.relationship('Case')
 
 
-class MintedValue(Base):
+class JobParameter(Base):
     """
     A Minted Value is a specific value for a field in a case.
     """
-    __tablename__ = 'mintedvalues'
+    __tablename__ = 'job_parameter'
 
-    mintedvalue_id = db.Column(db.Integer, primary_key=True,
-                               autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
     name = db.Column(db.String, nullable=False)
-    mintedcase_id = db.Column(db.Integer,
-                              db.ForeignKey('mintedcase.mintedcase_id'),
-                              nullable=False)
+    job_id = db.Column(db.Integer,
+                       db.ForeignKey('job.id'),
+                       nullable=False)
     value = db.Column(db.String, nullable=False)
-    mintstore_id = db.Column(db.Integer,
-                             db.ForeignKey('mintstore.mintstore_id'),
-                             nullable=True)
+    template_id = db.Column(db.Integer,
+                            db.ForeignKey('job_parameter_template.id'),
+                            nullable=True)
 
-    parent_mintedcase = db.relationship('MintedCase',
-                                        back_populates='values')
-    parent_mintstore = db.relationship('MintStore')
-
-
-MintedCase.values = db.relationship('MintedValue',
-                                    back_populates='parent_mintedcase',
-                                    cascade='all, delete-orphan')
+    parent_job = db.relationship('Job',
+                                 back_populates='values')
+    parent_template = db.relationship('JobParameterTemplate')
 
 
-class MintStore(Base):
+Job.values = db.relationship('JobParameter',
+                             back_populates='parent_job',
+                             cascade='all, delete-orphan')
+
+
+class JobParameterTemplate(Base):
     """
     A mint store is a collection of saved name value pairs
     bound to a given name. The idea is that they can be used
     as prefilled templates for values for cases
     """
-    __tablename__ = 'mintstore'
+    __tablename__ = 'job_parameter_template'
 
-    mintstore_id = db.Column(db.Integer, primary_key=True,
-                             autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
     name = db.Column(db.String, nullable=False)
     version = db.Column(db.Integer, nullable=False)
 
     def deep_copy(self):
-        new_mintstore = MintStore(
+        new_mintstore = JobParameterTemplate(
             name=self.name,
             version=self.version
         )
@@ -168,36 +168,36 @@ class MintStore(Base):
         return new_mintstore
 
 
-class MintStoreValue(Base):
+class JobParameterTemplateValue(Base):
     """
     A Mint Store Value is a specific key value pair in a
     given mint store
     """
-    __tablename__ = 'mintstorevalue'
+    __tablename__ = 'job_parameter_template_value'
 
-    mintstorevalue_id = db.Column(db.Integer, primary_key=True,
-                                  autoincrement=True)
-    mintstore_id = db.Column(db.Integer,
-                             db.ForeignKey('mintstore.mintstore_id'),
-                             nullable=False)
-    parameter_name = db.Column(db.String, nullable=False)
-    parameter_value = db.Column(db.String, nullable=False)
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
+    template_id = db.Column(db.Integer,
+                            db.ForeignKey('job_parameter_template.id'),
+                            nullable=False)
+    name = db.Column(db.String, nullable=False)
+    value = db.Column(db.String, nullable=False)
 
-    parent_mintstore = db.relationship('MintStore',
-                                       back_populates='values')
+    parent_template = db.relationship('JobParameterTemplate',
+                                      back_populates='values')
 
     def deep_copy(self):
-        new_mint_store_val = MintStoreValue(
-            mintstore_id=self.mintstore_id,
-            parameter_name=self.parameter_name,
-            parameter_value=self.parameter_value
+        new_mint_store_val = JobParameterTemplateValue(
+            id=self.id,
+            name=self.name,
+            value=self.value
         )
         return new_mint_store_val
 
 
-MintStore.values = db.relationship('MintStoreValue',
-                                   back_populates='parent_mintstore',
-                                   cascade='all, delete-orphan')
+JobParameterTemplate.values = db.relationship('JobParameterTemplateValue',
+                                              back_populates='parent_template',
+                                              cascade='all, delete-orphan')
 
 
 def init_database(app):
