@@ -58,7 +58,5 @@ def test_job_renamed(app):
     Test that the job name has actually changed
     """
     result = JobApi().dispatch_request(2)
-    print(result.data)
-    #job = Job.query().get(2)
-    print(Job.query.get(2).name)
+    assert(result.data['id'] == 2)
     assert(result.data['name'] == "Awesome Job")
