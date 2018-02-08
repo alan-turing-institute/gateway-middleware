@@ -19,13 +19,13 @@ job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
 
 pagination_args = {
-    'page': fields.Int(missing=1, validate=lambda p: p > 0),
-    'per_page': fields.Int(missing=10, validate=lambda p: p > 0)
+    'page': fields.Int(missing=1, strict=True, validate=lambda p: p > 0),
+    'per_page': fields.Int(missing=10, strict=True, validate=lambda p: p > 0)
 }
 
 job_args = {
-    'case_id': fields.Int(required=True),
-    'author': fields.Str(required=True),
+    'case_id': fields.Int(required=True, strict=True),
+    'author': fields.Str(required=True, strict=True),
     'name': fields.Str(required=True)
 }
 

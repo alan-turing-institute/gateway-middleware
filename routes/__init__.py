@@ -3,6 +3,7 @@ Routes module
 """
 
 from .routes import CasesApi, CaseApi, JobsApi, JobApi
+from .fake_routes import TestData
 
 
 def setup_routes(api):
@@ -13,3 +14,6 @@ def setup_routes(api):
     api.add_resource(CaseApi, '/case/<int:case_id>')
     api.add_resource(JobsApi, '/job')
     api.add_resource(JobApi, '/job/<int:job_id>')
+
+    # Only while in development
+    api.add_resource(TestData, '/test')

@@ -67,24 +67,39 @@ It supports the following endpoints:
 ### Status 2nd Feb 2017
 #### To get middleware running on Docker
 
-1) First, install Docker (https://docs.docker.com/docker-for-mac/install/), start it up.
-2) Create conda environment, install requirements. Start up postgres server.
-```
-conda create --name flaskify
-source activate flaskify
-pip install -r requirements.txt
-docker-compose run -p "8082:5432" postgres
-```
-3) Put some data into postgres database
-```
-python create_and_mint_case_using_stores.py
-```
-4) Take down docker
-```
-docker-compose down
-```
-5) Start docker 
-```
-docker-compose up
-```
-6) Connect to docker at `http:localhose:5000`
+1. First, install Docker (https://docs.docker.com/docker-for-mac/install/), start it up.
+
+1. Set run the postgres server the first time so it gets set up
+    ```
+    docker-compose run -d -p "8082:5432" postgres
+    ```
+
+1. Shutdown the postgres server
+    ```
+    docker-compose down
+    ```
+
+1. Bring up the full system
+    ```
+    docker-compose up
+    ```
+
+1. If you need to add data to the system do a `POST`
+    request to `http://localhost:5000/test`.
+
+1. Connect to the running server at `http://localhost:5000`
+
+1. To bring the system down (saving the database state)
+    ```
+    docker-compose down
+    ```
+
+1. If you ever need to work with the database run:
+    ```
+    docker-compose run -d -p "8082:5432" postgres
+    ```
+    You can then connect to the database using
+    ```
+    psql -U sg -W -p 8082 sg -h localhost
+    ```
+    with the password `sg`
