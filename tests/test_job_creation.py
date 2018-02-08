@@ -1,5 +1,8 @@
 """
 Tests for the job api
+
+This files requires that the tests
+are run in the order they are written.
 """
 # flake8: noqa
 # pylint: disable=W0613
@@ -8,6 +11,8 @@ from pytest import raises
 from werkzeug.exceptions import HTTPException
 
 from routes import JobsApi, JobApi
+
+from connection.models import Job
 
 from .decorators import request_context
 from .fixtures import demo_app as app
@@ -21,4 +26,39 @@ def test_create_job(app):
     Test that a job is created
     """
     result = JobsApi().dispatch_request()
-    assert(result['job_id'] > 0)
+    assert(result['job_id'] == 2)
+
+
+@request_context("/job/2")
+def test_has_new_job(app):
+    """
+    Test that the new job is there
+    """
+    result = JobApi().dispatch_request(2)
+    assert(result.data['id'] == 2)
+    assert(result.data['name'] == 'bob')
+
+
+@request_context("/job/2", method="PATCH",
+                 content_type='application/json',
+                 data='{"name": "Awesome Job"}')
+def test_rename_job_2(app):
+    """
+    Test that you can rename a job
+    """
+    result = JobApi().dispatch_request(2)
+    assert(result['status'] == 'success')
+    assert(result['changed'][0] == 'name')
+    assert(len(result['changed']) == 1)
+
+
+@request_context("/job/2")
+def test_job_renamed(app):
+    """
+    Test that the job name has actually changed
+    """
+    result = JobApi().dispatch_request(2)
+    print(result.data)
+    #job = Job.query().get(2)
+    print(Job.query.get(2).name)
+    assert(result.data['name'] == "Awesome Job")
