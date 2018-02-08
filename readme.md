@@ -1,29 +1,101 @@
+# Science Gateway Middleware
 
-### Current status (29th Jan 1:44pm)
+The science gateway middleware stores the current status 
+of all cases and jobs. It does minimal processing, and serves
+primarily as a persistent store of state (but not of data).
 
-* renamed app.py to sqlalchemy_classes.py and removed everything that wasn't related to defining the classes
-* separated out lengthy code to create tank, fluid cases, and milk,water,tankX mintstore into separate modules.
-* "main" script is now create_and_mint_case_using_stores.py
- - implemented functions to create a MintedCase given a Case and a mapping (dict) between case_fields and mintstore objects.
-* added marshmallow_schema_classes.py - can currently serialize/deserialize cases and their children.  Will add example
-and extend to Minted stuff.
+## Running The System
 
-To run:
-```bash
-python create_and_mint_case_using_stores.py
-FLASK_APP=app.py flask run
-```
+1. Ensure that you have installed [Docker](https://docs.docker.com/docker-for-mac/install/).
 
-If you want to run it through Docker you can do so with:
+1. Start the Docker daemon if it is not already running.
 
-```bash
-docker-compose up
-```
+1. If this is the first time you are running the system, 
+    run the Postgres server individually in order for it
+    to set itself up. You should give it a minute just to be 
+    safe.
+    ```shell
+    docker-compose run -d postgres
+    ```
 
-For some odd reason to do with the way the postgres job runs (I think),
-the first time you run it, it may fail as the database may start too slowly.
+1. Shutdown the Postgres server.
+    ```shell
+    docker-compose down
+    ```
+
+1. Bring up the full system.
+    ```shell
+    docker-compose up
+    ```
+
+1. If you need to add demo data to the system send a `POST`
+    request to `http://localhost:5000/test`. This will return
+    `null`.
+
+1. Connect to the running server at (http://localhost:5000).
+
+1. To bring the system down (saving the database state)
+    ```shell
+    docker-compose down
+    ```
+
+1. If you ever need to work with the database run:
+    ```shell
+    docker-compose run -d postgres
+    docker ps
+    ```
+    This will show a `CONTAINER ID` for the container that you just 
+    created. 
+    Connect to this container with:
+    ```shell
+    docker exec -it 5a73ca796372 /bin/bash
+    ```
+    Once inside the shell you can connect to the database with:
+    ```shell
+    psql -U sg -W sg 
+    ```
+    with the password `sg`
+    When you are finished. Quit from `psql` and the shell and run:
+    ```shell
+    docker-compose down
+    ```
+
+1. If you have Postgres installed on your local machine, you can 
+    connect to the docker `Postgres` instance by running:
+    ```shell
+    docker-compose run -d -p "8082:5432" postgres
+    psql -U sg -W -h localhost sg
+    ```
+    When you are finished run:
+    ```shell
+    docker-compose down
+    ```
+
+### Helpful SQL Commands
+
+Just as a reminder here are some helpful PostgreSQL commands
+that may be helpful:
+
+* List all tables:
+    ```sql
+    \dt
+    ```
+
+* Get all cases. Note that because the `case` table name clashes
+    with an SQL keyword, you must wrap the table name in `"`
+    ```sql
+    SELECT * FROM "Case";
+
+* Delete all tables:
+    ```sql
+    DROP TABLE IF EXISTS "Case", Case_Field, ParameterSpec, Job, JobParameter, JobParameterTemplate, JobParameterTemplateValue CASCADE;
+    ```
+
+
+## Using The Middleware
 
 The Flask app creates a server at `localhost:5000`.
+
 It supports the following endpoints:
 * `/case[?page=N&per_page=N]`: Get a listing of all the cases in the system.
     * `page` gives the page of output that you are requesting. The first page is 1 (also the default)
@@ -63,43 +135,3 @@ It supports the following endpoints:
    * marshmallow serialization/deserialization of the "Minted" half of the data model.
    * Job endpoints
    * Storage of script data
-
-### Status 2nd Feb 2017
-#### To get middleware running on Docker
-
-1. First, install Docker (https://docs.docker.com/docker-for-mac/install/), start it up.
-
-1. Set run the postgres server the first time so it gets set up
-    ```
-    docker-compose run -d -p "8082:5432" postgres
-    ```
-
-1. Shutdown the postgres server
-    ```
-    docker-compose down
-    ```
-
-1. Bring up the full system
-    ```
-    docker-compose up
-    ```
-
-1. If you need to add data to the system do a `POST`
-    request to `http://localhost:5000/test`.
-
-1. Connect to the running server at `http://localhost:5000`
-
-1. To bring the system down (saving the database state)
-    ```
-    docker-compose down
-    ```
-
-1. If you ever need to work with the database run:
-    ```
-    docker-compose run -d -p "8082:5432" postgres
-    ```
-    You can then connect to the database using
-    ```
-    psql -U sg -W -p 8082 sg -h localhost
-    ```
-    with the password `sg`
