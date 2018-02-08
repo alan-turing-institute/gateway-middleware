@@ -6,22 +6,16 @@ from flask_restful import Resource, abort
 
 from sqlalchemy.exc import IntegrityError
 
-from connection.models import Job, JobParameter, Case, db
-from connection.schemas import (CaseSchema, CaseHeaderSchema,
-                                JobHeaderSchema, JobSchema)
+from connection.models import Job, JobParameter, db
+from connection.schemas import JobHeaderSchema, JobSchema
 
 from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
 
-case_schema = CaseSchema()
-case_header_schema = CaseHeaderSchema()
+from .common_args import pagination_args
+
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
-
-pagination_args = {
-    'page': fields.Int(missing=1, strict=True, validate=lambda p: p > 0),
-    'per_page': fields.Int(missing=10, strict=True, validate=lambda p: p > 0)
-}
 
 job_args = {
     'case_id': fields.Int(required=True, strict=True),
@@ -38,40 +32,6 @@ job_patch_args = {
     'name': fields.Str(),
     'values': fields.List(fields.Nested(job_argument_args))
 }
-
-
-class CasesApi(Resource):
-    """
-    Api for the list of all cases
-    """
-    @use_kwargs(pagination_args)
-    def get(self, page, per_page):
-        """
-        Get all the cases that are in the requested range
-        """
-        return case_header_schema.dump(Case.query.paginate(page, per_page,
-                                                           False).items,
-                                       many=True)
-
-
-class CaseApi(Resource):
-    """
-    End point for dealing with a specific case
-    """
-    def get(self, case_id: str):
-        """
-        Get all the details for a specific case
-        """
-        try:
-            case_id = int(case_id)
-        except ValueError as e:
-            print(e)
-            abort(404, message='Sorry no such case {}'. format(case_id))
-        case = Case.query.get(case_id)
-        if case is not None:
-            return case_schema.dump(case)
-        else:
-            abort(404, message='Sorry, case {} not found'.format(case_id))
 
 
 class JobsApi(Resource):
@@ -128,15 +88,18 @@ class JobApi(Resource):
         """
         Update the given details for this job
         """
+        changed = []
         if name is missing and values is missing:
             # You don't actually need to change anything
-            return {'status': 'success'}
+            return {'status': 'success', 'changed': changed}
         job = Job.query.get(job_id)
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
         if name is not missing:
-            job.mintedcase_name = name
+            changed.append("name")
+            job.name = name
         if values is not missing:
+            changed.append("values")
             for value in job.values:
                 db.session.delete(value)
             for value in values:
@@ -149,4 +112,4 @@ class JobApi(Resource):
         except IntegrityError as e:
             print(e)
             abort(404, message='Sorry. Failed to commit your request')
-        return {'status': 'success'}
+        return {'status': 'success', "changed": changed}

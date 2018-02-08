@@ -2,7 +2,8 @@
 Routes module
 """
 
-from .routes import CasesApi, CaseApi, JobsApi, JobApi
+from .case_routes import CasesApi, CaseApi
+from .job_routes import JobsApi, JobApi
 from .fake_routes import TestData
 
 
