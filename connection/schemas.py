@@ -143,6 +143,7 @@ class JobValueSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = JobParameter
+        fields = ('id', 'name', 'value', 'parent_template')
 
 
 def init_marshmallow(app):
