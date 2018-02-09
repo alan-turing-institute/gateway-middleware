@@ -129,8 +129,9 @@ class JobSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = Job
-        fields = ('id', 'name', 'user', 'values')
+        fields = ('id', 'name', 'user', 'values', 'parent_case')
     values = ma.List(ma.Nested('JobValueSchema'))
+    parent_case = ma.Nested('CaseSchema')
 
 
 class JobValueSchema(ma.ModelSchema):
