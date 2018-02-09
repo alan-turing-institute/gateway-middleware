@@ -5,6 +5,8 @@ to store Cases and Jobs
 
 from flask_sqlalchemy import SQLAlchemy
 
+from .field import Field
+
 db = SQLAlchemy()
 
 Base = db.Model
@@ -18,6 +20,50 @@ class Case(Base):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
+    flat_fields = None
+
+    def _get_possible_fields(self):
+        """
+        Flatten the fields in a map for easy checking of whether they are
+        allowed and what their bounds are
+        """
+        stack = []
+        stack.extend(self.fields)
+        flat_fields = {}
+        while len(stack) > 0:
+            child = stack.pop()
+            # Recusively add children
+            stack.extend(child.child_fields)
+
+            # Get all the flattened spec
+            specs_map = {}
+            for spec in child.specs:
+                existing = specs_map.get(spec.name)
+                if existing is None:
+                    specs_map[spec.name] = spec.value
+                elif isinstance(existing, list):
+                    existing.append(spec.value)
+                else:
+                    specs_map[spec.name] = [existing, spec.value]
+
+            # If you have specs it's a field!
+            if len(specs_map) > 0:
+                field = Field(child.name, specs_map)
+                flat_fields[field.process_name] = field
+        self.flat_fields = flat_fields
+
+    def validate_value(self, fullname, value):
+        """
+        Check if a value is allowed to be set for a particular
+        parameter.
+        This uses the full name of the parameter, not the display name
+        """
+        if self.flat_fields is None:
+            self._get_possible_fields()
+        field = fullname.get(fullname)
+        if field is None:
+            return False
+        return field.validate_value(value)
 
 
 class CaseField(Base):
@@ -116,6 +162,14 @@ class Job(Base):
     user = db.Column(db.String, nullable=False)
 
     parent_case = db.relationship('Case')
+
+    def validate_value(self, fullname, value):
+        """
+        Check if a value is allowed to be set for a particular
+        parameter.
+        This uses the full name of the parameter, not the display name
+        """
+        self.parent_case.validate_value(fullname, value)
 
 
 class JobParameter(Base):
