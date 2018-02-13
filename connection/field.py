@@ -39,7 +39,7 @@ class Field:
         if suffix is not None:
             self.process_name = self.process_name + suffix
 
-    def check_value(self, new_value):
+    def validate_value(self, fullname, new_value):
         """
         Check to make sure the current value is allowed.
 
@@ -48,6 +48,8 @@ class Field:
         * min
         * max
         """
+        if fullname != self.process_name:
+            return False
         min = self.properties.get('min')
         if min is not None and min > new_value:
             return False

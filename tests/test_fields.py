@@ -18,9 +18,9 @@ def test_update_specs():
     assert(field.display_name == "test")
     assert(field.process_name == "test")
     assert(len(field.properties) == 1)
-    assert(not field.check_value(5))
-    assert(field.check_value(8))
-    assert(field.check_value(10))
+    assert(not field.validate_value("test", 5))
+    assert(field.validate_value("test", 8))
+    assert(field.validate_value('test', 10))
 
 
 def test_update_process_name():
