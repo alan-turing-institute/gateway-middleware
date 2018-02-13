@@ -60,10 +60,10 @@ class Case(Base):
         """
         if self.flat_fields is None:
             self._get_possible_fields()
-        field = fullname.get(fullname)
+        field = self.flat_fields.get(fullname)
         if field is None:
             return False
-        return field.validate_value(value)
+        return field.validate_value(fullname, value)
 
 
 class CaseField(Base):
@@ -163,13 +163,57 @@ class Job(Base):
 
     parent_case = db.relationship('Case')
 
+    def set_name(self, new_name, log):
+        """
+        Replace the job name if it is sensible.
+
+        Return True if the job name was changed. If it was
+        not there will be a string in the log explaining
+        why it was rejected.
+        """
+        if new_name is None:
+            log.append("Name must be provided")
+            return False
+        new_name = new_name.strip()
+        if len(new_name) == 0:
+            log.append("Name cannot be the empty string")
+            return False
+        self.name = new_name
+        return True
+
+    def set_value_list(self, new_values, log):
+        """
+        Replace the list of jobs with a list of new jobs
+
+        Return True if the list was replaced successfully.
+        Note that data may partially have been changed, so the
+        session should still be rollbacked.
+        If it returns false log will have appended messages
+        explaining why it was rejected.
+        """
+        success = True
+        for value in self.values:
+            db.session.delete(value)
+        for value in new_values:
+            if self.validate_value(value['name'], value['name']):
+                new_minted_value = JobParameter(name=value['name'],
+                                                value=value['value'],
+                                                parent_job=self)
+                self.values.append(new_minted_value)
+                print("Added value")
+            else:
+                success = False
+                log.append('Rejected parameter "%s" with value "s"'.
+                           format(value['name'], value['value']))
+        return success
+
     def validate_value(self, fullname, value):
         """
         Check if a value is allowed to be set for a particular
         parameter.
         This uses the full name of the parameter, not the display name
         """
-        self.parent_case.validate_value(fullname, value)
+        return self.parent_case.validate_value(fullname, value)
 
 
 class JobParameter(Base):

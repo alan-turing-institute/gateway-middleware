@@ -6,7 +6,7 @@ from flask_restful import Resource, abort
 
 from sqlalchemy.exc import IntegrityError
 
-from connection.models import Job, JobParameter, db
+from connection.models import Job, db
 from connection.schemas import JobHeaderSchema, JobSchema
 
 from webargs import fields, missing
@@ -89,27 +89,36 @@ class JobApi(Resource):
         Update the given details for this job
         """
         changed = []
+        error_log = []
+        status = 'success'
         if name is missing and values is missing:
             # You don't actually need to change anything
-            return {'status': 'success', 'changed': changed}
+            return {
+                'status': status,
+                'changed': changed,
+                'errors': error_log
+            }
         job = Job.query.get(job_id)
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
         if name is not missing:
-            changed.append("name")
-            job.name = name
+            if job.set_name(name, error_log):
+                changed.append("name")
         if values is not missing:
-            changed.append("values")
-            for value in job.values:
-                db.session.delete(value)
-            for value in values:
-                new_minted_value = JobParameter(name=value['name'],
-                                                value=value['value'],
-                                                parent_job=job)
-                job.values.append(new_minted_value)
+            if job.set_value_list(values, error_log):
+                changed.append("values")
         try:
-            db.session.commit()
+            if len(error_log) == 0:
+                db.session.commit()
+            else:
+                db.session.rollback()
+                changed = []
+                status = 'failed'
         except IntegrityError as e:
             print(e)
             abort(404, message='Sorry. Failed to commit your request')
-        return {'status': 'success', "changed": changed}
+        return {
+            'status': status,
+            'changed': changed,
+            'errors': error_log
+        }

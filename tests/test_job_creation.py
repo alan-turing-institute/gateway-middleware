@@ -50,6 +50,7 @@ def test_rename_job_2(app):
     assert(result['status'] == 'success')
     assert(result['changed'][0] == 'name')
     assert(len(result['changed']) == 1)
+    assert(len(result['errors']) == 0)
 
 
 @request_context("/job/2")
@@ -60,3 +61,16 @@ def test_job_renamed(app):
     result = JobApi().dispatch_request(2)
     assert(result.data['id'] == 2)
     assert(result.data['name'] == "Awesome Job")
+
+
+@request_context("/job/2", method="PATCH",
+                 content_type='application/json',
+                 data='{"values": [ { "name": "length", "value": "100" }]}')
+def test_revalues_job_2(app):
+    """
+    Test that you can rename a job
+    """
+    result = JobApi().dispatch_request(2)
+    assert(result['status'] != 'success')
+    assert(len(result['changed']) == 0)
+    assert(len(result['errors']) > 0)
