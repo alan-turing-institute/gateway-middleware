@@ -43,17 +43,18 @@ class Field:
         """
         Check to make sure the current value is allowed.
 
-        The current implementation only handles integers
+        The current implementation only handles floats
         and the fields
         * min
         * max
         """
+        new_value = float(new_value)
         if fullname != self.process_name:
             return False
         min = self.properties.get('min')
-        if min is not None and min > new_value:
+        if min is not None and float(min) > new_value:
             return False
         max = self.properties.get('max')
-        if max is not None and max < new_value:
+        if max is not None and float(max) < new_value:
             return False
         return True

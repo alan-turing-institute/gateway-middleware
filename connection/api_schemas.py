@@ -1,0 +1,104 @@
+"""
+Set up marshmallow classes for serialising data
+"""
+
+from webargs.fields import Int, Str, Nested
+from marshmallow import validates_schema, ValidationError
+
+from .schemas import ma
+
+
+class JobArgs(ma.Schema):
+    """
+    Class to read in arguments to create a new job
+    """
+    class Meta(object):
+        """
+        Ensure that it can only take the defined arguments
+        """
+        strict = True
+
+    case_id = Int(required=True)
+    author = Str(required=True)
+    name = Str(required=True)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        unknown = set(original_data) - set(self.fields)
+        if unknown:
+            raise ValidationError('Unknown field', unknown)
+
+
+class JobArgumentArgs(ma.Schema):
+    """
+    Class to read in the arguments for a single
+    Job argument value
+    """
+    class Meta(object):
+        """
+        Ensure that other fields are not provided
+        """
+        strict = True
+    name = Str(required=True)
+    value = Str(required=True)
+
+    @validates_schema(pass_original=True, pass_many=True)
+    def check_unknown_fields(self, data, original_data, many):
+        if not many:
+            self.check_unknown_field(data, original_data)
+            return
+        if len(data) != len(original_data):
+            raise ValidationError('Could not parse all fields, ',
+                                  original_data)
+        for index in range(0, len(data)):
+            self.check_unknown_field(data[index], original_data[index])
+
+    def check_unknown_field(self, data, original_data):
+        """
+        Check that a single instance of a field validates
+        """
+        unknown = set(original_data) - set(self.fields)
+        if unknown:
+            raise ValidationError('Unknown field', unknown)
+
+
+class JobPatchArgs(ma.Schema):
+    """
+    Read in the arguments for patching a job
+    """
+    class Meta(object):
+        """
+        Ensure that other fields are not provided
+        """
+        strict = True
+    name = Str()
+    values = Nested(JobArgumentArgs, many=True)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        unknown = set(original_data) - set(self.fields)
+        if unknown:
+            raise ValidationError('Unknown field', unknown)
+
+
+class PaginationArgs(ma.Schema):
+    """
+    Read in arguments for paginating
+    """
+    class Meta(object):
+        """
+        Ensure that other fields are not provided
+        """
+        strict = True
+    page = Int(missing=1, strict=True, validate=lambda p: p > 0)
+    per_page = Int(missing=10, strict=True, validate=lambda p: p > 0)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        unknown = set(original_data) - set(self.fields)
+        print(original_data)
+        print(self.fields)
+        print(data)
+        raise EnvironmentError()
+        if len(unknown) > 0:
+            raise ValidationError('Unknown field', unknown)

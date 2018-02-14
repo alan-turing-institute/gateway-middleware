@@ -195,15 +195,14 @@ class Job(Base):
         for value in self.values:
             db.session.delete(value)
         for value in new_values:
-            if self.validate_value(value['name'], value['name']):
+            if self.validate_value(value['name'], value['value']):
                 new_minted_value = JobParameter(name=value['name'],
                                                 value=value['value'],
                                                 parent_job=self)
                 self.values.append(new_minted_value)
-                print("Added value")
             else:
                 success = False
-                log.append('Rejected parameter "%s" with value "s"'.
+                log.append('Rejected parameter "{}" with value "{}"'.
                            format(value['name'], value['value']))
         return success
 

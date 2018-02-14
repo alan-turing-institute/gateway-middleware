@@ -6,10 +6,10 @@ from flask_restful import Resource, abort
 
 from connection.models import Case
 from connection.schemas import CaseSchema, CaseHeaderSchema
+from connection.api_schemas import PaginationArgs
 
 from webargs.flaskparser import use_kwargs
 
-from .common_args import pagination_args
 
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
@@ -19,7 +19,7 @@ class CasesApi(Resource):
     """
     Api for the list of all cases
     """
-    @use_kwargs(pagination_args)
+    @use_kwargs(PaginationArgs())
     def get(self, page, per_page):
         """
         Get all the cases that are in the requested range

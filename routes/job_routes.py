@@ -8,37 +8,20 @@ from sqlalchemy.exc import IntegrityError
 
 from connection.models import Job, db
 from connection.schemas import JobHeaderSchema, JobSchema
+from connection.api_schemas import JobArgs, JobPatchArgs, PaginationArgs
 
-from webargs import fields, missing
+from webargs import missing
 from webargs.flaskparser import use_kwargs
-
-from .common_args import pagination_args
 
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
-
-job_args = {
-    'case_id': fields.Int(required=True, strict=True),
-    'author': fields.Str(required=True, strict=True),
-    'name': fields.Str(required=True)
-}
-
-job_argument_args = {
-    'name': fields.Str(required=True),
-    'value': fields.Str(required=True)
-}
-
-job_patch_args = {
-    'name': fields.Str(),
-    'values': fields.List(fields.Nested(job_argument_args))
-}
 
 
 class JobsApi(Resource):
     """
     Endpoint for dealing with the list of jobs
     """
-    @use_kwargs(job_args, locations=('json',))
+    @use_kwargs(JobArgs(), locations=('json',))
     def post(self, case_id, name, author):
         """
         Create a new job based on a case
@@ -54,7 +37,7 @@ class JobsApi(Resource):
                   message='Sorry, these parameters have already been used')
         return {'job_id': new_job.id}
 
-    @use_kwargs(pagination_args)
+    @use_kwargs(PaginationArgs())
     def get(self, page, per_page):
         """
         Get all the jobs that are in the requested range
@@ -83,7 +66,7 @@ class JobApi(Resource):
         else:
             abort(404, message='Sorry, job {} not found'.format(job_id))
 
-    @use_kwargs(job_patch_args)
+    @use_kwargs(JobPatchArgs())
     def patch(self, job_id, name, values):
         """
         Update the given details for this job
