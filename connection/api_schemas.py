@@ -96,9 +96,5 @@ class PaginationArgs(ma.Schema):
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
         unknown = set(original_data) - set(self.fields)
-        print(original_data)
-        print(self.fields)
-        print(data)
-        raise EnvironmentError()
         if len(unknown) > 0:
             raise ValidationError('Unknown field', unknown)
