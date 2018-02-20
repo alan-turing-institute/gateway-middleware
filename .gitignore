@@ -5,6 +5,7 @@
 # Python stuff
 __pycache__/
 .cache/
+.pytest_cache/
 
 # Test database
 test.db
