@@ -86,10 +86,10 @@ class JobApi(Resource):
             abort(404, message='Sorry, job {} not found'.format(job_id))
         if name is not missing:
             if job.set_name(name, error_log):
-                changed.append("name")
+                changed.append('name')
         if values is not missing:
             if job.set_value_list(values, error_log):
-                changed.append("values")
+                changed.append('values')
         try:
             if len(error_log) == 0:
                 db.session.commit()
