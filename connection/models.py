@@ -300,6 +300,27 @@ JobParameterTemplate.values = db.relationship('JobParameterTemplateValue',
                                               cascade='all, delete-orphan')
 
 
+class Scripts(Base):
+    """
+    A table of scripts for a case
+    """
+    __tablename = 'scripts'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    case_id = db.Column(db.Integer,
+                        db.ForeignKey('case.id'),
+                        nullable=False)
+    name = db.Column(db.String, nullable=False)
+    url = db.Column(db.String, nullable=False)
+
+    parent_case = db.relationship('Case', back_populates='scripts')
+
+
+Case.scripts = db.relationship('Scripts',
+                               back_populates='parent_case',
+                               cascade='all, delete-orphan')
+
+
 def init_database(app):
     """
     Initialise the database and required classes in the context
