@@ -300,11 +300,11 @@ JobParameterTemplate.values = db.relationship('JobParameterTemplateValue',
                                               cascade='all, delete-orphan')
 
 
-class Scripts(Base):
+class Script(Base):
     """
     A table of scripts for a case
     """
-    __tablename = 'scripts'
+    __tablename = 'script'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     case_id = db.Column(db.Integer,
@@ -316,7 +316,7 @@ class Scripts(Base):
     parent_case = db.relationship('Case', back_populates='scripts')
 
 
-Case.scripts = db.relationship('Scripts',
+Case.scripts = db.relationship('Script',
                                back_populates='parent_case',
                                cascade='all, delete-orphan')
 

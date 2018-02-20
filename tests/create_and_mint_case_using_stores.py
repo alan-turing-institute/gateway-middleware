@@ -14,7 +14,7 @@ by retrieving casefields from the Tank and Fluid stores.
 """
 
 from connection import init_database
-from connection.models import (db, Case, CaseField,
+from connection.models import (db, Case, CaseField, Script,
                                JobParameterTemplate, JobParameter, Job)
 
 from .create_case_store import make_tank_store, make_fluid_store
@@ -180,8 +180,19 @@ def set_up_test_database():
     mycase.fields.append(new_tankA)
     mycase.fields.append(new_fluid1)
     mycase.fields.append(new_fluid2)
+
+    start = Script(parent_case=mycase, name='start',
+                   url='http://the.internet/start')
+    run = Script(parent_case=mycase, name='run',
+                 url='http://the.internet/run')
+    gofish = Script(parent_case=mycase, name='gofish',
+                    url='http://the.internet/gofish')
+
     # save this to the DB
     session.add(mycase)
+    session.add(start)
+    session.add(run)
+    session.add(gofish)
     session.commit()
 
     # test the prefix has been added
