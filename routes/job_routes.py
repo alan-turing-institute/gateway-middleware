@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from connection.models import Job, db
 from connection.schemas import JobHeaderSchema, JobSchema
 from connection.api_schemas import JobArgs, JobPatchArgs, PaginationArgs
+from connection.constants import JobStatus, RequestStatus
 
 from webargs import missing
 from webargs.flaskparser import use_kwargs
@@ -73,7 +74,7 @@ class JobApi(Resource):
         """
         changed = []
         error_log = []
-        status = 'success'
+        status = RequestStatus.SUCCESS.value
         if name is missing and values is missing:
             # You don't actually need to change anything
             return {
@@ -96,7 +97,7 @@ class JobApi(Resource):
             else:
                 db.session.rollback()
                 changed = []
-                status = 'failed'
+                status = RequestStatus.FAILED.value
         except IntegrityError as e:
             print(e)
             abort(404, message='Sorry. Failed to commit your request')
@@ -105,3 +106,14 @@ class JobApi(Resource):
             'changed': changed,
             'errors': error_log
         }
+
+        def post(self, job_id):
+            """
+            Start the given job if it isn't started yet
+            """
+            job = Job.query.get(job_id)
+            if job is None:
+                abort(404, message='Sorry, job {} not found'.format(job_id))
+            job.status = JobStatus.QUEUED
+            db.session.commit()
+            return {'status': RequestStatus.SUCCESS}

@@ -331,16 +331,23 @@ deleted.
 
 ##### Return 
 
-If the value is successfully changed the following structure is returned. 
+The following structure is returned. 
 
 ```json
 { 
-    "status": "success", 
-    "changed": [ "name", "values" ]
+    "status": "success" | "failed", 
+    "changed": [ "name", "values" ],
+    "errors": [ "error message" ]
 }
 ```
 
 Note that the `changed` field is a list of which fields where successfully changed. 
+If the request failed then the errors will explain why.
+A request will not succeed if there are any errors.
+
+#### `POST`
+
+Starts the current job. 
 
 ### `/test`
 
