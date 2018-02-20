@@ -11,6 +11,7 @@ from routes import JobsApi, JobApi
 
 from .decorators import request_context
 from .fixtures import demo_app as app
+from connection.constants import JobStatus
 
 
 @request_context("/job/1")
@@ -53,6 +54,7 @@ def test_get_job_1(app):
     print(result.data)
     assert(len(result.data['values']) > 0)
     assert(result.data['id'] == 1)
+    assert(result.data['status'] == JobStatus.NOT_STARTED.value)
 
 
 @request_context("/job?per_page=1", method="GET")
@@ -63,6 +65,7 @@ def test_1_per_page(app):
     result = JobsApi().dispatch_request()
     assert(len(result.data) == 1)
     assert(result.data[0]['id'] == 1)
+    assert(result.data[0]['status'] == JobStatus.NOT_STARTED.value)
     assert(result.data[0].get('values') is None)
 
 

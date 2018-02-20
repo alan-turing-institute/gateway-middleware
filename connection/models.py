@@ -6,6 +6,7 @@ to store Cases and Jobs
 from flask_sqlalchemy import SQLAlchemy
 
 from .field import Field
+from .constants import JobStatus
 
 db = SQLAlchemy()
 
@@ -160,6 +161,8 @@ class Job(Base):
                         nullable=False)
     name = db.Column(db.String, nullable=False)
     user = db.Column(db.String, nullable=False)
+    status = db.Column(db.String, nullable=False,
+                       default=JobStatus.NOT_STARTED.value)
 
     parent_case = db.relationship('Case')
 
