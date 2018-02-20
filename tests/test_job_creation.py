@@ -68,9 +68,10 @@ def test_job_renamed(app):
                  data='{"values": [ { "name": "length", "value": "100" }]}')
 def test_revalues_job_2(app):
     """
-    Test that you can rename a job
+    Test that you can't set an invalid number
     """
     result = JobApi().dispatch_request(2)
-    assert(result['status'] != 'success')
-    assert(len(result['changed']) == 0)
+    print(result)
+    assert(result['changed'] == [])
+    assert(result['status'] == 'failed')
     assert(len(result['errors']) > 0)
