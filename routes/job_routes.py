@@ -122,7 +122,7 @@ class JobApi(Resource):
         if not job.fully_configured():
             return {
                 'status': RequestStatus.FAILED.value,
-                'errors': ['You must set all the parameters before running a job']
+                'errors': ['You must set all parameters before running a job']
             }
         # TODO: Dispatch the start job request
         job.status = JobStatus.QUEUED
