@@ -64,7 +64,7 @@ def apply_mintstore_value_to_case_field(mintstore_value, case_field):
         return None
     min_val = None
     max_val = None
-    prefix = ""
+    prefix = ''
     for spec in case_field.specs:
         # check mintstore value against min, max
         if spec.name == 'min':
@@ -118,7 +118,7 @@ def mint_case(session, name, case, user, mintstoremap={}):
                           parent_case=case)
 
     for (k, v) in mintstoremap.items():
-        print(k, ",", v)
+        print(k, ',', v)
         case_field = session.query(CaseField). \
             filter(CaseField.name == k).first().deep_copy()
         if not case_field:
@@ -148,7 +148,7 @@ def set_up_test_database():
     for case in Case.query.all():
         done = True
     if done:
-        print("Data already there!")
+        print('Data already there!')
         exit()
     session.add(tank)
     session.add(fluid)
