@@ -172,11 +172,11 @@ class Job(Base):
         why it was rejected.
         """
         if new_name is None:
-            log.append("Name must be provided")
+            log.append('Name must be provided')
             return False
         new_name = new_name.strip()
         if len(new_name) == 0:
-            log.append("Name cannot be the empty string")
+            log.append('Name cannot be the empty string')
             return False
         self.name = new_name
         return True
