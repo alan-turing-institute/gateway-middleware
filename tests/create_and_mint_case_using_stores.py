@@ -32,7 +32,6 @@ def apply_mintstore_to_case_field(mintstore, case_field):
 
     minted_value_list = []
 
-    print('applying %s to %s' % (mintstore.name, case_field.name))
     case_fields_with_specs = recursively_get_case_fields_with_specs(case_field)
     mintstore_vals = mintstore.values
     if len(mintstore_vals) != len(case_fields_with_specs):
@@ -44,7 +43,6 @@ def apply_mintstore_to_case_field(mintstore, case_field):
     for mv in mintstore_vals:
         for cf in case_fields_with_specs:
             if mv.name == cf.name:
-                print('  Setting values for %s' % cf.name)
                 minted_value_list.append(
                     apply_mintstore_value_to_case_field(mv, cf))
                 break
@@ -118,7 +116,6 @@ def mint_case(session, name, case, user, mintstoremap={}):
                           parent_case=case)
 
     for (k, v) in mintstoremap.items():
-        print(k, ',', v)
         case_field = session.query(CaseField). \
             filter(CaseField.name == k).first().deep_copy()
         if not case_field:
@@ -214,10 +211,6 @@ def set_up_test_database():
 
     minted_case = mint_case(session, 'TESTMINT',
                             mycase, 'nbarlow', mintstoremap)
-    print('\n ==== Created a Job ====== \n')
-
-    for v in minted_case.values:
-        print('Minted case has %s = %s' % (v.name, v.value))
 
     session.add(minted_case)
     session.commit()
