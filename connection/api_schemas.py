@@ -3,7 +3,9 @@ Set up marshmallow classes for serialising data
 """
 
 from webargs.fields import Int, Str, Nested
-from marshmallow import validates_schema, ValidationError
+from marshmallow import validates_schema
+
+from werkzeug.exceptions import BadRequestKeyError
 
 from .schemas import ma
 
@@ -26,7 +28,7 @@ class JobArgs(ma.Schema):
     def check_unknown_fields(self, data, original_data):
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise ValidationError('Unknown field', unknown)
+            raise BadRequestKeyError('Unknown field', unknown)
 
 
 class JobArgumentArgs(ma.Schema):
@@ -48,8 +50,8 @@ class JobArgumentArgs(ma.Schema):
             self.check_unknown_field(data, original_data)
             return
         if len(data) != len(original_data):
-            raise ValidationError('Could not parse all fields, ',
-                                  original_data)
+            raise BadRequestKeyError('Could not parse all fields, '.
+                                     format(original_data))
         for index in range(0, len(data)):
             self.check_unknown_field(data[index], original_data[index])
 
@@ -59,7 +61,7 @@ class JobArgumentArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise ValidationError('Unknown field', unknown)
+            raise BadRequestKeyError('Unknown field'.format(unknown))
 
 
 class JobPatchArgs(ma.Schema):
@@ -78,7 +80,7 @@ class JobPatchArgs(ma.Schema):
     def check_unknown_fields(self, data, original_data):
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise ValidationError('Unknown field', unknown)
+            raise BadRequestKeyError('Unknown field {}'.format(unknown))
 
 
 class PaginationArgs(ma.Schema):
@@ -97,4 +99,4 @@ class PaginationArgs(ma.Schema):
     def check_unknown_fields(self, data, original_data):
         unknown = set(original_data) - set(self.fields)
         if len(unknown) > 0:
-            raise ValidationError('Unknown field', unknown)
+            raise BadRequestKeyError('Unknown field {}'.format(unknown))
