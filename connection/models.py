@@ -66,6 +66,14 @@ class Case(Base):
             return False
         return field.validate_value(fullname, value)
 
+    def required_values(self):
+        """
+        Return a set of all the fiels that need to be set
+        """
+        if self.flat_fields is None:
+            self._get_possible_fields()
+        return set(self.flat_fields.keys())
+
 
 class CaseField(Base):
     """
@@ -216,6 +224,14 @@ class Job(Base):
         This uses the full name of the parameter, not the display name
         """
         return self.parent_case.validate_value(fullname, value)
+
+    def fully_configured(self):
+        """
+        Check to make sure the job has all of it's required values set
+        """
+        set_values = set([v.name for v in self.values])
+        required_values = self.parent_case.required_values()
+        return len(required_values - set_values) == 0
 
 
 class JobParameter(Base):

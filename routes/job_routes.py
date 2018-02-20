@@ -107,20 +107,24 @@ class JobApi(Resource):
             'errors': error_log
         }
 
-        def post(self, job_id):
-            """
-            Start the given job if it isn't started yet
-            """
-            job = Job.query.get(job_id)
-            if job is None:
-                abort(404, message='Sorry, job {} not found'.format(job_id))
-            if job.status != JobStatus.NOT_STARTED.value:
-                return {
-                    'status': RequestStatus.FAILED.value,
-                    'errors': ['Job already started']
-                }
-            # TODO: Now check to make sure that all the parameters are set
-            # TODO: Dispatch the start job request
-            job.status = JobStatus.QUEUED
-            db.session.commit()
-            return {'status': RequestStatus.SUCCESS.value}
+    def post(self, job_id):
+        """
+        Start the given job if it isn't started yet
+        """
+        job = Job.query.get(job_id)
+        if job is None:
+            abort(404, message='Sorry, job {} not found'.format(job_id))
+        if job.status != JobStatus.NOT_STARTED.value:
+            return {
+                'status': RequestStatus.FAILED.value,
+                'errors': ['Job already started']
+            }
+        if not job.fully_configured():
+            return {
+                'status': RequestStatus.FAILED.value,
+                'errors': ['You must set all the parameters before running a job']
+            }
+        # TODO: Dispatch the start job request
+        job.status = JobStatus.QUEUED
+        db.session.commit()
+        return {'status': RequestStatus.SUCCESS.value}
