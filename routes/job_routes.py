@@ -114,8 +114,13 @@ class JobApi(Resource):
             job = Job.query.get(job_id)
             if job is None:
                 abort(404, message='Sorry, job {} not found'.format(job_id))
+            if job.status != JobStatus.NOT_STARTED.value:
+                return {
+                    'status': RequestStatus.FAILED.value,
+                    'errors': ['Job already started']
+                }
             # TODO: Now check to make sure that all the parameters are set
             # TODO: Dispatch the start job request
             job.status = JobStatus.QUEUED
             db.session.commit()
-            return {'status': RequestStatus.SUCCESS}
+            return {'status': RequestStatus.SUCCESS.value}
