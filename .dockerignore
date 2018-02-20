@@ -3,7 +3,11 @@ test.db
 
 # Generated files
 .vscode/
-__pycache__/
+**/__pycache__/
+**/*.pyc
+.cache/
+.pytest_cache/
+.mypy_cache/
 
 # Unneeded files
 .gitignore
