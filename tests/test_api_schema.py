@@ -7,7 +7,7 @@ Tests for the job api
 from pytest import raises
 
 from connection.api_schemas import JobPatchArgs
-from marshmallow import ValidationError
+from werkzeug.exceptions import HTTPException, BadRequestKeyError
 
 from routes import JobApi
 
@@ -23,7 +23,7 @@ def test_extra_args_fail(app):
         'name': 'fish',
         'dog': 'hound'
     }
-    with raises(ValidationError):
+    with raises(BadRequestKeyError):
         read = JobPatchArgs().load(input)
 
 def test_invalid_args_fail(app):
@@ -31,7 +31,7 @@ def test_invalid_args_fail(app):
     Test that going of the end of pages still works
     """
     input = '{ "dog": "hound" }'
-    with raises(ValidationError):
+    with raises(BadRequestKeyError):
         read = JobPatchArgs().load(input)
 
 def test_lists_check(app):
@@ -50,23 +50,21 @@ def test_lists_check(app):
             }
         ]
     }
-    with raises(ValidationError):
+    with raises(BadRequestKeyError):
         read = JobPatchArgs().load(input)
 
 @request_context("/case?fish=3")
 def test_incorrect_pagination_args(app):
-    result = app.dispatch_request()
-    assert(result.status_code != 200)
+    with raises(HTTPException):
+        result = app.dispatch_request()
 
 @request_context("/job/2", method="PATCH",
                  content_type='application/json',
                  data='{"dog": "Awesome Job"}')
 def test_rename_job_2(app):
     """
-    Test that you can rename a job
+    Test that you can't submit random arguments to 
+    patch
     """
-    result = JobApi().dispatch_request(2)
-    print(result)
-    assert(result['status'] != 'success')
-    assert(len(result['changed']) == 0)
-    assert(len(result['errors']) == 0)
+    with raises(HTTPException):
+        result = JobApi().dispatch_request(2)
