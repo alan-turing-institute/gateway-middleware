@@ -361,7 +361,45 @@ A request will not succeed if there are any errors.
 
 #### `POST`
 
-Starts the current job. 
+Starts the current job. Does not take any arguments.
+
+##### Return 
+
+The following structure is returned. 
+
+```json
+{ 
+    "status": "success" | "failed", 
+    "errors": [ "error message if failed" ]
+}
+```
+
+### `/test/<id>/<status>`
+
+Set the status for a given job to a specfic value.
+
+#### `PUT`
+
+Set the status of the given job to the requested.
+
+##### Arguments
+
+- `id` must be a valid job id
+- `status` must be a status from the following list (case insensitive)
+    - NOT_STARTED
+    - QUEUED
+    - FAILED
+
+##### Return
+
+The following structure is returned. 
+
+```json
+{ 
+    "status": "success" | "failed", 
+    "errors": [ "error message if failed" ]
+}
+```
 
 ### `/test`
 
