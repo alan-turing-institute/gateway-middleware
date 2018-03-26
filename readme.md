@@ -4,6 +4,20 @@ The science gateway middleware stores the current status
 of all cases and jobs. It does minimal processing, and serves
 primarily as a persistent store of state (but not of data).
 
+## Configuration
+
+In order to run the system you must setup the `config.json` file with the correct
+urls for the database and job manager. An example configuration is:
+
+```json
+{
+    "database_url": "postgres://sg:sg@postgres/sg",
+    "job_manager_url": "localhost:9000"
+}
+```
+
+Note that the `database_url` is an SqlAlchemy database connection string.
+
 ## Running The System
 
 1. Ensure that you have installed [Docker](https://docs.docker.com/docker-for-mac/install/).

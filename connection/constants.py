@@ -4,6 +4,8 @@ Constants module
 
 from enum import Enum
 
+JOB_MANAGER_URL = 'jb'
+
 
 class JobStatus(Enum):
     """

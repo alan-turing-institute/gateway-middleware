@@ -11,9 +11,16 @@ from connection import init_database, init_marshmallow
 
 from routes import setup_routes
 
+import connection.constants as const
+
+from json import load
+
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sg:sg@postgres/sg'
+with open('config.json') as json:
+    args = load(json)
+    app.config['SQLALCHEMY_DATABASE_URI'] = args['database_url']
+    const.JOB_MANAGER_URL = args['job_manager_url']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 init_database(app)
