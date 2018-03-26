@@ -126,15 +126,14 @@ class JobApi(Resource):
                 'status': RequestStatus.FAILED.value,
                 'errors': ['You must set all parameters before running a job']
             }
-        # TODO: Dispatch the start job request
-        # TODO: Get the scripts
         params = {
-            'fields': job.field_list(),
-            'scripts': []
+            'fields_to_patch': job.field_list(),
+            'scripts': job.script_list()
         }
         response = requests.get('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
                                 params)
         print(response)
+        # TODO: Handle errors
         job.status = JobStatus.QUEUED
         db.session.commit()
         return {'status': RequestStatus.SUCCESS.value}

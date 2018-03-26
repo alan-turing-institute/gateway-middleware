@@ -237,10 +237,25 @@ class Job(Base):
         """
         Get the field values as a dictionary
         """
-        fields = {}
+        fields = []
         for param in self.values:
-            fields[param.name] = param.value
+            fields.push({
+                'name': param.name,
+                'value': param.value
+            })
         return fields
+
+    def script_list(self):
+        """
+        Get the list of scripts as a dictionary
+        """
+        scripts = []
+        for script in self.parent_case.scripts:
+            scripts.push({
+                'name': script.name,
+                'location': script.url
+            })
+        return scripts
 
 
 class JobParameter(Base):
