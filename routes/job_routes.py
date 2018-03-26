@@ -9,10 +9,12 @@ from sqlalchemy.exc import IntegrityError
 from connection.models import Job, db
 from connection.schemas import JobHeaderSchema, JobSchema
 from connection.api_schemas import JobArgs, JobPatchArgs, PaginationArgs
-from connection.constants import JobStatus, RequestStatus
+from connection.constants import JobStatus, RequestStatus, JOB_MANAGER_URL
 
 from webargs import missing
 from webargs.flaskparser import use_kwargs
+
+import requests
 
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
@@ -125,6 +127,14 @@ class JobApi(Resource):
                 'errors': ['You must set all parameters before running a job']
             }
         # TODO: Dispatch the start job request
+        # TODO: Get the scripts
+        params = {
+            'fields': job.field_list(),
+            'scripts': []
+        }
+        response = requests.get('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
+                                params)
+        print(response)
         job.status = JobStatus.QUEUED
         db.session.commit()
         return {'status': RequestStatus.SUCCESS.value}
