@@ -13,7 +13,7 @@ from routes import setup_routes
 from .create_and_mint_case_using_stores import set_up_test_database
 
 
-@fixture(scope="module")
+@fixture(scope='module')
 def demo_app():
     """
     Setup the flask app context I hope
