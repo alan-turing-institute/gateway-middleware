@@ -233,6 +233,15 @@ class Job(Base):
         required_values = self.parent_case.required_values()
         return len(required_values - set_values) == 0
 
+    def field_list(self):
+        """
+        Get the field values as a dictionary
+        """
+        fields = {}
+        for param in self.values:
+            fields[param.name] = param.value
+        return fields
+
 
 class JobParameter(Base):
     """
