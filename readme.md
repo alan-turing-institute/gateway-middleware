@@ -102,7 +102,7 @@ that may be helpful:
 
 * Delete all tables:
     ```sql
-    DROP TABLE IF EXISTS "Case", Case_Field, ParameterSpec, Job, JobParameter, JobParameterTemplate, JobParameterTemplateValue CASCADE;
+    DROP TABLE IF EXISTS "case", job_parameter, job_parameter_template, job_parameter_template_value, script, Case_Field, ParameterSpec, Job, JobParameter, JobParameterTemplate, JobParameterTemplateValue CASCADE;
     ```
 
 
