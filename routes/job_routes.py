@@ -143,3 +143,12 @@ class JobApi(Resource):
         job.status = JobStatus.QUEUED.value
         db.session.commit()
         return {'status': RequestStatus.SUCCESS.value}
+
+
+class StatusApi(Resource):
+    """
+    This class deals with status changes to jobs
+    """
+
+    def put(self, job_id: int, status: JobStatus):
+        pass

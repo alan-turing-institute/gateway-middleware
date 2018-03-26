@@ -30,7 +30,7 @@ init_marshmallow(app)
 api = Api(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-setup_routes(api)
+setup_routes(app, api)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

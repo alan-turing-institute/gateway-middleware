@@ -29,7 +29,7 @@ def demo_app():
 
     api = Api(app)
 
-    setup_routes(api)
+    setup_routes(app, api)
     with app.app_context():
         set_up_test_database()
     return app
