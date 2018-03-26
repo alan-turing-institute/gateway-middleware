@@ -130,8 +130,8 @@ class JobApi(Resource):
             'fields_to_patch': job.field_list(),
             'scripts': job.script_list()
         }
-        response = requests.get('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
-                                params)
+        response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
+                                 params)
         print(response)
         # TODO: Handle errors
         job.status = JobStatus.QUEUED
