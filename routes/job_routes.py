@@ -132,8 +132,14 @@ class JobApi(Resource):
         }
         response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
                                  params)
-        print(response)
-        # TODO: Handle errors
-        job.status = JobStatus.QUEUED
+        if response.status_code != 200:
+            return {
+                    'status': RequestStatus.FAILED.value,
+                    'errors': ['Job Managed returned HTTP ' +
+                               response.status_code]
+                   }
+        result = response.json
+        # TODO: Handle non http errors - but they haven't been implemented
+        job.status = JobStatus.QUEUED.value
         db.session.commit()
         return {'status': RequestStatus.SUCCESS.value}

@@ -47,8 +47,8 @@ class Case(Base):
                 else:
                     specs_map[spec.name] = [existing, spec.value]
 
-            # If you have specs it's a field!
-            if len(specs_map) > 0:
+            # If you have children you're not a field!
+            if len(child.child_fields) == 0:
                 field = Field(child.name, specs_map)
                 flat_fields[field.process_name] = field
         self.flat_fields = flat_fields
@@ -239,7 +239,7 @@ class Job(Base):
         """
         fields = []
         for param in self.values:
-            fields.push({
+            fields.append({
                 'name': param.name,
                 'value': param.value
             })
@@ -251,7 +251,7 @@ class Job(Base):
         """
         scripts = []
         for script in self.parent_case.scripts:
-            scripts.push({
+            scripts.append({
                 'name': script.name,
                 'location': script.url
             })
@@ -278,6 +278,9 @@ class JobParameter(Base):
     parent_job = db.relationship('Job',
                                  back_populates='values')
     parent_template = db.relationship('JobParameterTemplate')
+
+    def __repr__(self):
+        return '<JP {}: {}>'.format(self.name, self.value)
 
 
 Job.values = db.relationship('JobParameter',
