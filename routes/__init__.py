@@ -19,7 +19,7 @@ def setup_routes(app, api):
     api.add_resource(CaseApi, '/case/<int:case_id>')
     api.add_resource(JobsApi, '/job')
     api.add_resource(JobApi, '/job/<int:job_id>')
-    api.add_resource(StatusApi, '/job/<int:job_id>/<stat:status>')
+    api.add_resource(StatusApi, '/job/<int:job_id>/status')
 
     # Only while in development
     api.add_resource(TestData, '/test')

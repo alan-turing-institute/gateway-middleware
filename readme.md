@@ -374,7 +374,7 @@ The following structure is returned.
 }
 ```
 
-### `/test/<id>/<status>`
+### `/test/<id>/status`
 
 Set the status for a given job to a specfic value.
 
@@ -384,8 +384,14 @@ Set the status of the given job to the requested.
 
 ##### Arguments
 
-- `id` must be a valid job id
-- `status` must be a status from the following list (case insensitive)
+The argument must be the json object:
+
+```json
+{
+    "status": "<new status>"
+}
+```
+where `<new status>` must be a status from the following list (case insensitive):
     - NOT_STARTED
     - QUEUED
     - FAILED

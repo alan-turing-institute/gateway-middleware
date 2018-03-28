@@ -8,6 +8,7 @@ from marshmallow import validates_schema
 from werkzeug.exceptions import BadRequestKeyError
 
 from .schemas import ma
+from .constants import RequestStatus
 
 
 class JobArgs(ma.Schema):
@@ -94,6 +95,25 @@ class PaginationArgs(ma.Schema):
         strict = True
     page = Int(missing=1, strict=True, validate=lambda p: p > 0)
     per_page = Int(missing=10, strict=True, validate=lambda p: p > 0)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        unknown = set(original_data) - set(self.fields)
+        if len(unknown) > 0:
+            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+
+
+class StatusPatchSchema(ma.Schema):
+    """
+    Read in arguments for setting a status value
+    """
+    class Meta(object):
+        """
+        Ensure that other fields are not provided
+        """
+        strict = True
+    status = Str(validate=lambda s: s.upper() in
+                 RequestStatus.__members__.keys())
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):

@@ -4,11 +4,12 @@ Tests for the job starting api
 
 # pylint: disable=W0613
 
-from routes import JobApi, JobsApi
+from routes import JobApi, JobsApi, StatusApi
 
 from .decorators import request_context
 from .fixtures import demo_app as app  # flake8: noqa
-from connection.constants import RequestStatus, JOB_MANAGER_URL
+from connection.constants import RequestStatus, JOB_MANAGER_URL, JobStatus
+from connection.models import Job
 
 from requests_mock import Mocker
 
@@ -32,6 +33,7 @@ def test_start_job_without_values(app):
         result = JobApi().dispatch_request(2)
     assert(len(result['errors']) > 0)
     assert(result['status'] == RequestStatus.FAILED.value)
+    assert Job.query.get(2).status == JobStatus.NOT_STARTED.value
 
 @request_context('/job/1', method='POST')
 def test_start_job(app):
@@ -41,5 +43,28 @@ def test_start_job(app):
     with Mocker() as m:
         m.post(JOB_MANAGER_URL + '/1/start', json='data')
         result = JobApi().dispatch_request(1)
-    print(result)
     assert(result['status'] == RequestStatus.SUCCESS.value)
+    assert Job.query.get(1).status == JobStatus.QUEUED.value
+
+@request_context('/job/1/status', method='PUT',
+                 data='{"status": "failed"}',
+                 content_type='application/json')
+def test_put_status(app):
+    """
+    Test that you can change the status of the queued job
+    """
+    result = StatusApi().dispatch_request(1)
+    assert(result['status'] == RequestStatus.SUCCESS.value)
+    assert Job.query.get(1).status == JobStatus.FAILED.value
+
+@request_context('/job/2/status', method='PUT',
+                 data='{"status": "failed"}',
+                 content_type='application/json')
+def test_fail_not_started(app):
+    """
+    Test that you can't fail a non started job
+    """
+    result = StatusApi().dispatch_request(2)
+    assert(result['status'] == RequestStatus.FAILED.value)
+    assert(len(result['errors']) > 0)
+    assert Job.query.get(2).status == JobStatus.NOT_STARTED.value

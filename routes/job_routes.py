@@ -8,8 +8,10 @@ from sqlalchemy.exc import IntegrityError
 
 from connection.models import Job, db
 from connection.schemas import JobHeaderSchema, JobSchema
-from connection.api_schemas import JobArgs, JobPatchArgs, PaginationArgs
+from connection.api_schemas import (JobArgs, JobPatchArgs,
+                                    PaginationArgs, StatusPatchSchema)
 from connection.constants import JobStatus, RequestStatus, JOB_MANAGER_URL
+from .helpers import make_response
 
 from webargs import missing
 from webargs.flaskparser import use_kwargs
@@ -117,15 +119,12 @@ class JobApi(Resource):
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
         if job.status != JobStatus.NOT_STARTED.value:
-            return {
-                'status': RequestStatus.FAILED.value,
-                'errors': ['Job already started']
-            }
+            return make_response(RequestStatus.FAILED,
+                                 errors=['Job already started'])
         if not job.fully_configured():
-            return {
-                'status': RequestStatus.FAILED.value,
-                'errors': ['You must set all parameters before running a job']
-            }
+            return make_response(RequestStatus.FAILED,
+                                 errors=['You must set all parameters '
+                                         'before starting a job'])
         params = {
             'fields_to_patch': job.field_list(),
             'scripts': job.script_list()
@@ -133,16 +132,15 @@ class JobApi(Resource):
         response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
                                  params)
         if response.status_code != 200:
-            return {
-                    'status': RequestStatus.FAILED.value,
-                    'errors': ['Job Managed returned HTTP ' +
-                               response.status_code]
-                   }
+            return make_response(RequestStatus.FAILED,
+                                 errors=['Job Managed returned HTTP {}'
+                                         .format(response.status_code)])
+
         result = response.json
         # TODO: Handle non http errors - but they haven't been implemented
         job.status = JobStatus.QUEUED.value
         db.session.commit()
-        return {'status': RequestStatus.SUCCESS.value}
+        return make_response()
 
 
 class StatusApi(Resource):
@@ -150,5 +148,24 @@ class StatusApi(Resource):
     This class deals with status changes to jobs
     """
 
-    def put(self, job_id: int, status: JobStatus):
-        pass
+    @use_kwargs(StatusPatchSchema())
+    def put(self, job_id: int, status: str):
+        try:
+            status = JobStatus[status.upper()]
+        except KeyError:
+            abort(400, message='Unknown status {}'.format(status))
+
+        job = Job.query.get(job_id)
+        if job is None:
+            abort(404, message='Sorry, job {} not found'.format(job_id))
+        if job.status == JobStatus.NOT_STARTED.value:
+            return make_response(RequestStatus.FAILED,
+                                 errors=['Cannot set state of not started job']
+                                 )
+        if not job.fully_configured():
+            return make_response(RequestStatus.FAILED,
+                                 errors=['You must set all parameters '
+                                         'before working with a job'])
+        job.status = status.value
+        db.session.commit()
+        return make_response()
