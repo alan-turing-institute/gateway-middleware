@@ -127,13 +127,16 @@ class JobApi(Resource):
                                          'before starting a job'])
         params = {
             'fields_to_patch': job.field_list(),
-            'scripts': job.script_list()
+            'scripts': job.script_list(),
+            'username': job.user
         }
-        response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
-                                 params)
+        print("PARAMS",params)
+        response = requests.post('{}/job/{}/start'.format(JOB_MANAGER_URL, job_id),
+                                 json=params)
         if response.status_code != 200:
+            return params
             return make_response(RequestStatus.FAILED,
-                                 errors=['Job Managed returned HTTP {}'
+                                 errors=['Job Manager returned HTTP {}'
                                          .format(response.status_code)])
 
         result = response.json
@@ -169,3 +172,14 @@ class StatusApi(Resource):
         job.status = status.value
         db.session.commit()
         return make_response()
+
+    def get(self, job_id:int):
+        """
+        get the job status from the job manager
+        """
+        
+        response = requests.get('{}/job/{}/status'.format(JOB_MANAGER_URL, job_id))
+        return response.json()
+
+    
+                                 
