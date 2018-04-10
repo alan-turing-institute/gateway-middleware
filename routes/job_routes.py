@@ -130,16 +130,14 @@ class JobApi(Resource):
             'scripts': job.script_list(),
             'username': job.user
         }
-        print("PARAMS",params)
-        response = requests.post('{}/job/{}/start'.format(JOB_MANAGER_URL, job_id),
+        response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
                                  json=params)
         if response.status_code != 200:
-            return params
             return make_response(RequestStatus.FAILED,
                                  errors=['Job Manager returned HTTP {}'
                                          .format(response.status_code)])
 
-        result = response.json
+        # TODO: do something with: result = response.json
         # TODO: Handle non http errors - but they haven't been implemented
         job.status = JobStatus.QUEUED.value
         db.session.commit()
@@ -172,14 +170,3 @@ class StatusApi(Resource):
         job.status = status.value
         db.session.commit()
         return make_response()
-
-    def get(self, job_id:int):
-        """
-        get the job status from the job manager
-        """
-        
-        response = requests.get('{}/job/{}/status'.format(JOB_MANAGER_URL, job_id))
-        return response.json()
-
-    
-                                 

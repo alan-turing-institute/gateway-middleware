@@ -86,6 +86,7 @@ def test_per_page_string(app):
     with raises(HTTPException):
         result = JobsApi().dispatch_request()
 
+
 @request_context("/job?page=5")
 def test_per_page_string(app):
     """

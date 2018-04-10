@@ -21,6 +21,8 @@ class Case(Base):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
+    thumbnail = db.Column(db.String, nullable=True)
+    description = db.Column(db.String, nullable=True)
     flat_fields = None
 
     def _get_possible_fields(self):
@@ -169,6 +171,7 @@ class Job(Base):
                         nullable=False)
     name = db.Column(db.String, nullable=False)
     user = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=True)
     status = db.Column(db.String, nullable=False,
                        default=JobStatus.NOT_STARTED.value)
 

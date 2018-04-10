@@ -70,7 +70,7 @@ class CaseSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = Case
-        fields = ('id', 'name', 'fields')
+        fields = ('id', 'name', 'fields', 'thumbnail', 'description')
     fields = ma.List(ma.Nested('CaseFieldSchema'))
 
     def make_case(self, data):
@@ -97,7 +97,7 @@ class CaseHeaderSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = Case
-        fields = ('id', 'name', 'links')
+        fields = ('id', 'name', 'links', 'thumbnail', 'description')
     links = ma.Hyperlinks({
         'self': ma.URLFor('caseapi', case_id='<id>')
     })
@@ -113,7 +113,7 @@ class JobHeaderSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = Job
-        fields = ('id', 'name', 'status', 'user', 'links')
+        fields = ('id', 'name', 'status', 'user', 'links', 'description')
     links = ma.Hyperlinks({
         'self': ma.URLFor('jobapi', job_id='<id>'),
         'case': ma.URLFor('caseapi', case_id='<case_id>')
@@ -129,7 +129,8 @@ class JobSchema(ma.ModelSchema):
         Specification of what to use from the original class
         """
         model = Job
-        fields = ('id', 'name', 'status', 'user', 'values', 'parent_case')
+        fields = ('id', 'name', 'status', 'user', 'values', 'description',
+                  'parent_case')
     values = ma.List(ma.Nested('JobValueSchema'))
     parent_case = ma.Nested('CaseSchema')
 

@@ -13,6 +13,7 @@ from connection.models import Job
 
 from requests_mock import Mocker
 
+
 @request_context("/job",
                  data='{"name": "bob", "case_id": "1", "author": "bob"}',
                  content_type='application/json', method="POST")
@@ -22,6 +23,7 @@ def test_create_job(app):
     """
     result = JobsApi().dispatch_request()
     assert(result['job_id'] == 2)
+
 
 @request_context('/job/2', method='POST')
 def test_start_job_without_values(app):
@@ -35,6 +37,7 @@ def test_start_job_without_values(app):
     assert(result['status'] == RequestStatus.FAILED.value)
     assert Job.query.get(2).status == JobStatus.NOT_STARTED.value
 
+
 @request_context('/job/1', method='POST')
 def test_start_job(app):
     """
@@ -46,6 +49,7 @@ def test_start_job(app):
     assert(result['status'] == RequestStatus.SUCCESS.value)
     assert Job.query.get(1).status == JobStatus.QUEUED.value
 
+
 @request_context('/job/1/status', method='PUT',
                  data='{"status": "failed"}',
                  content_type='application/json')
@@ -56,6 +60,7 @@ def test_put_status(app):
     result = StatusApi().dispatch_request(1)
     assert(result['status'] == RequestStatus.SUCCESS.value)
     assert Job.query.get(1).status == JobStatus.FAILED.value
+
 
 @request_context('/job/2/status', method='PUT',
                  data='{"status": "failed"}',

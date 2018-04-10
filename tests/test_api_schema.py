@@ -26,6 +26,7 @@ def test_extra_args_fail(app):
     with raises(BadRequestKeyError):
         read = JobPatchArgs().load(input)
 
+
 def test_invalid_args_fail(app):
     """
     Test that going of the end of pages still works
@@ -33,6 +34,7 @@ def test_invalid_args_fail(app):
     input = '{ "dog": "hound" }'
     with raises(BadRequestKeyError):
         read = JobPatchArgs().load(input)
+
 
 def test_lists_check(app):
     """
@@ -53,11 +55,13 @@ def test_lists_check(app):
     with raises(BadRequestKeyError):
         read = JobPatchArgs().load(input)
 
+
 @request_context("/case?fish=3")
 @mark.skip('Waiting on webargs bug')
 def test_incorrect_pagination_args(app):
     with raises(HTTPException):
         result = app.dispatch_request()
+
 
 @request_context("/job/2", method="PATCH",
                  content_type='application/json',
@@ -65,7 +69,7 @@ def test_incorrect_pagination_args(app):
 @mark.skip('Waiting on webargs bug')
 def test_rename_job_2(app):
     """
-    Test that you can't submit random arguments to 
+    Test that you can't submit random arguments to
     patch
     """
     with raises(HTTPException):
