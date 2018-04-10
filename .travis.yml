@@ -21,6 +21,8 @@ install:
  - pip install -r requirements.txt
  - pip install codecov
  - pip install pytest-cov
+ - pip install pep8
+ - pip install python-flake8
 
 
 before_script:
