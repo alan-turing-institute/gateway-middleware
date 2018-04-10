@@ -82,6 +82,7 @@ def test_per_page_string(app):
     with raises(HTTPException):
         result = CasesApi().dispatch_request()
 
+
 @request_context("/case?page=5")
 def test_per_page_string(app):
     """
