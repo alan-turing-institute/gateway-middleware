@@ -195,6 +195,24 @@ class Job(Base):
         self.name = new_name
         return True
 
+    def set_description(self, new_description, log):
+        """
+        Replace the job description if it is sensible.
+
+        Return True if the job description was changed. If it was
+        not there will be a string in the log explaining
+        why it was rejected.
+        """
+        if new_description is None:
+            log.append('Description must be provided')
+            return False
+        new_description = new_description.strip()
+        if len(new_description) == 0:
+            log.append('Description cannot be the empty string')
+            return False
+        self.description = new_description
+        return True
+
     def set_value_list(self, new_values, log):
         """
         Replace the list of jobs with a list of new jobs

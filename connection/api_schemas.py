@@ -75,6 +75,7 @@ class JobPatchArgs(ma.Schema):
         """
         strict = True
     name = Str()
+    description = Str()
     values = Nested(JobArgumentArgs, many=True)
 
     @validates_schema(pass_original=True)

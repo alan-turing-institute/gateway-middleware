@@ -64,22 +64,22 @@ class JobApi(Resource):
             job_id = int(job_id)
         except ValueError as e:
             print(e)
-            abort(404, message='Sorry no such job {}'. format(job_id))
+            abort(404, message='Sorry no job id {}'. format(job_id))
         job = Job.query.get(job_id)
         if job is not None:
             return job_schema.dump(job)
         else:
-            abort(404, message='Sorry, job {} not found'.format(job_id))
+            abort(404, message='Sorry, jobs {} not found'.format(job_id))
 
     @use_kwargs(JobPatchArgs())
-    def patch(self, job_id, name, values):
+    def patch(self, job_id, name, description, values):
         """
         Update the given details for this job
         """
         changed = []
         error_log = []
         status = RequestStatus.SUCCESS.value
-        if name is missing and values is missing:
+        if name is missing and values is missing and description is missing:
             # You don't actually need to change anything
             return {
                 'status': status,
@@ -92,6 +92,9 @@ class JobApi(Resource):
         if name is not missing:
             if job.set_name(name, error_log):
                 changed.append('name')
+        if description is not missing:
+            if job.set_description(description, error_log):
+                changed.append('description')
         if values is not missing:
             if job.set_value_list(values, error_log):
                 changed.append('values')
