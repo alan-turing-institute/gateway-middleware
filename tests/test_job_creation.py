@@ -78,6 +78,7 @@ def test_revalues_job_2(app):
     assert(result['status'] == 'failed')
     assert(len(result['errors']) > 0)
 
+
 @request_context("/job/2", method="PATCH",
                  content_type='application/json',
                  data='{"description": "test description"}')
@@ -91,6 +92,7 @@ def test_redescribe_job_2(app):
     assert result['changed'] == ['description']
     assert len(result['errors']) == 0
     assert Job.query.get(2).description == 'test description'
+
 
 @request_context("/job/2", method="PATCH",
                  content_type='application/json',
