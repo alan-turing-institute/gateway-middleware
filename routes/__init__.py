@@ -22,4 +22,4 @@ def setup_routes(app, api):
     api.add_resource(StatusApi, '/job/<int:job_id>/status')
 
     # Only while in development
-    api.add_resource(TestData, '/test/<int:test_id>')
+    api.add_resource(TestData, '/test')
