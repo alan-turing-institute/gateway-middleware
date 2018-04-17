@@ -69,6 +69,7 @@ class JobApi(Resource):
             return job_schema.dump(job)
         else:
             abort(404, message='Sorry, jobs {} not found'.format(job_id))
+            return None
 
     @use_kwargs(JobPatchArgs())
     def patch(self, job_id, name, description, values):

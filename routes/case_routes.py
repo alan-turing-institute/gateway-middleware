@@ -47,3 +47,4 @@ class CaseApi(Resource):
             return case_schema.dump(case)
         else:
             abort(404, message='Sorry, case {} not found'.format(case_id))
+            return None
