@@ -2,21 +2,18 @@
 Defintions of routes for the app
 """
 
-from flask_restful import Resource, abort
-
+from flask_restful import abort, Resource
+import requests
 from sqlalchemy.exc import IntegrityError
-
-from connection.models import Job, db
-from connection.schemas import JobHeaderSchema, JobSchema
-from connection.api_schemas import (JobArgs, JobPatchArgs,
-                                    PaginationArgs, StatusPatchSchema)
-from connection.constants import JobStatus, RequestStatus, JOB_MANAGER_URL
-from .helpers import make_response
-
 from webargs import missing
 from webargs.flaskparser import use_kwargs
 
-import requests
+from connection.api_schemas import (JobArgs, JobPatchArgs,
+                                    PaginationArgs, StatusPatchSchema)
+from connection.constants import JOB_MANAGER_URL, JobStatus, RequestStatus
+from connection.models import db, Job
+from connection.schemas import JobHeaderSchema, JobSchema
+from .helpers import make_response
 
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
@@ -26,6 +23,7 @@ class JobsApi(Resource):
     """
     Endpoint for dealing with the list of jobs
     """
+
     @use_kwargs(JobArgs(), locations=('json',))
     def post(self, case_id, name, author):
         """
@@ -56,6 +54,7 @@ class JobApi(Resource):
     """
     Endpoint for dealing with a specific job
     """
+
     def get(self, job_id):
         """
         Get the specified job
@@ -154,6 +153,9 @@ class StatusApi(Resource):
 
     @use_kwargs(StatusPatchSchema())
     def put(self, job_id: int, status: str):
+        """
+        Set the status for the given job
+        """
         try:
             status = JobStatus[status.upper()]
         except KeyError:
@@ -165,7 +167,7 @@ class StatusApi(Resource):
         if job.status == JobStatus.NOT_STARTED.value:
             return make_response(RequestStatus.FAILED,
                                  errors=['Cannot set state of not started job']
-                                 )
+                                )
         if not job.fully_configured():
             return make_response(RequestStatus.FAILED,
                                  errors=['You must set all parameters '

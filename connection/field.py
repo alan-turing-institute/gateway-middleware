@@ -12,6 +12,9 @@ class Field:
     """
 
     def __init__(self, name, properties={}):
+        """
+        Initialise a field
+        """
         self.display_name = name
         self.process_name = name
         self.properties = properties
@@ -51,10 +54,10 @@ class Field:
         new_value = float(new_value)
         if fullname != self.process_name:
             return False
-        min = self.properties.get('min')
-        if min is not None and float(min) > new_value:
+        min_value = self.properties.get('min')
+        if min_value is not None and float(min_value) > new_value:
             return False
-        max = self.properties.get('max')
-        if max is not None and float(max) < new_value:
+        max_value = self.properties.get('max')
+        if max_value is not None and float(max_value) < new_value:
             return False
         return True

@@ -4,44 +4,40 @@ Tests for the job api
 This files requires that the tests
 are run in the order they are written.
 """
-# flake8: noqa
-# pylint: disable=W0613
 
-from pytest import raises
+# pylint: disable=I0011, W0611, W0621, W0613
+
 from werkzeug.exceptions import HTTPException
 
-from routes import JobsApi, JobApi
-
+from connection.constants import RequestStatus
 from connection.models import Job
-
+from routes import JobApi, JobsApi
 from .decorators import request_context
 from .fixtures import demo_app as app
 
-from connection.constants import RequestStatus
 
-
-@request_context("/job",
+@request_context('/job',
                  data='{"name": "bob", "case_id": "1", "author": "bob"}',
-                 content_type='application/json', method="POST")
+                 content_type='application/json', method='POST')
 def test_create_job(app):
     """
     Test that a job is created
     """
     result = JobsApi().dispatch_request()
-    assert(result['job_id'] == 2)
+    assert result['job_id'] == 2
 
 
-@request_context("/job/2")
+@request_context('/job/2')
 def test_has_new_job(app):
     """
     Test that the new job is there
     """
     result = JobApi().dispatch_request(2)
-    assert(result.data['id'] == 2)
-    assert(result.data['name'] == 'bob')
+    assert result.data['id'] == 2
+    assert result.data['name'] == 'bob'
 
 
-@request_context("/job/2", method="PATCH",
+@request_context('/job/2', method='PATCH',
                  content_type='application/json',
                  data='{"name": "Awesome Job"}')
 def test_rename_job_2(app):
@@ -49,23 +45,23 @@ def test_rename_job_2(app):
     Test that you can rename a job
     """
     result = JobApi().dispatch_request(2)
-    assert(result['status'] == 'success')
-    assert(result['changed'][0] == 'name')
-    assert(len(result['changed']) == 1)
-    assert(len(result['errors']) == 0)
+    assert result['status'] == 'success'
+    assert result['changed'][0] == 'name'
+    assert len(result['changed']) == 1
+    assert len(result['errors']) == 0
 
 
-@request_context("/job/2")
+@request_context('/job/2')
 def test_job_renamed(app):
     """
     Test that the job name has actually changed
     """
     result = JobApi().dispatch_request(2)
-    assert(result.data['id'] == 2)
-    assert(result.data['name'] == "Awesome Job")
+    assert result.data['id'] == 2
+    assert result.data['name'] == 'Awesome Job'
 
 
-@request_context("/job/2", method="PATCH",
+@request_context('/job/2', method='PATCH',
                  content_type='application/json',
                  data='{"values": [ { "name": "length", "value": "100" }]}')
 def test_revalues_job_2(app):
@@ -74,12 +70,12 @@ def test_revalues_job_2(app):
     """
     result = JobApi().dispatch_request(2)
     print(result)
-    assert(result['changed'] == [])
-    assert(result['status'] == 'failed')
-    assert(len(result['errors']) > 0)
+    assert result['changed'] == []
+    assert result['status'] == 'failed'
+    assert len(result['errors']) > 0
 
 
-@request_context("/job/2", method="PATCH",
+@request_context('/job/2', method='PATCH',
                  content_type='application/json',
                  data='{"description": "test description"}')
 def test_redescribe_job_2(app):
@@ -94,7 +90,7 @@ def test_redescribe_job_2(app):
     assert Job.query.get(2).description == 'test description'
 
 
-@request_context("/job/2", method="PATCH",
+@request_context('/job/2', method='PATCH',
                  content_type='application/json',
                  data='{"description": "    "}')
 def test_undescribe_job_2(app):

@@ -3,17 +3,15 @@
 The main entry point for this flask app
 """
 
+from json import load
+
 from flask import Flask
-from flask_restful import Api
 from flask_cors import CORS
+from flask_restful import Api
 
 from connection import init_database, init_marshmallow
-
-from routes import setup_routes
-
 import connection.constants as const
-
-from json import load
+from routes import setup_routes
 
 app = Flask(__name__)
 

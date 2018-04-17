@@ -5,8 +5,8 @@ to store Cases and Jobs
 
 from flask_sqlalchemy import SQLAlchemy
 
-from .field import Field
 from .constants import JobStatus
+from .field import Field
 
 db = SQLAlchemy()
 
@@ -17,6 +17,7 @@ class Case(Base):
     """
     This represents the metadata for a Case in the system
     """
+
     __tablename__ = 'case'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -81,6 +82,7 @@ class CaseField(Base):
     """
     A casefield is a particular accordion or field within a given case
     """
+
     __tablename__ = 'case_field'
 
     id = db.Column(db.Integer, primary_key=True,
@@ -99,6 +101,9 @@ class CaseField(Base):
                                            remote_side=[id]))
 
     def deep_copy(self):
+        """
+        Create a deep clone
+        """
         new_case_field = CaseField(
             name=self.name)
         for child in self.child_fields:
@@ -108,13 +113,15 @@ class CaseField(Base):
         return new_case_field
 
     def prepend_prefix(self, prefix):
+        """
+        Add a prefix to all child fields
+        """
         for child in self.child_fields:
             child.prepend_prefix(prefix)
         prefix_spec = [spec for spec in self.specs if
                        spec.name == 'prefix']
         if prefix_spec:
-            prefix_spec[0].value = prefix + \
-                                            prefix_spec[0].value
+            prefix_spec[0].value = prefix + prefix_spec[0].value
         else:
             self.specs.append(ParameterSpec(name='prefix',
                                             value=prefix))
@@ -131,6 +138,7 @@ class ParameterSpec(Base):
     Each parameterspec is a single metadata entry for a single field.
     There may be many ParameterSpecs per field
     """
+
     __tablename__ = 'parameterspec'
 
     id = db.Column(db.Integer, primary_key=True,
@@ -144,6 +152,9 @@ class ParameterSpec(Base):
     parent_casefield = db.relationship('CaseField', back_populates='specs')
 
     def deep_copy(self):
+        """
+        Deep clone
+        """
         new_param_spec = ParameterSpec(
             name=self.name,
             value=self.value
@@ -161,9 +172,10 @@ class Job(Base):
     A job is an instance of a case for a
     specific user with chosen values
     """
+
     __tablename__ = 'job'
     __table_args__ = (db.UniqueConstraint('user', 'name',
-                      name='unique_user_and_name'),)
+                                          name='unique_user_and_name'),)
 
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True)
@@ -283,6 +295,7 @@ class JobParameter(Base):
     """
     A Minted Value is a specific value for a field in a case.
     """
+
     __tablename__ = 'job_parameter'
 
     id = db.Column(db.Integer, primary_key=True,
@@ -301,6 +314,9 @@ class JobParameter(Base):
     parent_template = db.relationship('JobParameterTemplate')
 
     def __repr__(self):
+        """
+        Create a user friendly string representation
+        """
         return '<JP {}: {}>'.format(self.name, self.value)
 
 
@@ -315,6 +331,7 @@ class JobParameterTemplate(Base):
     bound to a given name. The idea is that they can be used
     as prefilled templates for values for cases
     """
+
     __tablename__ = 'job_parameter_template'
 
     id = db.Column(db.Integer, primary_key=True,
@@ -323,6 +340,9 @@ class JobParameterTemplate(Base):
     version = db.Column(db.Integer, nullable=False)
 
     def deep_copy(self):
+        """
+        Create a deep clone
+        """
         new_mintstore = JobParameterTemplate(
             name=self.name,
             version=self.version
@@ -337,6 +357,7 @@ class JobParameterTemplateValue(Base):
     A Mint Store Value is a specific key value pair in a
     given mint store
     """
+
     __tablename__ = 'job_parameter_template_value'
 
     id = db.Column(db.Integer, primary_key=True,
@@ -351,6 +372,9 @@ class JobParameterTemplateValue(Base):
                                       back_populates='values')
 
     def deep_copy(self):
+        """
+        Create a deep clone
+        """
         new_mint_store_val = JobParameterTemplateValue(
             id=self.id,
             name=self.name,
@@ -368,6 +392,7 @@ class Script(Base):
     """
     A table of scripts for a case
     """
+
     __tablename = 'script'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

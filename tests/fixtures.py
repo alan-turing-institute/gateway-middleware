@@ -4,12 +4,10 @@ Helpful fixtures for testing
 
 from flask import Flask
 from flask_restful import Api
-
 from pytest import fixture
 
 from connection import init_database, init_marshmallow
 from routes import setup_routes
-
 from .create_and_mint_case_using_stores import set_up_test_database
 
 

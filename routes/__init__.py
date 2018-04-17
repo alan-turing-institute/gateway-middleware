@@ -2,17 +2,16 @@
 Routes module
 """
 
-from .case_routes import CasesApi, CaseApi
-from .job_routes import JobsApi, JobApi, StatusApi
-from .fake_routes import TestData
 from connection.constants import StatusConverter
+from .case_routes import CaseApi, CasesApi
+from .fake_routes import TestData
+from .job_routes import JobApi, JobsApi, StatusApi
 
 
 def setup_routes(app, api):
     """
     Set up the routes for these api end points
     """
-
     app.url_map.converters['stat'] = StatusConverter
 
     api.add_resource(CasesApi, '/case')
