@@ -17,6 +17,8 @@ from connection.models import Job
 from .decorators import request_context
 from .fixtures import demo_app as app
 
+from connection.constants import RequestStatus
+
 
 @request_context("/job",
                  data='{"name": "bob", "case_id": "1", "author": "bob"}',
@@ -75,3 +77,31 @@ def test_revalues_job_2(app):
     assert(result['changed'] == [])
     assert(result['status'] == 'failed')
     assert(len(result['errors']) > 0)
+
+@request_context("/job/2", method="PATCH",
+                 content_type='application/json',
+                 data='{"description": "test description"}')
+def test_redescribe_job_2(app):
+    """
+    Test that you can change description of job
+    """
+    result = JobApi().dispatch_request(2)
+    print(result)
+    assert result['status'] == RequestStatus.SUCCESS.value
+    assert result['changed'] == ['description']
+    assert len(result['errors']) == 0
+    assert Job.query.get(2).description == 'test description'
+
+@request_context("/job/2", method="PATCH",
+                 content_type='application/json',
+                 data='{"description": "    "}')
+def test_undescribe_job_2(app):
+    """
+    Test that you cannot put empty values into description
+    """
+    result = JobApi().dispatch_request(2)
+    print(result)
+    assert result['status'] == RequestStatus.FAILED.value
+    assert result['changed'] == []
+    assert len(result['errors']) > 0
+    assert Job.query.get(2).description == 'test description'
