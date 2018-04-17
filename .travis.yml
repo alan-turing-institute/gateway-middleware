@@ -18,7 +18,7 @@ install:
  - pip install -r requirements.txt
  - pip install codecov
  - pip install pytest-cov
- - pip install pep8
+ - pip install pycodestyle
  - pip install flake8
 
 
@@ -26,8 +26,8 @@ before_script:
  - "export PYTHONPATH=."
 
 script:
-  - pep8 tests/ routes/ connection/
-  - flake8 routes/ connection/ tests/
+  - pycodestyle .
+  - flake8 .
   - python -m pytest --cov=./
 
 
