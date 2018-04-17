@@ -18,16 +18,19 @@ install:
  - pip install -r requirements.txt
  - pip install codecov
  - pip install pytest-cov
- - pip install pep8
+ - pip install pylint
  - pip install flake8
+ - pip install flake8-quotes
+ - pip install flake8-docstrings
+ - pip install flake8-import-order
 
 
 before_script:
  - "export PYTHONPATH=."
 
 script:
-  - pep8 tests/ routes/ connection/
-  - flake8 routes/ connection/ tests/
+  - flake8
+  - pylint connection/ routes/ tests/ app.py
   - python -m pytest --cov=./
 
 

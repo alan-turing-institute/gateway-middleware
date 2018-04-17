@@ -10,7 +10,7 @@ from connection.models import Case, Script
 
 def make_dambreak():
     """
-    the openfoam dambreak case.
+    The openfoam dambreak case.
     """
     dambreak = Case(name='dambreak_test')
 

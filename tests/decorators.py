@@ -19,7 +19,6 @@ def request_context(route, app_pos=0, **route_args):
         app = args[app_pos]
         with app.app_context():
             with app.test_request_context(route, **route_args):
-                print(args)
                 return func(*args, **kwargs)
     return func_wrapper
 
@@ -36,6 +35,5 @@ def flask_context(app_pos=0):
         """
         app = args[app_pos]
         with app.app_context():
-                print(args)
-                return func(*args, **kwargs)
+            return func(*args, **kwargs)
     return func_wrapper

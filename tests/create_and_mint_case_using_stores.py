@@ -13,15 +13,14 @@ Then...
 by retrieving casefields from the Tank and Fluid stores.
 """
 
-from connection import init_database
-from connection.models import (db, Case, CaseField, Script,
-                               JobParameterTemplate, JobParameter, Job)
-
-from .create_case_store import make_tank_store, make_fluid_store
-from .create_mint_store import make_mint_store
-
 from flask import Flask
 from flask_restful import Api
+
+from connection import init_database
+from connection.models import (Case, CaseField, db, Job,
+                               JobParameter, JobParameterTemplate, Script)
+from .create_case_store import make_fluid_store, make_tank_store
+from .create_mint_store import make_mint_store
 
 
 def apply_mintstore_to_case_field(mintstore, case_field):
@@ -56,7 +55,7 @@ def apply_mintstore_value_to_case_field(mintstore_value, case_field):
     # output will be a minted value.  name will come from the case_field
     try:
         mint_param_val = float(mintstore_value.value)
-    except(TypeError):
+    except TypeError:
         print("Value of %s doesn't seem to be a number" %
               mintstore_value.name)
         return None
@@ -68,12 +67,12 @@ def apply_mintstore_value_to_case_field(mintstore_value, case_field):
         if spec.name == 'min':
             try:
                 min_val = float(spec.value)
-            except(TypeError):
+            except TypeError:
                 print('Min value of %s not a number?' % case_field.name)
         elif spec.name == 'max':
             try:
                 max_val = float(spec.value)
-            except(TypeError):
+            except TypeError:
                 print('Max value of %s not a number?' % case_field.name)
         elif spec.name == 'prefix':
             # get prefix - will be prepended to JobParameter name
@@ -108,7 +107,7 @@ def recursively_get_case_fields_with_specs(case_field):
     return output_list
 
 
-def mint_case(session, name, case, user, mintstoremap={}):
+def mint_case(session, name, case, user, mintstoremap):
     """
     Turn a case into a job by minting it
     """
@@ -142,7 +141,7 @@ def set_up_test_database():
     fluid = make_fluid_store()
 
     done = False
-    for case in Case.query.all():
+    for _ in Case.query.all():
         done = True
     if done:
         print('Data already there!')

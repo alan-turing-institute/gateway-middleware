@@ -3,8 +3,8 @@ Set up marshmallow classes for serialising data
 """
 from flask_marshmallow import Marshmallow
 
-from .models import (Case, CaseField, ParameterSpec,
-                     Job, JobParameter)
+from .models import (Case, CaseField,
+                     Job, JobParameter, ParameterSpec)
 
 
 ma = Marshmallow()
@@ -14,39 +14,48 @@ class ParamSpecSchema(ma.ModelSchema):
     """
     Serialise a Parameter spec
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = ParameterSpec
         fields = ('id', 'name', 'value')
 
     def make_param_spec(self, data):
+        """
+        Make an instance from a map
+        """
         return ParameterSpec(
             id=data.get('id'),
             name=data.get('name'),
             value=data.get('value')
-            )
+        )
 
 
 class CaseFieldSchema(ma.ModelSchema):
     """
     Fully serialise a case field
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = CaseField
         fields = ('name', 'child_fields', 'specs')
     child_fields = ma.Nested('self', many=True)
     specs = ma.List(ma.Nested('ParamSpecSchema'))
 
     def make_case_field(self, data):
-        casefield = CaseField(
-                              name=data.get('name'),
+        """
+        Make an instance from a map
+        """
+        casefield = CaseField(name=data.get('name'),
                               case_field_id=data.get('case_field_id')
-        )
+                             )
         if data.get('specs'):
             ps_schema = ParamSpecSchema()
             for spec in data.get('specs'):
@@ -65,19 +74,23 @@ class CaseSchema(ma.ModelSchema):
     """
     Fully serialise a Case
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = Case
         fields = ('id', 'name', 'fields', 'thumbnail', 'description')
     fields = ma.List(ma.Nested('CaseFieldSchema'))
 
     def make_case(self, data):
-        case = Case(
-                   cid=data.get('id'),
-                   name=data.get('name')
-        )
+        """
+        Make an instance from a map
+        """
+        case = Case(cid=data.get('id'),
+                    name=data.get('name')
+                   )
         if data.get('fields'):
             cfs = CaseFieldSchema()
             for child in data.get('fields'):
@@ -92,10 +105,12 @@ class CaseHeaderSchema(ma.ModelSchema):
     Serilaise the key metadata about a Case for
     quick listing
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = Case
         fields = ('id', 'name', 'links', 'thumbnail', 'description')
     links = ma.Hyperlinks({
@@ -108,10 +123,12 @@ class JobHeaderSchema(ma.ModelSchema):
     Serialise the key metadata about a job schema for
     quick listing
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = Job
         fields = ('id', 'name', 'status', 'user', 'links', 'description')
     links = ma.Hyperlinks({
@@ -124,10 +141,12 @@ class JobSchema(ma.ModelSchema):
     """
     Serialise a job schema in full
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = Job
         fields = ('id', 'name', 'status', 'user', 'values', 'description',
                   'parent_case')
@@ -139,10 +158,12 @@ class JobValueSchema(ma.ModelSchema):
     """
     Serialise a key value pair from a job specification
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = JobParameter
         fields = ('id', 'name', 'value', 'parent_template')
 
