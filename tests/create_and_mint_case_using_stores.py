@@ -12,14 +12,15 @@ Then...
 * Make a 'real' case, with a tank and two fluids,
 by retrieving casefields from the Tank and Fluid stores.
 """
-
+import os
+import re
 from flask import Flask
 from flask_restful import Api
 
 from connection import init_database
 from connection.models import (Case, CaseField, db, Job,
                                JobParameter, JobParameterTemplate, Script)
-from .create_case_store import make_fluid_store, make_tank_store
+from .create_case_store import make_fluid_store, make_tank_store, make_phases
 from .create_mint_store import make_mint_store
 
 
@@ -91,7 +92,7 @@ def apply_mintstore_value_to_case_field(mintstore_value, case_field):
 
 def recursively_get_case_fields_with_specs(case_field):
     """
-    Get the casefiels with specs
+    Get the casefields with specs
     """
     output_list = []
     if len(case_field.specs) > 0:
@@ -129,16 +130,15 @@ def mint_case(session, name, case, user, mintstoremap):
     return new_minted_case
 
 
-def set_up_test_database():
+def create_stores():
     """
-    Set up a database with some stuff in it
+    Populate the "stores" of case building-blocks, and the mint-store
     """
     # preamble - pretend this bit is being done before hand #################
 
     # add some cases to the Tank Store and the Fluid Store
     session = db.session
-    tank = make_tank_store()
-    fluid = make_fluid_store()
+    phases = make_phases()
 
     done = False
     for _ in Case.query.all():
@@ -146,86 +146,104 @@ def set_up_test_database():
     if done:
         print('Data already there!')
         exit()
-    session.add(tank)
-    session.add(fluid)
+    session.add(phases)
     session.commit()
-    # add milk and tankX (fixed values for Jobs) to the JobParameterTemplate
+    # add milk, water, air and tankX (fixed values for Jobs) to the JobParameterTemplate
     make_mint_store(session)
 
     # end of preamble #################
 
-    # create a real case, using the tank from the tank store
-    #  and the fluid from the fluid store
 
-    mycase = Case(name='MyCase')
+def add_damBreak_scripts(parent_case, local_base_dir):
+    """
+    Start by getting all the scripts in a local directory,
+    and adding them to a dict with default settings (destination same as location,
+    no patching, no action.
+    """
+    scripts = {}
+    uri_base = 'https://sgmiddleware.blob.core.windows.net/testopenfoam2'
 
-    new_tank_store = session.query(Case). \
-        filter(Case.name == 'tanks_R_us').first()
+    for root, dirs, files in os.walk(local_base_dir):
+        for filename in files:
+            full_filepath = os.path.join(root,filename)
+            rel_filepath = re.search("(damBreak\/[\S]+)",full_filepath).groups()[0]
+            scripts[filename] = Script(parent_case = parent_case,
+                                       source=uri_base+rel_filepath,
+                                       destination=rel_filepath,
+                                       action='',
+                                       patch=False)
+            pass
+        pass
+    # now override the scripts that we do want to patch
+    scripts['transportProperties'].patch=True
+    scripts['Allrun'].action='RUN'
 
-    new_tankA = new_tank_store.fields[0].deep_copy()
-    new_fluid_store = session.query(Case). \
-        filter(Case.name == 'fluids_R_us').first()
+    return scripts
 
-    new_fluid1 = new_fluid_store.fields[0].deep_copy()
-    new_fluid1.name = 'fluid 1'
-    new_fluid1.prepend_prefix('Fluid1_')
-    new_fluid2 = new_fluid_store.fields[0].deep_copy()
-    new_fluid2.name = 'fluid 2'
-    new_fluid2.prepend_prefix('Fluid2_')
 
-    mycase.fields.append(new_tankA)
-    mycase.fields.append(new_fluid1)
-    mycase.fields.append(new_fluid2)
-    src_uri = 'https://sgmiddleware.blob.core.windows.net/'
-    src_uri += 'testopenfoamapi/status_updater.sh'
-    start = Script(parent_case=mycase,
-                   source=src_uri,
-                   destination='dummy_scripts/status_updater.sh',
-                   action='RUN',
-                   patch=False)
-#    run = Script(parent_case=mycase, name='run',
-#                 url='http://the.internet/run')
-#    gofish = Script(parent_case=mycase, name='gofish',
-#                    url='http://the.internet/gofish')
+def set_up_test_database():
+    """
+    Make a real case.
+    """
+    create_stores()
+    session = db.session
+    # make damBreak case
+    damBreak = Case(name='damBreak')
+    print("ADDING DAMBREAK")
+    new_phase_store = session.query(Case). \
+        filter(Case.name == 'phases').first()
 
-    # save this to the DB
-    session.add(mycase)
-    session.add(start)
-#    session.add(run)
-#    session.add(gofish)
+    new_phaseA = new_phase_store.fields[0].deep_copy()
+    new_phaseA.name = 'Water'
+    new_phaseA.prepend_prefix('Water_')
+    
+    new_phaseB = new_phase_store.fields[1].deep_copy()
+    new_phaseB.name = "Air"
+    new_phaseB.prepend_prefix('Air_')
+
+    damBreak.fields.append(new_phaseA)
+    damBreak.fields.append(new_phaseB)
+    print(os.getcwd())
+
+    scripts = add_damBreak_scripts(damBreak,'tests/resources/damBreak')
+
+    for script in scripts.values():
+        session.add(script)
+    session.add(damBreak)
     session.commit()
-
-    # test the prefix has been added
-    # print('prefix to fluid2 viscosity ',
-    #       mycase.fields[2].child_field[1].specs[-1].property_value)
-
-    ###################################################################
-    # ########################try minting a case ########################
-
-    # create a dictionary with the mapping between
-    # the case names and the mintstore names
-    # => i guess the UI will have a better way of doing this in real life!
-
-    mintstoremap = {
-        'tankA': 'TankX',
-        'fluid 1': 'Milk',
-        'fluid 2': 'Water'
-    }
-
-    minted_case = mint_case(session, 'TESTMINT',
-                            mycase, 'nbarlow', mintstoremap)
-
-    session.add(minted_case)
-    session.commit()
-
-
-if __name__ == '__main__':
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = ('postgres://'
-                                             'sg:sg@localhost:8082/sg')
-
-    init_database(app)
-
-    api = Api(app)
-    with app.app_context():
-        set_up_test_database()
+    
+#     # test the prefix has been added
+#     # print('prefix to fluid2 viscosity ',
+#     #       mycase.fields[2].child_field[1].specs[-1].property_value)
+# 
+#     ###################################################################
+#     # ########################try minting a case ########################
+# 
+#     # create a dictionary with the mapping between
+#     # the case names and the mintstore names
+#     # => i guess the UI will have a better way of doing this in real life!
+# 
+#     mintstoremap = {
+#         'tankA': 'TankX',
+#         'fluid 1': 'Milk',
+#         'fluid 2': 'Water'
+#     }
+# 
+#     minted_case = mint_case(session, 'TESTMINT',
+#                             mycase, 'nbarlow', mintstoremap)
+# 
+#     session.add(minted_case)
+#     session.commit()
+# 
+# 
+# if __name__ == '__main__':
+#     app = Flask(__name__)
+#     app.config['SQLALCHEMY_DATABASE_URI'] = ('postgres://'
+#                                              'sg:sg@localhost:8082/sg')
+# 
+#     init_database(app)
+# 
+#     api = Api(app)
+#     with app.app_context():
+#         set_up_test_database()
+# 

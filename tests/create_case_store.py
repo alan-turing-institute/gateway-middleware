@@ -68,3 +68,69 @@ def make_fluid_store():
                   parent_casefield=fluida_viscosity)
 
     return fluid_store
+
+def make_phases():
+    """
+    Make an example fluid case for reusing later
+    """
+    phase_store = Case(name='phases')
+    # phase_A (e.g. water)
+    phase_A = CaseField(name='phase_A',
+                           parent_case=phase_store)
+
+    phase_A_density = CaseField(name='density', parent_field=phase_A)
+    ParameterSpec(name='min', value='1',
+                  parent_casefield=phase_A_density)
+    ParameterSpec(name='max', value='2000',
+                  parent_casefield=phase_A_density)
+    ParameterSpec(name='default', value='1000',
+                  parent_casefield=phase_A_density)
+    ParameterSpec(name='units', value='kg/m^3',
+                  parent_casefield=phase_A_density)
+
+    phase_A_viscosity = CaseField(name='viscosity', parent_field=phase_A)
+    ParameterSpec(name='min', value='0.000001',
+                  parent_casefield=phase_A_viscosity)
+    ParameterSpec(name='max', value='0.0001',
+                  parent_casefield=phase_A_viscosity)
+    ParameterSpec(name='default', value='0.00001',
+                  parent_casefield=phase_A_viscosity)
+    ParameterSpec(name='units', value='m/s^2',
+                  parent_casefield=phase_A_viscosity)
+
+    phase_A_surface_tension = CaseField(name='surface_tension',
+                                        parent_field=phase_A)
+    ParameterSpec(name='min', value='0.01',
+                  parent_casefield=phase_A_surface_tension)
+    ParameterSpec(name='max', value='0.1',
+                  parent_casefield=phase_A_surface_tension)
+    ParameterSpec(name='default', value='0.07',
+                  parent_casefield=phase_A_surface_tension)
+    ParameterSpec(name='units', value='N/m',
+                  parent_casefield=phase_A_surface_tension)
+
+    #phase_B (e.g. air)
+    phase_B = CaseField(name='phase_B',
+                           parent_case=phase_store)
+
+    phase_B_density = CaseField(name='density', parent_field=phase_B)
+    ParameterSpec(name='min', value='1',
+                  parent_casefield=phase_B_density)
+    ParameterSpec(name='max', value='2000',
+                  parent_casefield=phase_B_density)
+    ParameterSpec(name='default', value='1000',
+                  parent_casefield=phase_B_density)
+    ParameterSpec(name='units', value='kg/m^3',
+                  parent_casefield=phase_B_density)
+
+    phase_B_viscosity = CaseField(name='viscosity', parent_field=phase_B)
+    ParameterSpec(name='min', value='0.000001',
+                  parent_casefield=phase_B_viscosity)
+    ParameterSpec(name='max', value='0.0001',
+                  parent_casefield=phase_B_viscosity)
+    ParameterSpec(name='default', value='0.00001',
+                  parent_casefield=phase_B_viscosity)
+    ParameterSpec(name='units', value='m/s^2',
+                  parent_casefield=phase_B_viscosity)
+    
+    return phase_store
