@@ -404,7 +404,7 @@ class Script(Base):
     source = db.Column(db.String, nullable=False)
     destination = db.Column(db.String, nullable=False)
     action = db.Column(db.String, nullable=False)
-    patch = db.Column(db.Boolean, nullable=False)        
+    patch = db.Column(db.Boolean, nullable=False)
 
     parent_case = db.relationship('Case', back_populates='scripts')
 

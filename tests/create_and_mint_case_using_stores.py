@@ -176,10 +176,12 @@ def set_up_test_database():
     mycase.fields.append(new_tankA)
     mycase.fields.append(new_fluid1)
     mycase.fields.append(new_fluid2)
-
-    start = Script(parent_case=mycase, source='https://sgmiddleware.blob.core.windows.net/testopenfoamapi/status_updater.sh',
+    src_uri = 'https://sgmiddleware.blob.core.windows.net/'
+    src_uri += 'testopenfoamapi/status_updater.sh'
+    start = Script(parent_case=mycase,
+                   source=src_uri,
                    destination='dummy_scripts/status_updater.sh',
-                   action="RUN",
+                   action='RUN',
                    patch=False)
 #    run = Script(parent_case=mycase, name='run',
 #                 url='http://the.internet/run')
