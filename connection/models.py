@@ -285,8 +285,10 @@ class Job(Base):
         scripts = []
         for script in self.parent_case.scripts:
             scripts.append({
-                'name': script.name,
-                'location': script.url
+                'source': script.source,
+                'destination': script.destination,
+                'action': script.action,
+                'patch': script.patch
             })
         return scripts
 
@@ -399,8 +401,10 @@ class Script(Base):
     case_id = db.Column(db.Integer,
                         db.ForeignKey('case.id'),
                         nullable=False)
-    name = db.Column(db.String, nullable=False)
-    url = db.Column(db.String, nullable=False)
+    source = db.Column(db.String, nullable=False)
+    destination = db.Column(db.String, nullable=False)
+    action = db.Column(db.String, nullable=False)
+    patch = db.Column(db.Boolean, nullable=False)        
 
     parent_case = db.relationship('Case', back_populates='scripts')
 

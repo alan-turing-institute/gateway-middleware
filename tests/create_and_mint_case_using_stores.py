@@ -177,18 +177,20 @@ def set_up_test_database():
     mycase.fields.append(new_fluid1)
     mycase.fields.append(new_fluid2)
 
-    start = Script(parent_case=mycase, name='start',
-                   url='http://the.internet/start')
-    run = Script(parent_case=mycase, name='run',
-                 url='http://the.internet/run')
-    gofish = Script(parent_case=mycase, name='gofish',
-                    url='http://the.internet/gofish')
+    start = Script(parent_case=mycase, source='https://sgmiddleware.blob.core.windows.net/testopenfoamapi/status_updater.sh',
+                   destination='dummy_scripts/status_updater.sh',
+                   action="RUN",
+                   patch=False)
+#    run = Script(parent_case=mycase, name='run',
+#                 url='http://the.internet/run')
+#    gofish = Script(parent_case=mycase, name='gofish',
+#                    url='http://the.internet/gofish')
 
     # save this to the DB
     session.add(mycase)
     session.add(start)
-    session.add(run)
-    session.add(gofish)
+#    session.add(run)
+#    session.add(gofish)
     session.commit()
 
     # test the prefix has been added
