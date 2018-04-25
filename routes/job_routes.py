@@ -133,13 +133,6 @@ class JobApi(Resource):
             'scripts': job.script_list(),
             'username': job.user
         }
-        params = {
-            'fields_to_patch': [],
-            'scripts': job.script_list(),
-            'username': 'testuser'
-        }
-        
-#        params = {"fields_to_patch": [],"scripts": [{"source": "https://sgmiddleware.blob.core.windows.net/testopenfoamapi/status_updater.sh", "destination" : "dummy_scripts/status_updater.sh","action": "RUN", "patch": False}],"username" : "testuser"}
         response = requests.post('{}/job/{}/start'.format(JOB_MANAGER_URL, job_id),
                                  json=params)
         if response.status_code != 200:
