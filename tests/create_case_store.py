@@ -69,6 +69,7 @@ def make_fluid_store():
 
     return fluid_store
 
+
 def make_phases():
     """
     Make an example fluid case for reusing later
@@ -76,7 +77,7 @@ def make_phases():
     phase_store = Case(name='phases')
     # phase_A (e.g. water)
     phase_A = CaseField(name='phase_A',
-                           parent_case=phase_store)
+                        parent_case=phase_store)
 
     phase_A_density = CaseField(name='density', parent_field=phase_A)
     ParameterSpec(name='min', value='1',
@@ -109,9 +110,9 @@ def make_phases():
     ParameterSpec(name='units', value='N/m',
                   parent_casefield=phase_A_surface_tension)
 
-    #phase_B (e.g. air)
+    # phase_B (e.g. air)
     phase_B = CaseField(name='phase_B',
-                           parent_case=phase_store)
+                        parent_case=phase_store)
 
     phase_B_density = CaseField(name='density', parent_field=phase_B)
     ParameterSpec(name='min', value='1',
@@ -132,5 +133,5 @@ def make_phases():
                   parent_casefield=phase_B_viscosity)
     ParameterSpec(name='units', value='m/s^2',
                   parent_casefield=phase_B_viscosity)
-    
+
     return phase_store

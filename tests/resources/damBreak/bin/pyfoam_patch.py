@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# flake8: noqa
+
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 
 # read existing parameter file

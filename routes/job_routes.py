@@ -133,7 +133,7 @@ class JobApi(Resource):
             'scripts': job.script_list(),
             'username': job.user
         }
-        response = requests.post('{}/job/{}/start'.format(JOB_MANAGER_URL, job_id),
+        response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
                                  json=params)
         if response.status_code != 200:
             return make_response(RequestStatus.FAILED,

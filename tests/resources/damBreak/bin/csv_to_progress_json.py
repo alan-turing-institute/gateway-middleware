@@ -64,7 +64,7 @@ def csv_to_progress_json(fname):
         latest_value = float(last_row[index])
 
         reference_value = get_reference_value()
-        progress = latest_value/reference_value
+        progress = latest_value / reference_value
         output["value"] = progress
 
         return {"progress": output}
