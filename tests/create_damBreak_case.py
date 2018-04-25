@@ -6,9 +6,7 @@ using components from the "phase store".
 import os
 import re
 
-from connection.models import (Case, CaseField, db, Job,
-                               JobParameter, JobParameterTemplate, Script)
-
+from connection.models import Case, db, Script
 from .create_case_store import make_phases
 
 
@@ -20,8 +18,7 @@ def create_phase_store():
     session = db.session
     phases = make_phases()
 
-    phases_exists = session.query(Case). \
-                    filter(Case.name == 'phases').all()
+    exists = session.query(Case).filter(Case.name == 'phases').all()
     if len(phases_exists) > 0:
         print('Data already there!')
         exit()
@@ -50,8 +47,7 @@ def add_damBreak_scripts(parent_case, local_base_dir):
                                        destination=rel_filepath,
                                        action='',
                                        patch=False)
-            pass
-        pass
+            
     # now override the scripts that we do want to patch
     scripts['transportProperties'].patch = True
     scripts['Allrun'].action = 'RUN'

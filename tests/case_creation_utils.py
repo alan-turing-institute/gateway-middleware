@@ -6,9 +6,8 @@ The functions in here should not be specific to any given case
 or minted values, but can be called by specific case-building modules.
 """
 
-from connection import init_database
-from connection.models import (Case, CaseField, db, Job,
-                               JobParameter, JobParameterTemplate, Script)
+from connection.models import (CaseField, db, Job,
+                               JobParameter, JobParameterTemplate)
 
 
 def apply_mintstore_to_case_field(mintstore, case_field):
