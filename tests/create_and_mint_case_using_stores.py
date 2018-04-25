@@ -161,7 +161,7 @@ def add_damBreak_scripts(parent_case, local_base_dir):
     no patching, no action.
     """
     scripts = {}
-    uri_base = 'https://sgmiddleware.blob.core.windows.net/testopenfoam2'
+    uri_base = 'https://sgmiddleware.blob.core.windows.net/testopenfoam2/'
 
     for root, dirs, files in os.walk(local_base_dir):
         for filename in files:
@@ -185,11 +185,13 @@ def set_up_test_database():
     """
     Make a real case.
     """
+    uri_base = 'https://sgmiddleware.blob.core.windows.net/'
     create_stores()
     session = db.session
     # make damBreak case
-    damBreak = Case(name='damBreak')
-    print("ADDING DAMBREAK")
+    damBreak = Case(name='damBreak',
+                    thumbnail = uri_base + 'openfoam/thumbnails/damBreak.png',
+                    description = 'OpenFOAM simulation of breaking dam')
     new_phase_store = session.query(Case). \
         filter(Case.name == 'phases').first()
 
@@ -203,7 +205,6 @@ def set_up_test_database():
 
     damBreak.fields.append(new_phaseA)
     damBreak.fields.append(new_phaseB)
-    print(os.getcwd())
 
     scripts = add_damBreak_scripts(damBreak,'tests/resources/damBreak')
 
@@ -211,39 +212,3 @@ def set_up_test_database():
         session.add(script)
     session.add(damBreak)
     session.commit()
-    
-#     # test the prefix has been added
-#     # print('prefix to fluid2 viscosity ',
-#     #       mycase.fields[2].child_field[1].specs[-1].property_value)
-# 
-#     ###################################################################
-#     # ########################try minting a case ########################
-# 
-#     # create a dictionary with the mapping between
-#     # the case names and the mintstore names
-#     # => i guess the UI will have a better way of doing this in real life!
-# 
-#     mintstoremap = {
-#         'tankA': 'TankX',
-#         'fluid 1': 'Milk',
-#         'fluid 2': 'Water'
-#     }
-# 
-#     minted_case = mint_case(session, 'TESTMINT',
-#                             mycase, 'nbarlow', mintstoremap)
-# 
-#     session.add(minted_case)
-#     session.commit()
-# 
-# 
-# if __name__ == '__main__':
-#     app = Flask(__name__)
-#     app.config['SQLALCHEMY_DATABASE_URI'] = ('postgres://'
-#                                              'sg:sg@localhost:8082/sg')
-# 
-#     init_database(app)
-# 
-#     api = Api(app)
-#     with app.app_context():
-#         set_up_test_database()
-# 
