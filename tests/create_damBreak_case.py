@@ -19,8 +19,8 @@ def create_phase_store():
     phases = make_phases()
 
     exists = session.query(Case).filter(Case.name == 'phases').all()
-    if len(phases_exists) > 0:
-        print('Data already there!')
+    if len(exists) > 0:
+        print('PhaseStore already there!')
         exit()
     session.add(phases)
     session.commit()
@@ -47,7 +47,6 @@ def add_damBreak_scripts(parent_case, local_base_dir):
                                        destination=rel_filepath,
                                        action='',
                                        patch=False)
-            
     # now override the scripts that we do want to patch
     scripts['transportProperties'].patch = True
     scripts['Allrun'].action = 'RUN'
