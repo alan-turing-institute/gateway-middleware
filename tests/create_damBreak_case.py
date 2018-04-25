@@ -10,7 +10,6 @@ from connection.models import (Case, CaseField, db, Job,
                                JobParameter, JobParameterTemplate, Script)
 
 from .create_case_store import make_phases
-from .create_mint_store import make_mint_store
 
 
 def create_phase_store():
@@ -21,16 +20,13 @@ def create_phase_store():
     session = db.session
     phases = make_phases()
 
-    done = False
-    for _ in Case.query.all():
-        done = True
-    if done:
+    phases_exists = session.query(Case). \
+                    filter(Case.name == 'phases').all()
+    if len(phases_exists) > 0:
         print('Data already there!')
         exit()
     session.add(phases)
     session.commit()
-    # add water, air (fixed values for Jobs) to the JobParameterTemplate
-    make_mint_store(session)
 
 
 def add_damBreak_scripts(parent_case, local_base_dir):
@@ -47,7 +43,7 @@ def add_damBreak_scripts(parent_case, local_base_dir):
     for root, dirs, files in os.walk(local_base_dir):
         for filename in files:
             full_filepath = os.path.join(root, filename)
-            rel_filepath = re.search("(damBreak\/[\S]+)",
+            rel_filepath = re.search('(damBreak\/[\S]+)',
                                      full_filepath).groups()[0]
             scripts[filename] = Script(parent_case=parent_case,
                                        source=uri_base + rel_filepath,
@@ -87,7 +83,7 @@ def setup_dambreak_testdata():
     new_phaseA.prepend_prefix('Water_')
 
     new_phaseB = new_phase_store.fields[1].deep_copy()
-    new_phaseB.name = "Air"
+    new_phaseB.name = 'Air'
     new_phaseB.prepend_prefix('Air_')
 
     damBreak.fields.append(new_phaseA)
