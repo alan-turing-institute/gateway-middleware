@@ -6,7 +6,7 @@ The functions in here should not be specific to any given case
 or minted values, but can be called by specific case-building modules.
 """
 
-from connection.models import (CaseField, db, Job,
+from connection.models import (CaseField, Job,
                                JobParameter, JobParameterTemplate)
 
 

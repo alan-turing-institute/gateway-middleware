@@ -37,10 +37,10 @@ def add_damBreak_scripts(parent_case, local_base_dir):
     scripts = {}
     uri_base = 'https://sgmiddleware.blob.core.windows.net/testopenfoam2/'
 
-    for root, dirs, files in os.walk(local_base_dir):
+    for root, _dirs, files in os.walk(local_base_dir):
         for filename in files:
             full_filepath = os.path.join(root, filename)
-            rel_filepath = re.search('(damBreak\/[\S]+)',
+            rel_filepath = re.search(r'(damBreak\/[\S]+)',
                                      full_filepath).groups()[0]
             scripts[filename] = Script(parent_case=parent_case,
                                        source=uri_base + rel_filepath,
