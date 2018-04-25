@@ -20,11 +20,12 @@ from connection import init_database
 from connection.models import (Case, CaseField, db, Job,
                                JobParameter, JobParameterTemplate, Script)
 from .create_case_store import make_fluid_store, make_tank_store
-from .create_mint_store import make_mint_store
+
 from .case_creation_utils import (apply_mintstore_to_case_field,
                                   apply_mintstore_value_to_case_field,
-                                  recursively_get_case_fields_with_specs,
-                                  mint_case)
+                                  mint_case,
+                                  recursively_get_case_fields_with_specs)
+from .create_mint_store import make_mint_store
 
 
 def set_up_test_database():
