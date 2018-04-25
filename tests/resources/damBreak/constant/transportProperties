@@ -27,10 +27,10 @@ water
 air
 {
     transportModel  Newtonian;
-    nu              ${parameters['Air_viscosity'];
-    rho             ${parameters['Air_density'];
+    nu              ${parameters['Air_viscosity']};
+    rho             ${parameters['Air_density']};
 }
 
-sigma            ${parameters['Water_surface_tension'];
+sigma            ${parameters['Water_surface_tension']};
 
 // ************************************************************************* //
