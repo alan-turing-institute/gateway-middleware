@@ -12,7 +12,7 @@ def make_tank_store():
     """
     Make an example tank case containing a sample tank
     """
-    tank_store = Case(name='tanks_R_us')
+    tank_store = Case(name='tanks_R_us', visible=False)
 
     tanka = CaseField(name='tankA', parent_case=tank_store)
 
@@ -43,7 +43,7 @@ def make_fluid_store():
     """
     Make an example fluid case for reusing later
     """
-    fluid_store = Case(name='fluids_R_us')
+    fluid_store = Case(name='fluids_R_us', visible=True)
 
     fluida = CaseField(name='fluidA', parent_case=fluid_store)
 
@@ -74,7 +74,7 @@ def make_phases():
     """
     Make an example fluid case for reusing later
     """
-    phase_store = Case(name='phases')
+    phase_store = Case(name='phases', visible=True)
     # phase_A (e.g. water)
     phase_A = CaseField(name='phase_A',
                         parent_case=phase_store)

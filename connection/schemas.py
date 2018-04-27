@@ -112,7 +112,7 @@ class CaseHeaderSchema(ma.ModelSchema):
         """
 
         model = Case
-        fields = ('id', 'name', 'links', 'thumbnail', 'description')
+        fields = ('id', 'name', 'links', 'thumbnail', 'description', 'visible')
     links = ma.Hyperlinks({
         'self': ma.URLFor('caseapi', case_id='<id>')
     })

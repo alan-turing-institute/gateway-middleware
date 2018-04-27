@@ -24,6 +24,7 @@ class Case(Base):
     name = db.Column(db.String, nullable=False)
     thumbnail = db.Column(db.String, nullable=True)
     description = db.Column(db.String, nullable=True)
+    visible = db.Column(db.Boolean, nullable=False)
     flat_fields = None
 
     def _get_possible_fields(self):

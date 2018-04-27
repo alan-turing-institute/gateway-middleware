@@ -51,7 +51,7 @@ def set_up_test_database():
     # create a real case, using the tank from the tank store
     #  and the fluid from the fluid store
 
-    mycase = Case(name='MyCase')
+    mycase = Case(name='MyCase', visible=True)
 
     new_tank_store = session.query(Case). \
         filter(Case.name == 'tanks_R_us').first()

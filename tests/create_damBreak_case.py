@@ -67,7 +67,8 @@ def setup_dambreak_testdata():
     # make damBreak case
     damBreak = Case(name='damBreak',
                     thumbnail=uri_base + 'openfoam/thumbnails/damBreak.png',
-                    description='OpenFOAM simulation of breaking dam')
+                    description='OpenFOAM simulation of breaking dam', 
+                    visible=True)
     # retrieve the phase store from the database
     new_phase_store = session.query(Case). \
         filter(Case.name == 'phases').first()
