@@ -94,6 +94,8 @@ def make_phases():
                   parent_casefield=phase_A_viscosity)
     ParameterSpec(name='max', value='0.0001',
                   parent_casefield=phase_A_viscosity)
+    ParameterSpec(name='step', value='0.000001',
+                  parent_casefield=phase_A_viscosity)
     ParameterSpec(name='default', value='0.00001',
                   parent_casefield=phase_A_viscosity)
     ParameterSpec(name='units', value='m/s^2',
@@ -104,6 +106,8 @@ def make_phases():
     ParameterSpec(name='min', value='0.01',
                   parent_casefield=phase_A_surface_tension)
     ParameterSpec(name='max', value='0.1',
+                  parent_casefield=phase_A_surface_tension)
+    ParameterSpec(name='step', value='0.01',
                   parent_casefield=phase_A_surface_tension)
     ParameterSpec(name='default', value='0.07',
                   parent_casefield=phase_A_surface_tension)
@@ -128,6 +132,8 @@ def make_phases():
     ParameterSpec(name='min', value='0.000001',
                   parent_casefield=phase_B_viscosity)
     ParameterSpec(name='max', value='0.0001',
+                  parent_casefield=phase_B_viscosity)
+    ParameterSpec(name='step', value='0.000001',
                   parent_casefield=phase_B_viscosity)
     ParameterSpec(name='default', value='0.00001',
                   parent_casefield=phase_B_viscosity)
