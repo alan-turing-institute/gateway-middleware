@@ -43,7 +43,7 @@ def make_fluid_store():
     """
     Make an example fluid case for reusing later
     """
-    fluid_store = Case(name='fluids_R_us', visible=True)
+    fluid_store = Case(name='fluids_R_us', visible=False)
 
     fluida = CaseField(name='fluidA', parent_case=fluid_store)
 

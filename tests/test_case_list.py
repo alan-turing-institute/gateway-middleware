@@ -60,7 +60,7 @@ def test_1_per_page(app):
     """
     result = CasesApi().dispatch_request()
     assert len(result.data) == 1
-    assert result.data[0]['id'] == 2
+    assert result.data[0]['id'] == 3
     assert result.data[0].get('fields') is None
 
 
@@ -89,14 +89,14 @@ def test_per_page(app):
     """
     result = CasesApi().dispatch_request()
     # print(result.data)
-    assert len(result.data) == 2
+    assert len(result.data) == 1
 
 
-@request_context('/case?per_page=1&page=2', method='GET')
+@request_context('/case?per_page=1&page=1', method='GET')
 def test_1_per_page_page_1(app):
     """
-    Make sure that if you ask for the second page of 1 per page
-    results you get the second case
+    Make sure that if you ask for the first page of 1 per page
+    results you get the first case
     """
     result = CasesApi().dispatch_request()
     assert len(result.data) == 1
