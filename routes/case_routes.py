@@ -22,7 +22,6 @@ class CasesApi(Resource):
     def get(self, page, per_page):
         """
         Get all the cases that are in the requested range
-        
         return case_header_schema.dump(Case.query.paginate(page, per_page,
                                                            False).items,
                                        many=True)
@@ -32,8 +31,8 @@ class CasesApi(Resource):
         #                                many=True)
         return case_header_schema.dump(Case.query.filter_by(visible=True)
                                        .order_by(Case.id)
-                                       .paginate(page, per_page, False).items
-                                       , many=True)
+                                       .paginate(page, per_page, False)
+                                       .items, many=True)
 
 
 class CaseApi(Resource):
