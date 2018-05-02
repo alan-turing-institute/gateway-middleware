@@ -136,7 +136,7 @@ class JobHeaderSchema(ma.ModelSchema):
         'self': ma.URLFor('jobapi', job_id='<id>'),
         'case': ma.URLFor('caseapi', case_id='<case_id>')
     })
-    parent_case = ma.Nested('CaseSchema')
+    parent_case = ma.Nested('CaseHeaderSchema')
 
 
 class JobSchema(ma.ModelSchema):
