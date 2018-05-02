@@ -13,8 +13,8 @@ class JobStatus(Enum):
     """
     Job status enum. Variable must always be UPPERCASE.
     """
-
     FAILED = 'Failed'
+    COMPLETED = 'Completed'
     NOT_STARTED = 'Not Started'
     QUEUED = 'Queued'
 
