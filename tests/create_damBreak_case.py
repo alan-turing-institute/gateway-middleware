@@ -48,8 +48,8 @@ def add_damBreak_scripts(parent_case, local_base_dir):
                                        action='',
                                        patch=False)
     # now override the scripts that we do want to patch
-    scripts['transportProperties'].patch = True
-    scripts['Allrun'].action = 'RUN'
+    scripts['pyfoam_patch.py'].patch = True
+    scripts['run.sh'].action = 'RUN'
 
     return scripts
 
