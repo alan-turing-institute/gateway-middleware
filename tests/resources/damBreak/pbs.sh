@@ -2,6 +2,12 @@
 #PBS -j oe
 #PBS -o "TEST.out"
 
+sleep 10
+
+jobid = `cat job_id`
+curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"status" : "RUNNING"}' -H "Content-type: application/json"
+
+
 STORAGE_SCRIPT='./bin/storage_sync_azure.sh'
 STORAGE_SYNC_FREQUENCY=10
 
@@ -30,6 +36,10 @@ STORAGE_DAEMON_PID=$!
 
 source /opt/openfoam5/etc/bashrc
 ./Allrun
+
+sleep 10
+
+curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"status" : "FINALIZING"}' -H "Content-type: application/json" | tee /tmp/output_token.txt
 
 # here we ensure cloud storage is complete, before local cluster storage
 

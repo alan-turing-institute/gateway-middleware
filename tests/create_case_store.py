@@ -74,7 +74,7 @@ def make_phases():
     """
     Make an example fluid case for reusing later
     """
-    phase_store = Case(name='phases', visible=True)
+    phase_store = Case(name='phases', visible=False)
     # phase_A (e.g. water)
     phase_A = CaseField(name='phase_A',
                         parent_case=phase_store)
