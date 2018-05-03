@@ -7,7 +7,7 @@ from marshmallow import validates_schema
 from webargs.fields import Int, Nested, Str
 from werkzeug.exceptions import BadRequestKeyError
 
-from .constants import RequestStatus
+from .constants import JobStatus
 from .schemas import ma
 
 
@@ -135,7 +135,7 @@ class StatusPatchSchema(ma.Schema):
 
         strict = True
     status = Str(validate=lambda s: s.upper() in
-                 RequestStatus.__members__.keys())
+                 JobStatus.__members__.keys())
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):

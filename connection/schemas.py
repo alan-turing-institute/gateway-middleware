@@ -130,11 +130,13 @@ class JobHeaderSchema(ma.ModelSchema):
         """
 
         model = Job
-        fields = ('id', 'name', 'status', 'user', 'links', 'description')
+        fields = ('id', 'name', 'status', 'user', 'links', 'description',
+                  'parent_case')
     links = ma.Hyperlinks({
         'self': ma.URLFor('jobapi', job_id='<id>'),
         'case': ma.URLFor('caseapi', case_id='<case_id>')
     })
+    parent_case = ma.Nested('CaseHeaderSchema')
 
 
 class JobSchema(ma.ModelSchema):

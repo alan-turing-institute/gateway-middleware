@@ -166,9 +166,10 @@ class StatusApi(Resource):
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
         if job.status == JobStatus.NOT_STARTED.value:
-            return make_response(RequestStatus.FAILED,
+            if status is JobStatus.QUEUED.value:
+                return make_response(RequestStatus.FAILED,
                                  errors=['Cannot set state of not started job']
-                                )
+                               )
         if not job.fully_configured():
             return make_response(RequestStatus.FAILED,
                                  errors=['You must set all parameters '
