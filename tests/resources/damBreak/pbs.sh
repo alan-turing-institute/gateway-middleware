@@ -2,14 +2,13 @@
 #PBS -j oe
 #PBS -o "TEST.out"
 
-sleep 10
-
-jobid = `cat job_id`
-curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "RUNNING"}' -H "Content-type: application/json"
+#sleep 10
 
 
-STORAGE_SCRIPT='./bin/storage_sync_azure.sh'
-STORAGE_SYNC_FREQUENCY=10
+
+
+#STORAGE_SCRIPT='./bin/storage_sync_azure.sh'
+#STORAGE_SYNC_FREQUENCY=10
 
 echo "Start PBS"
 
@@ -30,16 +29,20 @@ mkdir -p $TMPDIR
 cp -r $PBS_O_WORKDIR/* $TMPDIR  # TODO explicitly copy only required files
 cd $TMPDIR
 
+jobid=`cat job_id`
+#curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "RUNNING"}' -H "Content-type: application/json"
+
 # run storage daemon loop and collect its PID number
-(while `true`; do $STORAGE_SCRIPT; sleep $STORAGE_SYNC_FREQUENCY; done) &
-STORAGE_DAEMON_PID=$!
+#(while `true`; do $STORAGE_SCRIPT; sleep $STORAGE_SYNC_FREQUENCY; done) &
+#STORAGE_DAEMON_PID=$!
 
 source /opt/openfoam5/etc/bashrc
+chmod a+x Allrun
 ./Allrun
 
-sleep 10
+#sleep 10
 
-curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "FINALIZING"}' -H "Content-type: application/json" | tee /tmp/output_token.txt
+#curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "FINALIZING"}' -H "Content-type: application/json" | tee /tmp/output_token.txt
 
 # here we ensure cloud storage is complete, before local cluster storage
 
@@ -47,13 +50,13 @@ curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : 
 # kill storage daemon loop and ensure that it completes
 # one full cycle
 
-kill STORAGE_DAEMON_PID
-$STORAGE_SCRIPT
+#kill STORAGE_DAEMON_PID
+#$STORAGE_SCRIPT
 
 # STORAGE SYSTEM B: local cluster storage
 # copy back timestep information
-for timestep in $(foamListTimes); do
-  cp -r $TMPDIR/$timestep $PBS_O_WORKDIR
-done
+#for timestep in $(foamListTimes); do
+#  cp -r $TMPDIR/$timestep $PBS_O_WORKDIR
+#done
 
 echo "End PBS"

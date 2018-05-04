@@ -7,8 +7,11 @@ cd ${0%/*} || exit 1    # Run from this directory
 # Get application name
 application=`getApplication`
 
+echo "PATCHING"
 # patch openfoam input parameters
 python pyfoam_patch.py
+
+echo "PATCHED OK"
 
 runApplication blockMesh
 runApplication setFields
