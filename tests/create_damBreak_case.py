@@ -49,6 +49,7 @@ def add_damBreak_scripts(parent_case, local_base_dir):
                                        patch=False)
     # now override the scripts that we do want to patch
     scripts['pyfoam_patch.py'].patch = True
+    scripts['job_id'].patch = True
     scripts['run.sh'].action = 'RUN'
 
     return scripts
