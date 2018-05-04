@@ -5,7 +5,7 @@
 sleep 10
 
 jobid = `cat job_id`
-curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"status" : "RUNNING"}' -H "Content-type: application/json"
+curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "RUNNING"}' -H "Content-type: application/json"
 
 
 STORAGE_SCRIPT='./bin/storage_sync_azure.sh'
@@ -39,7 +39,7 @@ source /opt/openfoam5/etc/bashrc
 
 sleep 10
 
-curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"status" : "FINALIZING"}' -H "Content-type: application/json" | tee /tmp/output_token.txt
+curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "FINALIZING"}' -H "Content-type: application/json" | tee /tmp/output_token.txt
 
 # here we ensure cloud storage is complete, before local cluster storage
 
