@@ -166,12 +166,14 @@ class StatusApi(Resource):
         if job.status == JobStatus.NOT_STARTED.value:
             if status is JobStatus.QUEUED.value:
                 return make_response(RequestStatus.FAILED,
-                                 errors=['Cannot set state of not started job']
-                               )
+                                     errors=['Cannot set state \
+                                              of not started job'])
         if not job.fully_configured():
             return make_response(RequestStatus.FAILED,
-                                 errors=['You must set all parameters '
-                                         'before working with a job'])
+                                 errors=['You must set all \
+                                          parameters \
+                                          before \
+                                          working with a job'])
         job.status = status.value
         db.session.commit()
         return make_response()
