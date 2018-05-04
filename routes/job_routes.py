@@ -169,8 +169,7 @@ class StatusApi(Resource):
             if status is JobStatus.QUEUED.value:
                 return make_response(RequestStatus.FAILED,
                                      errors=['Cannot set state \
-                                              of not started job']
-                               )
+                                              of not started job'])
         if not job.fully_configured():
             return make_response(RequestStatus.FAILED,
                                  errors=['You must set all \
