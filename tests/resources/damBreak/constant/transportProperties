@@ -20,17 +20,17 @@ phases (water air);
 water
 {
     transportModel  Newtonian;
-    nu              ${parameters['Water_viscosity']};
-    rho             ${parameters['Water_density']};
+    nu              1e-06;
+    rho             1000;
 }
 
 air
 {
     transportModel  Newtonian;
-    nu              ${parameters['Air_viscosity']};
-    rho             ${parameters['Air_density']};
+    nu              1.48e-05;
+    rho             1;
 }
 
-sigma            ${parameters['Water_surface_tension']};
+sigma            0.07;
 
 // ************************************************************************* //
