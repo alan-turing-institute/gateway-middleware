@@ -153,7 +153,7 @@ class StatusApi(Resource):
     """
 
     @use_kwargs(StatusPatchSchema())
-    def put(self, job_id: int, status: str):
+    def put(self, job_id: int, status: str, outputs: str):
         """
         Set the status for the given job
         """
@@ -176,6 +176,9 @@ class StatusApi(Resource):
                                           parameters \
                                           before \
                                           working with a job'])
+        if status.value == JobStatus.COMPLETED.value and \
+           outputs is not missing:
+            job.outputs = outputs
         job.status = status.value
         db.session.commit()
         return make_response()

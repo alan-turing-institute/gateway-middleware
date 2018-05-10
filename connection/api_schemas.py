@@ -136,7 +136,8 @@ class StatusPatchSchema(ma.Schema):
         strict = True
     status = Str(validate=lambda s: s.upper() in
                  JobStatus.__members__.keys())
-
+    outputs = Str()
+    
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
         """
