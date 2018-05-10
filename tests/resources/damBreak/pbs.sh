@@ -34,6 +34,7 @@ source /opt/openfoam5/etc/bashrc
 chmod a+x Allrun
 ./Allrun
 
+sleep 20
 # update job status to FINALIZING - this will get us some json containing Azure
 # details (account name, container name, SAS token) which we put in a txt file.
 curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "FINALIZING"}' -H "Content-type: application/json" | tee output_token.txt
@@ -43,6 +44,8 @@ STORAGE_SCRIPT="${TMPDIR}/store_output_azure.sh"
 chmod u+x $STORAGE_SCRIPT
 echo "Calling $STORAGE_SCRIPT $TMPDIR"
 $STORAGE_SCRIPT $TMPDIR
+
+sleep 20
 
 # update job status to COMPLETED
 curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "COMPLETED"}' -H "Content-type: application/json" 

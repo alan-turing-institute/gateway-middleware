@@ -12,6 +12,7 @@ PBS_JOB_ID=$(cat pbs_job_id)
 
 ACCOUNT=$(cat output_token.txt | jq -r '.data.account')
 CONTAINER=$(cat output_token.txt | jq -r '.data.container')
+BLOB=$(cat output_token.txt | jq -r '.data.blob')
 
 lockdir='.lock_storage_sync'
 
@@ -27,7 +28,7 @@ trap "rmdir $lockdir" EXIT INT KILL TERM
 zip -r /tmp/output_${JOB_ID}.zip ./*
 
 # transfer files to cloud storage
-CMD="az storage blob upload --container-name $CONTAINER --file /tmp/output_${JOB_ID}.zip --account-name $ACCOUNT --sas-token '$JOB_STORAGE_TOKEN' --name '$JOB_ID/output.zip' "
+CMD="az storage blob upload --container-name $CONTAINER --file /tmp/output_${JOB_ID}.zip --account-name $ACCOUNT --sas-token '$JOB_STORAGE_TOKEN' --name '$BLOB' "
 
 # why does executing $CMD directly not work?  Don't know, but it doesn't!
 echo $CMD > azure_cmd.sh
