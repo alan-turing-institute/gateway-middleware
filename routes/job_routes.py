@@ -142,6 +142,8 @@ class JobApi(Resource):
 
         # TODO: do something with: result = response.json
         # TODO: Handle non http errors - but they haven't been implemented
+        job.status = JobStatus.QUEUED.value
+        db.session.commit()
         return make_response()
 
 
