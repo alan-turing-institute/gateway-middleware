@@ -1,15 +1,8 @@
 #!/bin/bash
-#PBS -j oe
-#PBS -o "TEST.out"
-
-sleep 10
-
-jobid = `cat job_id`
-curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"status" : "RUNNING"}' -H "Content-type: application/json"
 
 
-STORAGE_SCRIPT='./bin/storage_sync_azure.sh'
-STORAGE_SYNC_FREQUENCY=10
+
+
 
 echo "Start PBS"
 
@@ -20,7 +13,7 @@ trap "kill 0" EXIT
 
 set -vx
 
-# emulate running in TMPDIR as per Imperial College cx1
+# emulate running in TMPDIR 
 TMPDIR="/tmp/pbs.$PBS_JOBID"
 
 echo $TMPDIR
@@ -30,30 +23,28 @@ mkdir -p $TMPDIR
 cp -r $PBS_O_WORKDIR/* $TMPDIR  # TODO explicitly copy only required files
 cd $TMPDIR
 
-# run storage daemon loop and collect its PID number
-(while `true`; do $STORAGE_SCRIPT; sleep $STORAGE_SYNC_FREQUENCY; done) &
-STORAGE_DAEMON_PID=$!
+jobid=`cat job_id`
 
+# update status in job-manager to RUNNING
+curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "RUNNING"}' -H "Content-type: application/json"
+
+# set env vars for openfoam
 source /opt/openfoam5/etc/bashrc
+# run simulation
+chmod a+x Allrun
 ./Allrun
 
-sleep 10
+# update job status to FINALIZING - this will get us some json containing Azure
+# details (account name, container name, SAS token) which we put in a txt file.
+curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "FINALIZING"}' -H "Content-type: application/json" | tee output_token.txt
 
-curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"status" : "FINALIZING"}' -H "Content-type: application/json" | tee /tmp/output_token.txt
+# Run the storage script, giving it the current directory as an argument
+STORAGE_SCRIPT="${TMPDIR}/store_output_azure.sh"
+chmod u+x $STORAGE_SCRIPT
+echo "Calling $STORAGE_SCRIPT $TMPDIR"
+$STORAGE_SCRIPT $TMPDIR
 
-# here we ensure cloud storage is complete, before local cluster storage
-
-# STORAGE SYSTEM A: cloud provider storage
-# kill storage daemon loop and ensure that it completes
-# one full cycle
-
-kill STORAGE_DAEMON_PID
-$STORAGE_SCRIPT
-
-# STORAGE SYSTEM B: local cluster storage
-# copy back timestep information
-for timestep in $(foamListTimes); do
-  cp -r $TMPDIR/$timestep $PBS_O_WORKDIR
-done
+# update job status to COMPLETED
+curl -X PATCH http://job-manager:5001/job/$jobid/status --data '{"job_status" : "COMPLETED"}' -H "Content-type: application/json" 
 
 echo "End PBS"
