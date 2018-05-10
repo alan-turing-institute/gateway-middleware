@@ -8,4 +8,4 @@ cd ${0%/*} || exit 1    # Run from this directory
 
 qsub -o /tmp/logstdout.txt -e /tmp/logerr.txt  pbs.sh | tee pbs_job_id
 
-
+echo "Submitted job"
