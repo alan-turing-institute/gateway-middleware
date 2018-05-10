@@ -24,7 +24,7 @@ mkdir $lockdir  || {
 trap "rmdir $lockdir" EXIT INT KILL TERM
 
 # zip files to /tmp/output_<job_id>.zip
-zip /tmp/output_${JOB_ID}.zip ./*
+zip -r /tmp/output_${JOB_ID}.zip ./*
 
 # transfer files to cloud storage
 CMD="az storage blob upload --container-name $CONTAINER --file /tmp/output_${JOB_ID}.zip --account-name $ACCOUNT --sas-token '$JOB_STORAGE_TOKEN' --name '$JOB_ID/output.zip' "
