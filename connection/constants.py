@@ -15,6 +15,8 @@ class JobStatus(Enum):
     """
 
     FAILED = 'Failed'
+    RUNNING = 'Running'
+    FINALIZING = 'Finalizing'
     COMPLETED = 'Completed'
     NOT_STARTED = 'Not Started'
     QUEUED = 'Queued'

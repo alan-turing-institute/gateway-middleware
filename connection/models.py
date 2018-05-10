@@ -187,6 +187,8 @@ class Job(Base):
     description = db.Column(db.String, nullable=True)
     status = db.Column(db.String, nullable=False,
                        default=JobStatus.NOT_STARTED.value)
+    outputs = db.Column(db.String, nullable=True,
+                       default='')
 
     parent_case = db.relationship('Case')
 

@@ -151,7 +151,7 @@ class JobSchema(ma.ModelSchema):
 
         model = Job
         fields = ('id', 'name', 'status', 'user', 'values', 'description',
-                  'parent_case')
+                  'parent_case', 'outputs')
     values = ma.List(ma.Nested('JobValueSchema'))
     parent_case = ma.Nested('CaseSchema')
 
