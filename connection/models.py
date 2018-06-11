@@ -178,8 +178,8 @@ class Job(Base):
     __table_args__ = (db.UniqueConstraint('user', 'name',
                                           name='unique_user_and_name'),)
 
-    id = db.Column(db.Integer, primary_key=True,
-                   autoincrement=True)
+    id = db.Column(db.String, primary_key=True,
+                   nullable=False)
     case_id = db.Column(db.Integer, db.ForeignKey('case.id'),
                         nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -306,7 +306,7 @@ class JobParameter(Base):
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True)
     name = db.Column(db.String, nullable=False)
-    job_id = db.Column(db.Integer,
+    job_id = db.Column(db.String,
                        db.ForeignKey('job.id'),
                        nullable=False)
     value = db.Column(db.String, nullable=False)

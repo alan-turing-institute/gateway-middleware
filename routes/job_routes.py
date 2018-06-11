@@ -7,6 +7,7 @@ import requests
 from sqlalchemy.exc import IntegrityError
 from webargs import missing
 from webargs.flaskparser import use_kwargs
+from uuid import uuid4
 
 from connection.api_schemas import (JobArgs, JobPatchArgs,
                                     PaginationArgs, StatusPatchSchema)
@@ -30,8 +31,10 @@ class JobsApi(Resource):
         Create a new job based on a case
         """
         try:
-            new_job = Job(name=name,
-                          user=author, case_id=case_id)
+            new_job = Job(id=str(uuid4()),
+                          name=name,
+                          user=author,
+                          case_id=case_id)
             db.session.add(new_job)
             db.session.commit()
         except IntegrityError as e:
@@ -60,7 +63,7 @@ class JobApi(Resource):
         Get the specified job
         """
         try:
-            job_id = int(job_id)
+            job_id = job_id
         except ValueError as e:
             print(e)
             abort(404, message='Sorry no job id {}'. format(job_id))

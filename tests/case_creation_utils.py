@@ -5,6 +5,7 @@ Tools to help case-builders (and automated tests) build cases.
 The functions in here should not be specific to any given case
 or minted values, but can be called by specific case-building modules.
 """
+from uuid import uuid4
 
 from connection.models import (CaseField, Job,
                                JobParameter, JobParameterTemplate)
@@ -98,7 +99,9 @@ def mint_case(session, name, case, user, mintstoremap):
     """
     Turn a case into a job by minting it
     """
-    new_minted_case = Job(name=name, user=user,
+    new_minted_case = Job(id=str(uuid4()),
+                          name=name,
+                          user=user,
                           parent_case=case)
 
     for (k, v) in mintstoremap.items():
