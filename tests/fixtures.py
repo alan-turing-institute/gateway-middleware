@@ -1,12 +1,14 @@
 """
 Helpful fixtures for testing
 """
+from uuid import uuid4
 
 from flask import Flask
 from flask_restful import Api
 from pytest import fixture
 
 from connection import init_database, init_marshmallow
+from connection.models import Job
 from routes import setup_routes
 from .create_and_mint_case_using_stores import set_up_test_database
 
@@ -31,3 +33,11 @@ def demo_app():
     with app.app_context():
         set_up_test_database()
     return app
+
+@fixture(scope='module')
+def test_job():
+    """
+    Create a test job with a known job_id
+    """
+    job = Job(id=str(uuid4()), name="bob")
+    return job

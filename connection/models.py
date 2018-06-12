@@ -187,11 +187,11 @@ class Job(Base):
     description = db.Column(db.String, nullable=True)
     status = db.Column(db.String, nullable=False,
                        default=JobStatus.NOT_STARTED.value)
-    outputs = db.Column(db.String, nullable=True,
-                       default='')
-
+    outputs = db.relationship("Output",
+                              back_populates="job", lazy="joined")
     parent_case = db.relationship('Case')
 
+    
     def set_name(self, new_name, log):
         """
         Replace the job name if it is sensible.
@@ -391,6 +391,18 @@ class JobParameterTemplateValue(Base):
 JobParameterTemplate.values = db.relationship('JobParameterTemplateValue',
                                               back_populates='parent_template',
                                               cascade='all, delete-orphan')
+
+
+class Output(db.Model):
+    """
+    The output of a job - contains a file type and a URL.
+    """
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
+    destination_path = db.Column(db.String)
+    type = db.Column(db.String)
+    job_id = db.Column(db.String, db.ForeignKey('job.id'))
+    job = db.relationship("Job", back_populates="outputs")
 
 
 class Script(Base):

@@ -4,7 +4,8 @@ Set up marshmallow classes for serialising data
 from flask_marshmallow import Marshmallow
 
 from .models import (Case, CaseField,
-                     Job, JobParameter, ParameterSpec)
+                     Job, JobParameter,
+                     ParameterSpec, Output)
 
 
 ma = Marshmallow()
@@ -153,8 +154,9 @@ class JobSchema(ma.ModelSchema):
         fields = ('id', 'name', 'status', 'user', 'values', 'description',
                   'parent_case', 'outputs')
     values = ma.List(ma.Nested('JobValueSchema'))
+    outputs = ma.List(ma.Nested('OutputSchema'))
     parent_case = ma.Nested('CaseSchema')
-
+    
 
 class JobValueSchema(ma.ModelSchema):
     """
@@ -168,6 +170,18 @@ class JobValueSchema(ma.ModelSchema):
 
         model = JobParameter
         fields = ('id', 'name', 'value', 'parent_template')
+
+
+class OutputSchema(ma.ModelSchema):
+    """
+    Serialize name and type of a job output
+    """
+    class Meta:
+        """
+        Specification of what to use from the original class
+        """
+        model = Output
+        fields = ('destination_path', 'type')
 
 
 def init_marshmallow(app):
