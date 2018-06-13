@@ -160,7 +160,7 @@ class OutputArgs(ma.Schema):
         strict = True
 
     job_id = Str(required=True)
-    type = Str(required=True)
+    output_type = Str(required=True)
     destination_path = Str(required=True)
 
     @validates_schema(pass_original=True)

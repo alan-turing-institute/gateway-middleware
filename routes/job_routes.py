@@ -198,7 +198,7 @@ class OutputApi(Resource):
     """
 
     @use_kwargs(OutputArgs())
-    def post(self, job_id, type, destination_path):
+    def post(self, job_id, output_type, destination_path):
         """
         Create an output and add it to the job.
         """
@@ -206,7 +206,7 @@ class OutputApi(Resource):
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
         output = Output(job_id=job_id,
-                        type=type,
+                        output_type=output_type,
                         destination_path=destination_path)
         job.outputs.append(output)
         db.session.commit()

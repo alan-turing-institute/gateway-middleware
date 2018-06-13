@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 Helpful fixtures for testing
 """
@@ -13,7 +14,7 @@ from routes import setup_routes
 from .create_and_mint_case_using_stores import set_up_test_database
 
 
-@fixture(scope='session')
+@fixture(scope='module')
 def demo_app():
     """
     Setup the flask app context I hope
@@ -35,7 +36,7 @@ def demo_app():
     return app
 
 
-@fixture(scope='session')
+@fixture(scope='module')
 def test_job_id(demo_app):
     """
     Create a test job with a known job_id and add it to the db
@@ -64,7 +65,7 @@ def test_job_id(demo_app):
     return job_id
 
 
-@fixture(scope='session')
+@fixture(scope='module')
 def test_job_id_no_values(demo_app):
     """
     Create a test job with a known job_id but not values set,
