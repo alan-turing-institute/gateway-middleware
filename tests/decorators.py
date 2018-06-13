@@ -38,7 +38,7 @@ def request_context_from_args(route, app_pos=0, uuid_pos=1, **route_args):
         app = args[app_pos]
         uuid = args[uuid_pos]
         with app.app_context():
-            with app.test_request_context(join(route,uuid),  **route_args):
+            with app.test_request_context(join(route, uuid), **route_args):
                 return func(*args, **kwargs)
     return func_wrapper
 
