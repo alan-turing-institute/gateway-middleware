@@ -200,9 +200,8 @@ class OutputApi(Resource):
     @use_kwargs(OutputArgs())
     def post(self, job_id, type, destination_path):
         """
-        create an output and add it to the job.
+        Create an output and add it to the job.
         """
-
         job = Job.query.get(job_id)
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
@@ -217,7 +216,6 @@ class OutputApi(Resource):
         When the user wants to download an output, need to get a token or
         similar from the job manager to get the actual URL.
         """
-
         r = requests.get('{}/{}/output'.format(JOB_MANAGER_URL, job_id))
         if r.status_code != 200:
             abort(404, message='Unable to get output for {}'.format(job_id))

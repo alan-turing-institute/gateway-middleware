@@ -151,12 +151,12 @@ class OutputArgs(ma.Schema):
     """
     Check read-in arguments for creating a job Output.
     """
-    
+
     class Meta(object):
         """
         Ensure that it can only take the defined arguments
         """
-        
+
         strict = True
 
     job_id = Str(required=True)

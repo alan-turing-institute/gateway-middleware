@@ -8,13 +8,11 @@ are run in the order they are written.
 # pylint: disable=I0011, W0611, W0621, W0613
 from uuid import uuid4
 
-import unittest
-
 from werkzeug.exceptions import HTTPException
 
 from connection import init_database
 from connection.constants import JobStatus, RequestStatus
-from connection.models import Job, db
+from connection.models import Job
 from routes import JobApi, JobsApi
 from .decorators import request_context, request_context_from_args
 from .fixtures import demo_app
@@ -32,7 +30,6 @@ def test_create_job(demo_app):
     assert result['job_id'] is not None
 
 
-
 @request_context('/job/2')
 def test_has_new_job(demo_app, test_job_id):
     """
@@ -46,7 +43,7 @@ def test_has_new_job(demo_app, test_job_id):
 @request_context('/job/2', method='PATCH',
                  content_type='application/json',
                  data='{"name": "Awesome Job"}')
-def test_rename_job_2(demo_app,test_job_id):
+def test_rename_job_2(demo_app, test_job_id):
     """
     Test that you can rename a job
     """
@@ -96,7 +93,7 @@ def test_good_revalues_job_2(demo_app, test_job_id):
 
 
 @request_context_from_args('/job/')
-def test_get_job_1(demo_app,test_job_id):
+def test_get_job_1(demo_app, test_job_id):
     """
     Get get job 1 and make sure you get something sensible back
     """

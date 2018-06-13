@@ -34,6 +34,7 @@ def demo_app():
         set_up_test_database()
     return app
 
+
 @fixture(scope='session')
 def test_job_id(demo_app):
     """
