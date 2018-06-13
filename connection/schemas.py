@@ -5,7 +5,7 @@ from flask_marshmallow import Marshmallow
 
 from .models import (Case, CaseField,
                      Job, JobParameter,
-                     ParameterSpec, Output)
+                     Output, ParameterSpec)
 
 
 ma = Marshmallow()
@@ -156,7 +156,7 @@ class JobSchema(ma.ModelSchema):
     values = ma.List(ma.Nested('JobValueSchema'))
     outputs = ma.List(ma.Nested('OutputSchema'))
     parent_case = ma.Nested('CaseSchema')
-    
+
 
 class JobValueSchema(ma.ModelSchema):
     """
@@ -176,10 +176,12 @@ class OutputSchema(ma.ModelSchema):
     """
     Serialize name and type of a job output
     """
+
     class Meta:
         """
         Specification of what to use from the original class
         """
+
         model = Output
         fields = ('destination_path', 'type')
 

@@ -146,15 +146,17 @@ class StatusPatchSchema(ma.Schema):
         if len(unknown) > 0:
             raise BadRequestKeyError('Unknown field {}'.format(unknown))
 
-        
+
 class OutputArgs(ma.Schema):
     """
     Check read-in arguments for creating a job Output.
     """
+    
     class Meta(object):
         """
         Ensure that it can only take the defined arguments
         """
+        
         strict = True
 
     job_id = Str(required=True)

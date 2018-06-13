@@ -1,9 +1,8 @@
 """
 Defintions of routes for the app
 """
-from uuid import uuid4
-
 import json
+from uuid import uuid4
 
 from flask_restful import abort, Resource
 import requests
@@ -11,9 +10,8 @@ from sqlalchemy.exc import IntegrityError
 from webargs import missing
 from webargs.flaskparser import use_kwargs
 
-from connection.api_schemas import (JobArgs, JobPatchArgs,
-                                    PaginationArgs, StatusPatchSchema,
-                                    OutputArgs)
+from connection.api_schemas import (JobArgs, JobPatchArgs, OutputArgs,
+                                    PaginationArgs, StatusPatchSchema)
 from connection.constants import JOB_MANAGER_URL, JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
@@ -22,6 +20,7 @@ from .helpers import make_response
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
 output_schema = OutputSchema()
+
 
 class JobsApi(Resource):
     """
@@ -161,7 +160,7 @@ class StatusApi(Resource):
     @use_kwargs(StatusPatchSchema())
     def put(self, job_id: int, status: str):
         """
-        Set the status for the given job.  
+        Set the status for the given job.
         """
         try:
             status = JobStatus[status.upper()]
@@ -190,16 +189,20 @@ class StatusApi(Resource):
 class OutputApi(Resource):
     """
     This class deals with job outputs.
-    The POST endpoint is called by the job manager to 
-    specify an Outputs {"type": x,"destination_path" : y}/
-
+    The POST endpoint is called by the job manager to
+    specify an Output {"type": x,"destination_path" : y}
     The GET endpoint is called by the frontend when an output
     is to actually be retrieved, and in turn calls the job_manager
-    to get an authorization token.  The URL including this token is 
+    to get an authorization token.  The URL including this token is
     returned to the frontend.
     """
+
     @use_kwargs(OutputArgs())
     def post(self, job_id, type, destination_path):
+        """
+        create an output and add it to the job.
+        """
+
         job = Job.query.get(job_id)
         if job is None:
             abort(404, message='Sorry, job {} not found'.format(job_id))
@@ -209,14 +212,14 @@ class OutputApi(Resource):
         job.outputs.append(output)
         db.session.commit()
 
-
     def get(self, job_id):
         """
         When the user wants to download an output, need to get a token or
         similar from the job manager to get the actual URL.
         """
+
         r = requests.get('{}/{}/output'.format(JOB_MANAGER_URL, job_id))
         if r.status_code != 200:
-            abort(404, message='Unable to get output URL for {}'.format(job_id))
-        result = json.loads(r.content.decode("utf-8"))
+            abort(404, message='Unable to get output for {}'.format(job_id))
+        result = json.loads(r.content.decode('utf-8'))
         return result
