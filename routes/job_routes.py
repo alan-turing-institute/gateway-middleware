@@ -19,6 +19,8 @@ from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
 from .helpers import make_response
 
+from .authentication import token_required
+
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
 output_schema = OutputSchema()
@@ -29,6 +31,7 @@ class JobsApi(Resource):
     Endpoint for dealing with the list of jobs
     """
 
+    @token_required
     @use_kwargs(JobArgs(), locations=('json',))
     def post(self, case_id, name, author):
         """
@@ -47,6 +50,7 @@ class JobsApi(Resource):
                   message='Sorry, these parameters have already been used')
         return {'job_id': new_job.id}
 
+    @token_required
     @use_kwargs(PaginationArgs())
     def get(self, page, per_page):
         """
@@ -62,6 +66,7 @@ class JobApi(Resource):
     Endpoint for dealing with a specific job
     """
 
+    @token_required
     def get(self, job_id):
         """
         Get the specified job
@@ -78,6 +83,7 @@ class JobApi(Resource):
             abort(404, message='Sorry, jobs {} not found'.format(job_id))
             return None
 
+    @token_required
     @use_kwargs(JobPatchArgs())
     def patch(self, job_id, name, description, values):
         """
@@ -121,6 +127,7 @@ class JobApi(Resource):
             'errors': error_log
         }
 
+    @token_required
     def post(self, job_id):
         """
         Start the given job if it isn't started yet
@@ -200,6 +207,7 @@ class OutputApi(Resource):
     returned to the frontend.
     """
 
+    @token_required
     @use_kwargs(OutputArgs())
     def post(self, job_id, output_type, destination_path):
         """
@@ -214,6 +222,7 @@ class OutputApi(Resource):
         job.outputs.append(output)
         db.session.commit()
 
+    @token_required
     def get(self, job_id):
         """
         When the user wants to download an output, need to get a token or

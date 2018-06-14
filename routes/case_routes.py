@@ -12,7 +12,7 @@ from connection.schemas import CaseHeaderSchema, CaseSchema
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
 
-from .helpers import token_required
+from .authentication import token_required
 
 
 class CasesApi(Resource):
@@ -20,7 +20,7 @@ class CasesApi(Resource):
     Api for the list of all cases
     """
 
-    # @token_required
+    @token_required
     @use_kwargs(PaginationArgs())
     def get(self, page, per_page):
         """
@@ -43,7 +43,7 @@ class CaseApi(Resource):
     End point for dealing with a specific case
     """
 
-    # @token_required
+    @token_required
     def get(self, case_id: str):
         """
         Get all the details for a specific case
