@@ -18,7 +18,7 @@ from routes import setup_routes
 app = Flask(__name__)
 
 config_mode = os.getenv('FLASK_CONFIGURATION', 'development')
-config_fname = "config.{}.json".format(config_mode.lower())
+config_fname = 'config.{}.json'.format(config_mode.lower())
 app.config.from_json(config_fname)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

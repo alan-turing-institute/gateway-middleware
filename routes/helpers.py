@@ -2,11 +2,12 @@
 Helper functions for the routes
 """
 
-from typing import List
 from functools import wraps
+from typing import List
 
-from flask import request, Response, current_app
+from flask import current_app, request, Response
 import requests
+
 from connection.constants import RequestStatus
 
 
@@ -24,7 +25,6 @@ def make_response(response: RequestStatus=RequestStatus.SUCCESS,
 
 def token_required(f):
     """Checks whether token is valid or raises error 401."""
-
     @wraps(f)
     def decorated(*args, **kwargs):
         token_string = request.headers.get('Authorization')
