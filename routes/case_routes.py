@@ -9,10 +9,10 @@ from connection.api_schemas import PaginationArgs
 from connection.models import Case
 from connection.schemas import CaseHeaderSchema, CaseSchema
 
+from .authentication import token_required
+
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
-
-from .authentication import token_required
 
 
 class CasesApi(Resource):

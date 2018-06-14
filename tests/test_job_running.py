@@ -30,8 +30,10 @@ def test_start_job_without_values(demo_app, test_job_id_no_values):
     Test that you can't start a job with unset values
     """
     with Mocker() as m:
-        m.post('{}/{}/start'.format(demo_app.config['JOB_MANAGER_URL'], test_job_id_no_values),
-               json='data')
+        start_url = '{}/{}/start'.format(
+            demo_app.config['JOB_MANAGER_URL'],
+            test_job_id_no_values)
+        m.post(start_url, json='data')
         result = JobApi().dispatch_request(test_job_id_no_values)
     assert len(result['errors']) > 0
     assert result['status'] == RequestStatus.FAILED.value
@@ -45,8 +47,9 @@ def test_start_job(demo_app, test_job_id):
     Test that you can start a job
     """
     with Mocker() as m:
-        m.post('{}/{}/start'.format(demo_app.config['JOB_MANAGER_URL'], test_job_id),
-               json='data')
+        start_url = '{}/{}/start'.format(
+            demo_app.config['JOB_MANAGER_URL'], test_job_id)
+        m.post(start_url, json='data')
         result = JobApi().dispatch_request(test_job_id)
     assert result['status'] == RequestStatus.SUCCESS.value
     assert Job.query.get(test_job_id).status == JobStatus.QUEUED.value

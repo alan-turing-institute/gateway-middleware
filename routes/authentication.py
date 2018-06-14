@@ -26,8 +26,9 @@ def token_required(f):
             if r.status_code == 200:
                 return f(*args, **kwargs)
             else:
-                return Response('User not authenticated',
-                    401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
+                return Response(
+                    'User not authenticated',
+                    401,
+                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
     return decorated

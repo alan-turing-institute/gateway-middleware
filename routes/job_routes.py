@@ -228,6 +228,7 @@ class OutputApi(Resource):
         When the user wants to download an output, need to get a token or
         similar from the job manager to get the actual URL.
         """
+        JOB_MANAGER_URL = current_app.config['JOB_MANAGER_URL']
         r = requests.get('{}/{}/output'.format(JOB_MANAGER_URL, job_id))
         if r.status_code != 200:
             abort(404, message='Unable to get output for {}'.format(job_id))

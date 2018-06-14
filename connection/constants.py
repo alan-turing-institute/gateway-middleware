@@ -6,6 +6,7 @@ from enum import Enum
 
 from werkzeug.routing import BaseConverter
 
+
 class JobStatus(Enum):
     """
     Job status enum. Variable must always be UPPERCASE.
