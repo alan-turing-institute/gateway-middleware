@@ -12,6 +12,7 @@ def token_required(f):
     """Checks whether token is valid or raises error 401."""
     @wraps(f)
     def decorated(*args, **kwargs):
+        """Return function for decorator"""
         token_string = request.headers.get('Authorization')
 
         auth_url = current_app.config['AUTHENTICATION_URL']
