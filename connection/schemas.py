@@ -4,7 +4,8 @@ Set up marshmallow classes for serialising data
 from flask_marshmallow import Marshmallow
 
 from .models import (Case, CaseField,
-                     Job, JobParameter, ParameterSpec)
+                     Job, JobParameter,
+                     Output, ParameterSpec)
 
 
 ma = Marshmallow()
@@ -130,11 +131,13 @@ class JobHeaderSchema(ma.ModelSchema):
         """
 
         model = Job
-        fields = ('id', 'name', 'status', 'user', 'links', 'description')
+        fields = ('id', 'name', 'status', 'user', 'links', 'description',
+                  'parent_case')
     links = ma.Hyperlinks({
         'self': ma.URLFor('jobapi', job_id='<id>'),
         'case': ma.URLFor('caseapi', case_id='<case_id>')
     })
+    parent_case = ma.Nested('CaseHeaderSchema')
 
 
 class JobSchema(ma.ModelSchema):
@@ -149,8 +152,9 @@ class JobSchema(ma.ModelSchema):
 
         model = Job
         fields = ('id', 'name', 'status', 'user', 'values', 'description',
-                  'parent_case')
+                  'parent_case', 'outputs')
     values = ma.List(ma.Nested('JobValueSchema'))
+    outputs = ma.List(ma.Nested('OutputSchema'))
     parent_case = ma.Nested('CaseSchema')
 
 
@@ -166,6 +170,20 @@ class JobValueSchema(ma.ModelSchema):
 
         model = JobParameter
         fields = ('id', 'name', 'value', 'parent_template')
+
+
+class OutputSchema(ma.ModelSchema):
+    """
+    Serialize name and type of a job output
+    """
+
+    class Meta:
+        """
+        Specification of what to use from the original class
+        """
+
+        model = Output
+        fields = ('destination_path', 'output_type')
 
 
 def init_marshmallow(app):

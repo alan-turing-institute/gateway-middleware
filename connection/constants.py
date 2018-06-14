@@ -6,7 +6,7 @@ from enum import Enum
 
 from werkzeug.routing import BaseConverter
 
-JOB_MANAGER_URL = 'http://job-manager:5001'
+JOB_MANAGER_URL = 'http://job-manager:5001/job'
 
 
 class JobStatus(Enum):
@@ -15,6 +15,9 @@ class JobStatus(Enum):
     """
 
     FAILED = 'Failed'
+    RUNNING = 'Running'
+    FINALIZING = 'Finalizing'
+    COMPLETED = 'Completed'
     NOT_STARTED = 'Not Started'
     QUEUED = 'Queued'
 

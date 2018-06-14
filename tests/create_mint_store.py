@@ -24,6 +24,14 @@ def make_mint_store(session):
     JobParameterTemplateValue(name='viscosity', value='1.2',
                               parent_template=water)
 
+    # create air in the mintstore table
+    air = JobParameterTemplate(name='Air', version='1')
+    JobParameterTemplateValue(name='density', value='1.0',
+                              parent_template=air)
+    JobParameterTemplateValue(name='viscosity', value='1.48',
+                              parent_template=air)
+
+    # create tank_x in the mintstore table
     tankx = JobParameterTemplate(name='TankX', version='1')
     JobParameterTemplateValue(name='width', value='3.35',
                               parent_template=tankx)
@@ -33,4 +41,5 @@ def make_mint_store(session):
     session.add(milk)
     session.add(water)
     session.add(tankx)
+    session.add(air)
     session.commit()

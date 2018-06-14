@@ -24,6 +24,7 @@ class Case(Base):
     name = db.Column(db.String, nullable=False)
     thumbnail = db.Column(db.String, nullable=True)
     description = db.Column(db.String, nullable=True)
+    visible = db.Column(db.Boolean, nullable=False)
     flat_fields = None
 
     def _get_possible_fields(self):
@@ -177,8 +178,8 @@ class Job(Base):
     __table_args__ = (db.UniqueConstraint('user', 'name',
                                           name='unique_user_and_name'),)
 
-    id = db.Column(db.Integer, primary_key=True,
-                   autoincrement=True)
+    id = db.Column(db.String, primary_key=True,
+                   nullable=False)
     case_id = db.Column(db.Integer, db.ForeignKey('case.id'),
                         nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -186,7 +187,8 @@ class Job(Base):
     description = db.Column(db.String, nullable=True)
     status = db.Column(db.String, nullable=False,
                        default=JobStatus.NOT_STARTED.value)
-
+    outputs = db.relationship('Output',
+                              back_populates='job', lazy='joined')
     parent_case = db.relationship('Case')
 
     def set_name(self, new_name, log):
@@ -285,8 +287,10 @@ class Job(Base):
         scripts = []
         for script in self.parent_case.scripts:
             scripts.append({
-                'name': script.name,
-                'location': script.url
+                'source': script.source,
+                'destination': script.destination,
+                'action': script.action,
+                'patch': script.patch
             })
         return scripts
 
@@ -301,7 +305,7 @@ class JobParameter(Base):
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True)
     name = db.Column(db.String, nullable=False)
-    job_id = db.Column(db.Integer,
+    job_id = db.Column(db.String,
                        db.ForeignKey('job.id'),
                        nullable=False)
     value = db.Column(db.String, nullable=False)
@@ -388,6 +392,19 @@ JobParameterTemplate.values = db.relationship('JobParameterTemplateValue',
                                               cascade='all, delete-orphan')
 
 
+class Output(db.Model):
+    """
+    The output of a job - contains a file type and a URL.
+    """
+
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True)
+    destination_path = db.Column(db.String)
+    output_type = db.Column(db.String)
+    job_id = db.Column(db.String, db.ForeignKey('job.id'))
+    job = db.relationship('Job', back_populates='outputs')
+
+
 class Script(Base):
     """
     A table of scripts for a case
@@ -399,8 +416,10 @@ class Script(Base):
     case_id = db.Column(db.Integer,
                         db.ForeignKey('case.id'),
                         nullable=False)
-    name = db.Column(db.String, nullable=False)
-    url = db.Column(db.String, nullable=False)
+    source = db.Column(db.String, nullable=False)
+    destination = db.Column(db.String, nullable=False)
+    action = db.Column(db.String, nullable=False)
+    patch = db.Column(db.Boolean, nullable=False)
 
     parent_case = db.relationship('Case', back_populates='scripts')
 

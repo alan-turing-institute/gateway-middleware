@@ -7,7 +7,7 @@ from marshmallow import validates_schema
 from webargs.fields import Int, Nested, Str
 from werkzeug.exceptions import BadRequestKeyError
 
-from .constants import RequestStatus
+from .constants import JobStatus
 from .schemas import ma
 
 
@@ -135,7 +135,7 @@ class StatusPatchSchema(ma.Schema):
 
         strict = True
     status = Str(validate=lambda s: s.upper() in
-                 RequestStatus.__members__.keys())
+                 JobStatus.__members__.keys())
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
@@ -145,3 +145,29 @@ class StatusPatchSchema(ma.Schema):
         unknown = set(original_data) - set(self.fields)
         if len(unknown) > 0:
             raise BadRequestKeyError('Unknown field {}'.format(unknown))
+
+
+class OutputArgs(ma.Schema):
+    """
+    Check read-in arguments for creating a job Output.
+    """
+
+    class Meta(object):
+        """
+        Ensure that it can only take the defined arguments
+        """
+
+        strict = True
+
+    job_id = Str(required=True)
+    output_type = Str(required=True)
+    destination_path = Str(required=True)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        """
+        Ensure no additional fields are passed
+        """
+        unknown = set(original_data) - set(self.fields)
+        if unknown:
+            raise BadRequestKeyError('Unknown field', unknown)
