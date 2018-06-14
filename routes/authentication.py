@@ -3,13 +3,13 @@ Authentication functions for the routes
 """
 
 from functools import wraps
-from flask import request, Response, current_app
+
+from flask import current_app, request, Response
 import requests
 
 
 def token_required(f):
     """Checks whether token is valid or raises error 401."""
-
     @wraps(f)
     def decorated(*args, **kwargs):
         token_string = request.headers.get('Authorization')

@@ -3,8 +3,9 @@
 The main entry point for this flask app
 """
 
-import os
 from json import load
+import os
+
 
 from flask import Flask
 from flask_cors import CORS

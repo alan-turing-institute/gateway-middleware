@@ -4,9 +4,8 @@ Defintions of routes for the app
 import json
 from uuid import uuid4
 
-from flask_restful import abort, Resource
 from flask import current_app
-
+from flask_restful import abort, Resource
 import requests
 from sqlalchemy.exc import IntegrityError
 from webargs import missing
@@ -17,9 +16,8 @@ from connection.api_schemas import (JobArgs, JobPatchArgs, OutputArgs,
 from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
-from .helpers import make_response
-
 from .authentication import token_required
+from .helpers import make_response
 
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
