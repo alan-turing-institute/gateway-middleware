@@ -1,0 +1,5 @@
+{
+    "SQLALCHEMY_DATABASE_URI": "sqlite://",
+    "JOB_MANAGER_URL": "http://job-manager:5001/job",
+    "AUTHENTICATION_URL": "http://auth:6000/auth/status"
+}

@@ -1,4 +1,0 @@
-{
-    "database_url": "postgres://sg:sg@postgres/sg",
-    "job_manager_url": "localhost:9000"
-}

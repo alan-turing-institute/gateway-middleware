@@ -6,9 +6,6 @@ from enum import Enum
 
 from werkzeug.routing import BaseConverter
 
-JOB_MANAGER_URL = 'http://job-manager:5001/job'
-
-
 class JobStatus(Enum):
     """
     Job status enum. Variable must always be UPPERCASE.
