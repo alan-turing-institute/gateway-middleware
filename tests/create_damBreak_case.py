@@ -5,6 +5,7 @@ using components from the "phase store".
 
 import os
 import re
+from posixpath import join
 
 from connection.models import Case, db, Script
 from .create_case_store import make_phases
@@ -35,18 +36,23 @@ def add_damBreak_scripts(parent_case, local_base_dir):
     as necessary for individual scripts.
     """
     scripts = {}
-    uri_base = 'https://sgmiddleware.blob.core.windows.net/testopenfoam2/'
+    uri_base = 'https://sgmiddleware.blob.core.windows.net/openfoam-test-cases/'
 
     for root, _dirs, files in os.walk(local_base_dir):
         for filename in files:
             full_filepath = os.path.join(root, filename)
-            rel_filepath = re.search(r'(damBreak\/[\S]+)',
+            rel_filepath = re.search(r'damBreak\/([\S]+)',
                                      full_filepath).groups()[0]
+
+            source_filepath = join(uri_base, 'damBreak', rel_filepath)
+            destination_filepath = rel_filepath
+
             scripts[filename] = Script(parent_case=parent_case,
-                                       source=uri_base + rel_filepath,
-                                       destination=rel_filepath,
+                                       source=source_filepath,
+                                       destination=destination_filepath,
                                        action='',
                                        patch=False)
+
     # now override the scripts that we do want to patch
     scripts['pyfoam_patch.py'].patch = True
     scripts['job_id'].patch = True
