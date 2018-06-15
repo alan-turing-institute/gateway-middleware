@@ -4,6 +4,7 @@ Defintions of routes for the app
 import json
 from uuid import uuid4
 
+from flask import current_app
 from flask_restful import abort, Resource
 import requests
 from sqlalchemy.exc import IntegrityError
@@ -12,9 +13,10 @@ from webargs.flaskparser import use_kwargs
 
 from connection.api_schemas import (JobArgs, JobPatchArgs, OutputArgs,
                                     PaginationArgs, StatusPatchSchema)
-from connection.constants import JOB_MANAGER_URL, JobStatus, RequestStatus
+from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
+from .authentication import token_required
 from .helpers import make_response
 
 job_header_schema = JobHeaderSchema()
@@ -27,6 +29,7 @@ class JobsApi(Resource):
     Endpoint for dealing with the list of jobs
     """
 
+    @token_required
     @use_kwargs(JobArgs(), locations=('json',))
     def post(self, case_id, name, author):
         """
@@ -45,6 +48,7 @@ class JobsApi(Resource):
                   message='Sorry, these parameters have already been used')
         return {'job_id': new_job.id}
 
+    @token_required
     @use_kwargs(PaginationArgs())
     def get(self, page, per_page):
         """
@@ -60,6 +64,7 @@ class JobApi(Resource):
     Endpoint for dealing with a specific job
     """
 
+    @token_required
     def get(self, job_id):
         """
         Get the specified job
@@ -76,6 +81,7 @@ class JobApi(Resource):
             abort(404, message='Sorry, jobs {} not found'.format(job_id))
             return None
 
+    @token_required
     @use_kwargs(JobPatchArgs())
     def patch(self, job_id, name, description, values):
         """
@@ -119,6 +125,7 @@ class JobApi(Resource):
             'errors': error_log
         }
 
+    @token_required
     def post(self, job_id):
         """
         Start the given job if it isn't started yet
@@ -138,6 +145,7 @@ class JobApi(Resource):
             'scripts': job.script_list(),
             'username': job.user
         }
+        JOB_MANAGER_URL = current_app.config['JOB_MANAGER_URL']
         response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
                                  json=params)
         if response.status_code != 200:
@@ -197,6 +205,7 @@ class OutputApi(Resource):
     returned to the frontend.
     """
 
+    @token_required
     @use_kwargs(OutputArgs())
     def post(self, job_id, output_type, destination_path):
         """
@@ -211,11 +220,13 @@ class OutputApi(Resource):
         job.outputs.append(output)
         db.session.commit()
 
+    @token_required
     def get(self, job_id):
         """
         When the user wants to download an output, need to get a token or
         similar from the job manager to get the actual URL.
         """
+        JOB_MANAGER_URL = current_app.config['JOB_MANAGER_URL']
         r = requests.get('{}/{}/output'.format(JOB_MANAGER_URL, job_id))
         if r.status_code != 200:
             abort(404, message='Unable to get output for {}'.format(job_id))

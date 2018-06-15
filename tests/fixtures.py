@@ -21,8 +21,9 @@ def demo_app():
     """
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+    app.config.from_json('config.testing.json')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     app.testing = True
 
     init_database(app)

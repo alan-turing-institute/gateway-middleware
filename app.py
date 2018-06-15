@@ -3,22 +3,20 @@
 The main entry point for this flask app
 """
 
-from json import load
+import os
 
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 
 from connection import init_database, init_marshmallow
-import connection.constants as const
 from routes import setup_routes
 
 app = Flask(__name__)
 
-with open('config.json') as json:
-    args = load(json)
-    app.config['SQLALCHEMY_DATABASE_URI'] = args['database_url']
-    const.JOB_MANAGER_URL = args['job_manager_url']
+config_mode = os.getenv('FLASK_CONFIGURATION', 'development')
+config_fname = 'config.{}.json'.format(config_mode.lower())
+app.config.from_json(config_fname)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 init_database(app)

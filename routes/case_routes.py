@@ -8,6 +8,7 @@ from webargs.flaskparser import use_kwargs
 from connection.api_schemas import PaginationArgs
 from connection.models import Case
 from connection.schemas import CaseHeaderSchema, CaseSchema
+from .authentication import token_required
 
 case_schema = CaseSchema()
 case_header_schema = CaseHeaderSchema()
@@ -18,6 +19,7 @@ class CasesApi(Resource):
     Api for the list of all cases
     """
 
+    @token_required
     @use_kwargs(PaginationArgs())
     def get(self, page, per_page):
         """
@@ -40,6 +42,7 @@ class CaseApi(Resource):
     End point for dealing with a specific case
     """
 
+    @token_required
     def get(self, case_id: str):
         """
         Get all the details for a specific case
