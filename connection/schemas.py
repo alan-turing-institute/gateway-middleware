@@ -5,7 +5,7 @@ from flask_marshmallow import Marshmallow
 
 from .models import (Case, CaseField,
                      Job, JobParameter,
-                     Output, ParameterSpec)
+                     Output, Script, ParameterSpec)
 
 
 ma = Marshmallow()
@@ -82,8 +82,9 @@ class CaseSchema(ma.ModelSchema):
         """
 
         model = Case
-        fields = ('id', 'name', 'fields', 'thumbnail', 'description')
+        fields = ('id', 'name', 'fields', 'thumbnail', 'description', 'scripts')
     fields = ma.List(ma.Nested('CaseFieldSchema'))
+    scripts = ma.List(ma.Nested('ScriptSchema'))
 
     def make_case(self, data):
         """
@@ -170,6 +171,20 @@ class JobValueSchema(ma.ModelSchema):
 
         model = JobParameter
         fields = ('id', 'name', 'value', 'parent_template')
+
+
+class ScriptSchema(ma.ModelSchema):
+    """
+    Serialize scripts
+    """
+
+    class Meta:
+        """
+        Specification of what to use from the original class
+        """
+
+        model = Script
+        fields = ('source', 'destination', 'action')
 
 
 class OutputSchema(ma.ModelSchema):
