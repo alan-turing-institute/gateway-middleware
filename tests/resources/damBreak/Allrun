@@ -10,9 +10,9 @@ application=`getApplication`
 echo "PATCHING"
 # patch openfoam input parameters
 python pyfoam_patch.py
-
 echo "PATCHED OK"
 
+cp 0/alpha.water.orig 0/alpha.water
 runApplication blockMesh
 runApplication setFields
 runApplication $application
