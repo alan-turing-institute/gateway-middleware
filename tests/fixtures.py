@@ -10,7 +10,7 @@ from pytest import fixture
 
 from connection import init_database, init_marshmallow
 from connection.models import db, Job, JobParameter, JobStatus
-from routes import setup_routes
+from routes import set_up_routes
 from .create_and_mint_case_using_stores import set_up_test_database
 
 
@@ -31,7 +31,7 @@ def demo_app():
 
     api = Api(app)
 
-    setup_routes(app, api)
+    set_up_routes(app, api)
     with app.app_context():
         set_up_test_database()
     return app

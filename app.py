@@ -10,7 +10,7 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from connection import init_database, init_marshmallow
-from routes import setup_routes
+from routes import set_up_routes
 
 app = Flask(__name__)
 
@@ -26,7 +26,7 @@ init_marshmallow(app)
 api = Api(app)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-setup_routes(app, api)
+set_up_routes(app, api)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
