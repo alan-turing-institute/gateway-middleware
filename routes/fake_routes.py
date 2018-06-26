@@ -17,6 +17,6 @@ class TestData(Resource):
         """
         Create the default fake data
         """
-        set_up_test_database()
+        # set_up_test_database()
         set_up_dambreak_testdata()
         set_up_cavity_testdata()
