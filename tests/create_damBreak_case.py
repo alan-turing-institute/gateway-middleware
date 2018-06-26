@@ -36,17 +36,22 @@ def add_damBreak_scripts(parent_case, local_base_dir):
     as necessary for individual scripts.
     """
     scripts = {}
-    uri_base = 'https://sgmiddleware.blob.core.windows.net/openfoam-test-cases/'
+    uri_base = ('https://sgmiddleware.blob.core.windows.net/'
+                'openfoam-test-cases/')
 
     for root, _dirs, files in os.walk(local_base_dir):
+        files = [f for f in files if not f[0] == '.']  # ignore hidden files
         for filename in files:
             full_filepath = os.path.join(root, filename)
             rel_filepath = re.search(r'damBreak\/([\S]+)',
                                      full_filepath).groups()[0]
 
-            source_filepath = join(uri_base, 'damBreak', rel_filepath)
+            # assume that relevant files aleady exist at source_filepath
+            # (no files are transferred to cloud storage here)
+            source_filepath = join(uri_base, 'damBreakRefactor', rel_filepath)
             destination_filepath = rel_filepath
 
+            # assume unique filenames for test case
             scripts[filename] = Script(parent_case=parent_case,
                                        source=source_filepath,
                                        destination=destination_filepath,
@@ -54,7 +59,7 @@ def add_damBreak_scripts(parent_case, local_base_dir):
                                        patch=False)
 
     # now override the scripts that we do want to patch
-    scripts['pyfoam_patch.py'].patch = True
+    scripts['patch.py'].patch = True
     scripts['job_id'].patch = True
     scripts['run.sh'].action = 'RUN'
 

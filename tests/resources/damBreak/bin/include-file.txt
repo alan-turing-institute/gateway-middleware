@@ -1,2 +1,0 @@
-# an rclone include rule file
-*.vtk
