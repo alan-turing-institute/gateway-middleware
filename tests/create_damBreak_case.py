@@ -36,7 +36,7 @@ def damBreak_scripts(parent_case, local_base_dir):
     as necessary for individual scripts.
     """
     scripts = {}
-    uri_base = ('https://sgmiddleware.blob.core.windows.net/'
+    uri_base = ('https://simulate.blob.core.windows.net/'
                 'openfoam-test-cases/')
 
     for root, _dirs, files in os.walk(local_base_dir):
@@ -73,7 +73,7 @@ def set_up_dambreak_testdata():
     """
     create_phase_store()
 
-    uri_base = 'https://sgmiddleware.blob.core.windows.net/'
+    uri_base = 'https://simulate.blob.core.windows.net/'
 
     session = db.session
     # make damBreak case
