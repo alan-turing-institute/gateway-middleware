@@ -8,7 +8,7 @@ from .fake_routes import TestData
 from .job_routes import JobApi, JobsApi, OutputApi, StatusApi
 
 
-def setup_routes(app, api):
+def set_up_routes(app, api):
     """
     Set up the routes for these api end points
     """

@@ -1,5 +1,5 @@
 """
-Create a test interFoam damBreak case,
+Create a test icoFoam cavity case,
 using components from the "phase store".
 """
 
@@ -7,27 +7,10 @@ import os
 import re
 from posixpath import join
 
-from connection.models import Case, db, Script
-from .create_case_store import make_phases
+from connection.models import Case, CaseField, Script, ParameterSpec, db
 
 
-def create_phase_store():
-    """
-    Populate the "store" of phases
-    """
-    # add some cases to the Phase Store
-    session = db.session
-    phases = make_phases()
-
-    exists = session.query(Case).filter(Case.name == 'phases').all()
-    if len(exists) > 0:
-        print('PhaseStore already there!')
-        exit()
-    session.add(phases)
-    session.commit()
-
-
-def damBreak_scripts(parent_case, local_base_dir):
+def cavity_scripts(parent_case, local_base_dir):
     """
     Start by getting all the scripts in a local directory,
     and adding them to a dict (while modifiying source location with the
@@ -43,12 +26,12 @@ def damBreak_scripts(parent_case, local_base_dir):
         files = [f for f in files if not f[0] == '.']  # ignore hidden files
         for filename in files:
             full_filepath = os.path.join(root, filename)
-            rel_filepath = re.search(r'damBreak\/([\S]+)',
+            rel_filepath = re.search(r'cavity\/([\S]+)',
                                      full_filepath).groups()[0]
 
             # assume that relevant files aleady exist at source_filepath
             # (no files are transferred to cloud storage here)
-            source_filepath = join(uri_base, 'damBreak', rel_filepath)
+            source_filepath = join(uri_base, 'cavity', rel_filepath)
             destination_filepath = rel_filepath
 
             # assume unique filenames for test case
@@ -66,43 +49,54 @@ def damBreak_scripts(parent_case, local_base_dir):
     return scripts
 
 
-def set_up_dambreak_testdata():
+def set_up_cavity_testdata():
     """
-    Make a real case, using phases from the 'phase store',
-    and commit it to the database
+    Make a cavity case and commit it to the database
     """
-    create_phase_store()
 
     uri_base = 'https://sgmiddleware.blob.core.windows.net/'
 
     session = db.session
     # make damBreak case
-    damBreak = Case(name='damBreak',
-                    thumbnail=uri_base + 'openfoam-thumbnails/damBreak.png',
-                    description='interFoam damBreak tutorial',
-                    visible=True)
-    # retrieve the phase store from the database
-    new_phase_store = session.query(Case). \
-        filter(Case.name == 'phases').first()
+    cavity = Case(name='cavity',
+                  thumbnail=join(uri_base, 'openfoam-thumbnails/cavity.png'),
+                  description='icoFoam cavity tutorial',
+                  visible=True)
 
-    # copy phases from the phase store, and name them Water and Air
-    new_phaseA = new_phase_store.fields[0].deep_copy()
-    new_phaseA.name = 'Water'
-    new_phaseA.prepend_prefix('Water_')
+    fluid = CaseField(name='fluid', parent_case=cavity)
+    kinematic_viscosity = CaseField(
+        name='kinematic_viscosity', parent_field=fluid)
+    ParameterSpec(name='min', value='0.000001',
+                  parent_casefield=kinematic_viscosity)
+    ParameterSpec(name='max', value='0.0001',
+                  parent_casefield=kinematic_viscosity)
+    ParameterSpec(name='step', value='0.000001',
+                  parent_casefield=kinematic_viscosity)
+    ParameterSpec(name='default', value='0.00001',
+                  parent_casefield=kinematic_viscosity)
+    ParameterSpec(name='units', value='m/s^2',
+                  parent_casefield=kinematic_viscosity)
 
-    new_phaseB = new_phase_store.fields[1].deep_copy()
-    new_phaseB.name = 'Air'
-    new_phaseB.prepend_prefix('Air_')
+    lid = CaseField(name='lid', parent_case=cavity)
+    wall_velocity = CaseField(name='wall_velocity', parent_field=lid)
+    ParameterSpec(name='min', value='0.1',
+                  parent_casefield=wall_velocity)
+    ParameterSpec(name='max', value='2.0',
+                  parent_casefield=wall_velocity)
+    ParameterSpec(name='step', value='0.01',
+                  parent_casefield=wall_velocity)
+    ParameterSpec(name='default', value='0.5',
+                  parent_casefield=wall_velocity)
+    ParameterSpec(name='units', value='m/s',
+                  parent_casefield=wall_velocity)
 
-    damBreak.fields.append(new_phaseA)
-    damBreak.fields.append(new_phaseB)
     # get the list of necessary scripts by scanning this local directory,
     # even though the actual scripts are on Azure blob storage
     # NOTE: this requires a manual sync between local scripts and azure scripts
-    scripts = damBreak_scripts(damBreak, 'tests/resources/damBreak')
+    scripts = cavity_scripts(cavity, 'tests/resources/cavity')
 
     # add everything to the database
     for script in scripts.values():
         session.add(script)
-    session.add(damBreak)
+    session.add(cavity)
     session.commit()
