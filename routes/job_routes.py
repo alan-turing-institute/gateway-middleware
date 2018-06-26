@@ -205,7 +205,6 @@ class OutputApi(Resource):
     returned to the frontend.
     """
 
-    @token_required
     @use_kwargs(OutputArgs())
     def post(self, job_id, output_type, destination_path):
         """
