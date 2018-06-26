@@ -4,10 +4,10 @@ using components from the "phase store".
 """
 
 import os
-import re
 from posixpath import join
+import re
 
-from connection.models import Case, CaseField, Script, ParameterSpec, db
+from connection.models import Case, CaseField, db, ParameterSpec, Script
 
 
 def cavity_scripts(parent_case, local_base_dir):
@@ -53,7 +53,6 @@ def set_up_cavity_testdata():
     """
     Make a cavity case and commit it to the database
     """
-
     uri_base = 'https://simulate.blob.core.windows.net/'
 
     session = db.session

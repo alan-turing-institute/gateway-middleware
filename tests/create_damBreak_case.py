@@ -4,8 +4,8 @@ using components from the "phase store".
 """
 
 import os
-import re
 from posixpath import join
+import re
 
 from connection.models import Case, db, Script
 from .create_case_store import make_phases
