@@ -5,7 +5,7 @@ from flask_marshmallow import Marshmallow
 
 from .models import (Case, CaseField,
                      Job, JobParameter,
-                     Output, Script, ParameterSpec)
+                     Output, ParameterSpec, Script)
 
 
 ma = Marshmallow()
