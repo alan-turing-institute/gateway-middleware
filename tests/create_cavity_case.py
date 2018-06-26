@@ -19,7 +19,7 @@ def cavity_scripts(parent_case, local_base_dir):
     as necessary for individual scripts.
     """
     scripts = {}
-    uri_base = ('https://sgmiddleware.blob.core.windows.net/'
+    uri_base = ('https://simulate.blob.core.windows.net/'
                 'openfoam-test-cases/')
 
     for root, _dirs, files in os.walk(local_base_dir):
@@ -54,7 +54,7 @@ def set_up_cavity_testdata():
     Make a cavity case and commit it to the database
     """
 
-    uri_base = 'https://sgmiddleware.blob.core.windows.net/'
+    uri_base = 'https://simulate.blob.core.windows.net/'
 
     session = db.session
     # make damBreak case
