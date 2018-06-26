@@ -82,7 +82,8 @@ class CaseSchema(ma.ModelSchema):
         """
 
         model = Case
-        fields = ('id', 'name', 'fields', 'thumbnail', 'description', 'scripts')
+        fields = ('id', 'name', 'fields',
+                  'thumbnail', 'description', 'scripts')
     fields = ma.List(ma.Nested('CaseFieldSchema'))
     scripts = ma.List(ma.Nested('ScriptSchema'))
 
