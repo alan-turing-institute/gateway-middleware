@@ -6,6 +6,7 @@ using components from the "phase store".
 from dataloading.case_json_loader import read_case_from_json
 from connection.models import Case, Job, db
 
+
 def set_up_osrc_testdata():
     """
     Make a osrc case and commit it to the database
@@ -16,6 +17,7 @@ def set_up_osrc_testdata():
 
     session.add(osrc)
     session.commit()
+
 
 def clear_db():
     """

@@ -6,6 +6,7 @@ from json import load
 
 from connection.models import Case, Script, CaseField, ParameterSpec
 
+
 def read_case_from_json(filename):
     """
     Given a json file, read in the case.
@@ -17,6 +18,7 @@ def read_case_from_json(filename):
         json_data = load(json_file)
         case = parse_case(json_data)
     return case
+
 
 def parse_case(case_map):
     """
@@ -39,6 +41,7 @@ def parse_case(case_map):
             raise AttributeError('Found unknown key in root: {}'.format(key))
     return case
 
+
 def parse_fields(fields_list, parent_case):
     """
     Take the JSON list of fields, and return it
@@ -49,6 +52,7 @@ def parse_fields(fields_list, parent_case):
     for field_map in fields_list:
         fields.append(parse_field(field_map, parent_case))
     return fields
+
 
 def parse_field(field_map, parent_case):
     """
@@ -65,6 +69,7 @@ def parse_field(field_map, parent_case):
             casefield.specs = parse_specs(value, casefield)
     return casefield
 
+
 def parse_specs(spec_map, parent_casefield):
     """
     Parse a set of specs from JSON to a list of objects
@@ -76,6 +81,7 @@ def parse_specs(spec_map, parent_casefield):
         specs.append(ParameterSpec(name=spec, value=value,
                                    parent_casefield=parent_casefield))
     return specs
+
 
 def parse_scripts(scripts_list, parent_case):
     """
@@ -89,6 +95,7 @@ def parse_scripts(scripts_list, parent_case):
         s.parent_case = parent_case
         parsed_scripts.append(s)
     return parsed_scripts
+
 
 def parse_script(script_map):
     """
@@ -107,6 +114,7 @@ def parse_script(script_map):
             raise AttributeError('Unexpected field {} in script'.format(key))
     return script
 
+
 def ensure_string(value):
     """
     Ensure the current value is a string.
@@ -116,7 +124,9 @@ def ensure_string(value):
     """
     if isinstance(value, str):
         return value
-    raise ValueError('{} must be of type string but is {}'.format(value, type(value)))
+    raise ValueError('{} must be of type string but is {}'.
+                     format(value, type(value)))
+
 
 def ensure_boolean(value):
     """
@@ -127,4 +137,5 @@ def ensure_boolean(value):
     """
     if isinstance(value, bool):
         return value
-    raise ValueError('{} must be of type string but is {}'.format(value, type(value)))
+    raise ValueError('{} must be of type string but is {}'.
+                     format(value, type(value)))

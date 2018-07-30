@@ -6,6 +6,7 @@ from flask_restful import Resource
 
 from tests.create_osrc_case import set_up_osrc_testdata, clear_db
 
+
 class TestData(Resource):
     """
     Class to be used for generating fake data

@@ -171,7 +171,8 @@ class JobApi(Resource):
            job.status == JobStatus.FINALIZING.value or \
            job.status == JobStatus.RUNNING.value:
             return make_response(RequestStatus.FAILED,
-                                 errors=['A job cannot be deleted while running'])
+                                 errors=['A job cannot be '
+                                         'deleted while running'])
         db.session.delete(job)
         db.session.commit()
         return make_response()
