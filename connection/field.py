@@ -4,7 +4,7 @@ with fields and their validation
 """
 
 
-class Field:
+class Field(object):
     """
     A class to represents fields in cases
     and do logical processing and validation
@@ -51,7 +51,30 @@ class Field:
         * min
         * max
         """
-        new_value = float(new_value)
+        widget = self.properties.get('type')
+        widget = 'slider' if not widget else widget
+        if widget == 'slider':
+            return self._validate_float(fullname, new_value)
+        elif widget == 'file':
+            # This needs to be changed to something sensible
+            return True
+        else:
+            print('Unknown widget type {}'.format(widget))
+            return False
+
+    def _validate_float(self, fullname, new_value):
+        """
+        Check to make sure the current floating point value is allowed.
+
+        The current implementation only handles the fields
+            * min
+            * max
+            * step
+        """
+        try:
+            new_value = float(new_value)
+        except ValueError:
+            return False
         if fullname != self.process_name:
             return False
         min_value = self.properties.get('min')
@@ -59,5 +82,8 @@ class Field:
             return False
         max_value = self.properties.get('max')
         if max_value is not None and float(max_value) < new_value:
+            return False
+        step_value = self.properties.get('step')
+        if step_value is not None and new_value % float(step_value):
             return False
         return True
