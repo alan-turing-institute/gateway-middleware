@@ -159,6 +159,23 @@ class JobApi(Resource):
         db.session.commit()
         return make_response()
 
+    @token_required
+    def delete(self, job_id):
+        """
+        Delete a job if it exists
+        """
+        job = Job.query.get(job_id)
+        if job is None:
+            abort(404, message='Sorry, job {} not found'.format(job_id))
+        if job.status == JobStatus.QUEUED.value or \
+           job.status == JobStatus.FINALIZING.value or \
+           job.status == JobStatus.RUNNING.value:
+            return make_response(RequestStatus.FAILED,
+                                 errors=['A job cannot be deleted while running'])
+        db.session.delete(job)
+        db.session.commit()
+        return make_response()
+
 
 class StatusApi(Resource):
     """
