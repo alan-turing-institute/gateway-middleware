@@ -34,7 +34,7 @@ while not db_loaded:
 init_marshmallow(app)
 
 api = Api(app)
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app, resources=r'/*', origins='*')
 
 set_up_routes(app, api)
 
