@@ -4,7 +4,8 @@ using components from the "phase store".
 """
 
 from dataloading.case_json_loader import read_case_from_json
-from connection.models import Case, Job, db
+
+from connection.models import Case, db, Job
 
 
 def set_up_osrc_testdata():

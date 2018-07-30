@@ -4,7 +4,7 @@ Module to turn JSON cases into real cases
 
 from json import load
 
-from connection.models import Case, Script, CaseField, ParameterSpec
+from connection.models import Case, CaseField, ParameterSpec, Script
 
 
 def read_case_from_json(filename):
