@@ -3,10 +3,8 @@ Make some fake routes for testing purposes
 """
 
 from flask_restful import Resource
-# from tests.create_and_mint_case_using_stores import set_up_test_database
-from tests.create_cavity_case import set_up_cavity_testdata
-from tests.create_damBreak_case import set_up_dambreak_testdata
 
+from tests.create_osrc_case import set_up_osrc_testdata, clear_db
 
 class TestData(Resource):
     """
@@ -17,6 +15,10 @@ class TestData(Resource):
         """
         Create the default fake data
         """
-        # set_up_test_database()
-        set_up_dambreak_testdata()
-        set_up_cavity_testdata()
+        set_up_osrc_testdata()
+
+    def delete(self):
+        """
+        Delete all the cases and jobs
+        """
+        clear_db()
