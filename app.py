@@ -4,6 +4,7 @@ The main entry point for this flask app
 """
 
 import os
+from time import sleep
 
 from flask import Flask
 from flask_cors import CORS
@@ -14,12 +15,21 @@ from routes import set_up_routes
 
 app = Flask(__name__)
 
+logger = app.logger
 config_mode = os.getenv('FLASK_CONFIGURATION', 'development')
 config_fname = 'config.{}.json'.format(config_mode.lower())
 app.config.from_json(config_fname)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-init_database(app)
+db_loaded = False
+while not db_loaded:
+    try:
+        db_loaded = True
+        init_database(app)
+    except Exception as e:
+        db_loaded = False
+        logger.error(e)
+        sleep(3)
 
 init_marshmallow(app)
 
