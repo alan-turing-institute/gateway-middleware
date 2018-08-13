@@ -91,6 +91,7 @@ class CaseField(Base):
     case_id = db.Column(db.Integer, db.ForeignKey('case.id'),
                         nullable=True)
     name = db.Column(db.String, nullable=False)
+    component = db.Column(db.String, nullable=True)
     parent_id = db.Column(db.Integer,
                           db.ForeignKey('case_field.id'),
                           nullable=True)
@@ -106,7 +107,7 @@ class CaseField(Base):
         Create a deep clone
         """
         new_case_field = CaseField(
-            name=self.name)
+            name=self.name, component=self.component)
         for child in self.child_fields:
             new_case_field.child_fields.append(child.deep_copy())
         for spec in self.specs:

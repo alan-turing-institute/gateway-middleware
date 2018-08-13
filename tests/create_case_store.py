@@ -77,9 +77,12 @@ def make_phases():
     phase_store = Case(name='phases', visible=False)
     # phase_A (e.g. water)
     phase_A = CaseField(name='phase_A',
-                        parent_case=phase_store)
+                        parent_case=phase_store,
+                        component='heading')
 
-    phase_A_density = CaseField(name='density', parent_field=phase_A)
+    phase_A_density = CaseField(name='density',
+                                parent_field=phase_A,
+                                component='slider')
     ParameterSpec(name='min', value='1',
                   parent_casefield=phase_A_density)
     ParameterSpec(name='max', value='2000',
@@ -89,7 +92,9 @@ def make_phases():
     ParameterSpec(name='units', value='kg/m^3',
                   parent_casefield=phase_A_density)
 
-    phase_A_viscosity = CaseField(name='viscosity', parent_field=phase_A)
+    phase_A_viscosity = CaseField(name='viscosity',
+                                  parent_field=phase_A,
+                                  component='slider')
     ParameterSpec(name='min', value='0.000001',
                   parent_casefield=phase_A_viscosity)
     ParameterSpec(name='max', value='0.0001',
@@ -102,7 +107,8 @@ def make_phases():
                   parent_casefield=phase_A_viscosity)
 
     phase_A_surface_tension = CaseField(name='surface_tension',
-                                        parent_field=phase_A)
+                                        parent_field=phase_A,
+                                        component='slider')
     ParameterSpec(name='min', value='0.01',
                   parent_casefield=phase_A_surface_tension)
     ParameterSpec(name='max', value='0.1',
@@ -116,9 +122,12 @@ def make_phases():
 
     # phase_B (e.g. air)
     phase_B = CaseField(name='phase_B',
-                        parent_case=phase_store)
+                        parent_case=phase_store,
+                        component='heading')
 
-    phase_B_density = CaseField(name='density', parent_field=phase_B)
+    phase_B_density = CaseField(name='density',
+                                parent_field=phase_B,
+                                component='slider')
     ParameterSpec(name='min', value='1',
                   parent_casefield=phase_B_density)
     ParameterSpec(name='max', value='2000',
@@ -128,7 +137,9 @@ def make_phases():
     ParameterSpec(name='units', value='kg/m^3',
                   parent_casefield=phase_B_density)
 
-    phase_B_viscosity = CaseField(name='viscosity', parent_field=phase_B)
+    phase_B_viscosity = CaseField(name='viscosity',
+                                  parent_field=phase_B,
+                                  component='slider')
     ParameterSpec(name='min', value='0.000001',
                   parent_casefield=phase_B_viscosity)
     ParameterSpec(name='max', value='0.0001',

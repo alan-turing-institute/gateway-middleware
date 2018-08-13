@@ -46,7 +46,7 @@ class CaseFieldSchema(ma.ModelSchema):
         """
 
         model = CaseField
-        fields = ('name', 'child_fields', 'specs')
+        fields = ('name', 'child_fields', 'specs', 'component')
     child_fields = ma.Nested('self', many=True)
     specs = ma.List(ma.Nested('ParamSpecSchema'))
 

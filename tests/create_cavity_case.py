@@ -63,8 +63,9 @@ def set_up_cavity_testdata():
                   visible=True)
 
     fluid = CaseField(name='fluid', parent_case=cavity)
-    kinematic_viscosity = CaseField(
-        name='kinematic_viscosity', parent_field=fluid)
+    kinematic_viscosity = CaseField(name='kinematic_viscosity',
+                                    parent_field=fluid,
+                                    component='slider')
     ParameterSpec(name='min', value='0.000001',
                   parent_casefield=kinematic_viscosity)
     ParameterSpec(name='max', value='0.0001',
@@ -77,7 +78,9 @@ def set_up_cavity_testdata():
                   parent_casefield=kinematic_viscosity)
 
     lid = CaseField(name='lid', parent_case=cavity)
-    wall_velocity = CaseField(name='wall_velocity', parent_field=lid)
+    wall_velocity = CaseField(name='wall_velocity',
+                              parent_field=lid,
+                              component='slider')
     ParameterSpec(name='min', value='0.1',
                   parent_casefield=wall_velocity)
     ParameterSpec(name='max', value='2.0',
