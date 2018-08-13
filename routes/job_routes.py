@@ -12,7 +12,8 @@ from webargs import missing
 from webargs.flaskparser import use_kwargs
 
 from connection.api_schemas import (JobArgs, JobPatchArgs, OutputArgs,
-                                    PaginationArgs, StatusPatchSchema)
+                                    PaginationArgs, StatusPatchSchema,
+                                    SearchArgs)
 from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
@@ -57,6 +58,19 @@ class JobsApi(Resource):
         return job_header_schema.dump(Job.query.paginate(page, per_page,
                                                          False).items,
                                       many=True)
+
+class JobsSearchApi(Resource):
+    """
+    Endpoint for searching for jobs and cases
+    """
+
+    @token_required
+    @use_kwargs(SearchArgs())
+    def get(self, name):
+        """
+        Search jobs that match the incoming query
+        """
+        return job_header_schema.dump(Job.query.filter_by(name=name), many=True)
 
 
 class JobApi(Resource):

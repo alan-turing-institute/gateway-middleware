@@ -123,6 +123,29 @@ class PaginationArgs(ma.Schema):
             raise BadRequestKeyError('Unknown field {}'.format(unknown))
 
 
+class SearchArgs(ma.Schema):
+    """
+    Read in arguments for searching
+    """
+
+    class Meta:
+        """
+        Ensure that other fields are not provided
+        """
+
+        strict = True
+    name = Str(missing=None, strict=True)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        """
+        Ensure no additional fields are passed
+        """
+        unknown = set(original_data) - set(self.fields)
+        if len(unknown) > 0:
+            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+
+
 class StatusPatchSchema(ma.Schema):
     """
     Read in arguments for setting a status value
