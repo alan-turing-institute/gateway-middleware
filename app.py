@@ -9,6 +9,7 @@ from time import sleep
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
+from sqlalchemy.exc import OperationalError
 
 from connection import init_database, init_marshmallow
 from routes import set_up_routes
@@ -26,7 +27,7 @@ while not db_loaded:
     try:
         db_loaded = True
         init_database(app)
-    except Exception as e:
+    except OperationalError as e:
         db_loaded = False
         logger.error(e)
         sleep(3)

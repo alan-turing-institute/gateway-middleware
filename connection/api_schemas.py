@@ -16,7 +16,7 @@ class JobArgs(ma.Schema):
     Class to read in arguments to create a new job
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that it can only take the defined arguments
         """
@@ -42,7 +42,7 @@ class JobArgumentArgs(ma.Schema):
     Class to read in the arguments for a single Job argument value
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
@@ -79,7 +79,7 @@ class JobPatchArgs(ma.Schema):
     Read in the arguments for patching a job
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
@@ -104,7 +104,7 @@ class PaginationArgs(ma.Schema):
     Read in arguments for paginating
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
@@ -128,7 +128,7 @@ class StatusPatchSchema(ma.Schema):
     Read in arguments for setting a status value
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
@@ -152,7 +152,7 @@ class OutputArgs(ma.Schema):
     Check read-in arguments for creating a job Output.
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that it can only take the defined arguments
         """

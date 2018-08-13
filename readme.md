@@ -99,6 +99,7 @@ that may be helpful:
     with an SQL keyword, you must wrap the table name in `"`
     ```sql
     SELECT * FROM "Case";
+    ```
 
 * Delete all tables:
     ```sql
@@ -127,7 +128,7 @@ It supports the following query args:
     The first page is 1.
     If you ask for a page that does not exist (i.e off the end) you will get an empty list.
 * `per_page` (optional, default=10) gives the number of results per page to return.
-    
+  
 No information about whether the next page exists is returned. 
 This is because I am expecting this to be used as part of an
 infinite scrolling system, where there is no explicit display to the user to ask for more 
@@ -209,7 +210,7 @@ It supports the following query args:
     The first page is 1.
     If you ask for a page that does not exist (i.e off the end) you will get an empty list.
 * `per_page` (optional, default=10) gives the number of results per page to return.
-    
+  
 No information about whether the next page exists is returned. 
 This is because I am expecting this to be used as part of an
 infinite scrolling system, where there is no explicit display to the user to ask for more 

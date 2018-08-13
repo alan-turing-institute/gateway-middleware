@@ -265,7 +265,7 @@ class Job(Base):
         """
         Check to make sure the job has all of it's required values set
         """
-        set_values = set([v.name for v in self.values])
+        set_values = set(v.name for v in self.values)
         required_values = self.parent_case.required_values()
         return len(required_values - set_values) == 0
 
