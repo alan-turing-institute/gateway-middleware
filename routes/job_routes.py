@@ -213,7 +213,7 @@ class OutputApi(Resource):
     This class deals with job outputs.
     The POST endpoint is called by the job manager to
     specify an Output {"type": x,"destination_path" : y}
-    The GET endpoint is called by the frontend when an output
+    The GET endpoint is called by the front end when an output
     is to actually be retrieved, and in turn calls the job_manager
     to get an authorization token.  The URL including this token is
     returned to the frontend.

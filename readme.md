@@ -1,6 +1,6 @@
-# Science Gateway Middleware
+# Simulate Middleware
 
-The science gateway middleware stores the current status 
+The simulate middleware stores the current status 
 of all cases and jobs. It does minimal processing, and serves
 primarily as a persistent store of state (but not of data).
 

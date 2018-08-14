@@ -27,8 +27,8 @@ JOB_ID=`cat $STATE/job_id`
 
 echo $PBS_JOBID > $STATE/pbs_job_id
 
-# update status in job-manager to RUNNING
-curl -X PATCH http://job-manager:5001/job/$JOB_ID/status \
+# update status in manager to RUNNING
+curl -X PATCH http://manager:5001/job/$JOB_ID/status \
   --data '{"status" : "RUNNING"}' \
   -H "Content-type: application/json"
 
@@ -38,12 +38,12 @@ source /opt/openfoam5/etc/bashrc
 chmod a+x Allrun
 ./Allrun
 
-# artificial delay, useful for testing frontend features
+# artificial delay, useful for testing front-end features
 sleep 5
 
 # update job status to FINALIZING - this will get us some json containing Azure
 # details (account name, container name, SAS token) which we put in a json file.
-curl -X PATCH http://job-manager:5001/job/$JOB_ID/status \
+curl -X PATCH http://manager:5001/job/$JOB_ID/status \
   --data '{"status" : "FINALIZING"}' \
   -H "Content-type: application/json" | tee $STATE/store.json
 
@@ -54,11 +54,11 @@ chmod u+x $STORAGE_SCRIPT
 echo "INFO: Calling $STORAGE_SCRIPT $TMPDIR"
 $STORAGE_SCRIPT $TMPDIR
 
-# artificial delay, useful for testing frontend features
+# artificial delay, useful for testing front-end features
 sleep 5
 
 # update job status to COMPLETED
-curl -X PATCH http://job-manager:5001/job/$JOB_ID/status \
+curl -X PATCH http://manager:5001/job/$JOB_ID/status \
   --data '{"status" : "COMPLETED"}' \
   -H "Content-type: application/json"
 
