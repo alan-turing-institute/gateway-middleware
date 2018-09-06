@@ -47,6 +47,13 @@ curl -X PATCH http://manager:5001/job/$JOB_ID/status \
   --data '{"status" : "FINALIZING"}' \
   -H "Content-type: application/json" | tee $STATE/store.json
 
+
+# Run the metrics script
+METRICS_SCRIPT="$SIMULATE/metrics.sh"
+chmod u+x $METRICS_SCRIPT
+echo "INFO: Calling $METRICS_SCRIPT"
+$METRICS_SCRIPT
+
 # Run the storage script, giving it the current directory as an argument
 STORAGE_SCRIPT="$SIMULATE/store.sh"
 
