@@ -17,10 +17,10 @@ from routes import set_up_routes
 app = Flask(__name__)
 
 logger = app.logger
-config_mode = os.getenv('FLASK_CONFIGURATION', 'development')
-config_fname = 'config.{}.json'.format(config_mode.lower())
+config_mode = os.getenv("FLASK_CONFIGURATION", "development")
+config_fname = "config.{}.json".format(config_mode.lower())
 app.config.from_json(config_fname)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db_loaded = False
 while not db_loaded:
@@ -35,9 +35,9 @@ while not db_loaded:
 init_marshmallow(app)
 
 api = Api(app)
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 set_up_routes(app, api)
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)

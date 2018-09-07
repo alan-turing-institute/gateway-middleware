@@ -7,20 +7,20 @@ from .case_routes import CaseApi, CasesApi
 from .job_routes import JobApi, JobsApi, JobsSearchApi, OutputApi, StatusApi
 from .fake_routes import TestData
 
+
 def set_up_routes(app, api):
     """
     Set up the routes for these api end points
     """
-    app.url_map.converters['stat'] = StatusConverter
+    app.url_map.converters["stat"] = StatusConverter
 
-    api.add_resource(CasesApi, '/case')
-    api.add_resource(CaseApi, '/case/<int:case_id>')
-    api.add_resource(JobsApi, '/job')
-    api.add_resource(JobsSearchApi, '/job/search')
-    api.add_resource(JobApi, '/job/<string:job_id>')
-    api.add_resource(StatusApi, '/job/<string:job_id>/status')
-    api.add_resource(OutputApi, '/job/<string:job_id>/output')
-    
+    api.add_resource(CasesApi, "/case")
+    api.add_resource(CaseApi, "/case/<int:case_id>")
+    api.add_resource(JobsApi, "/job")
+    api.add_resource(JobsSearchApi, "/job/search")
+    api.add_resource(JobApi, "/job/<string:job_id>")
+    api.add_resource(StatusApi, "/job/<string:job_id>/status")
+    api.add_resource(OutputApi, "/job/<string:job_id>/output")
 
     # Only while in development
-    api.add_resource(TestData, '/test')
+    api.add_resource(TestData, "/test")

@@ -34,7 +34,7 @@ class JobArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field', unknown)
+            raise BadRequestKeyError("Unknown field", unknown)
 
 
 class JobArgumentArgs(ma.Schema):
@@ -48,6 +48,7 @@ class JobArgumentArgs(ma.Schema):
         """
 
         strict = True
+
     name = Str(required=True)
     value = Str(required=True)
 
@@ -60,8 +61,9 @@ class JobArgumentArgs(ma.Schema):
             self.check_unknown_field(data, original_data)
             return
         if len(data) != len(original_data):
-            raise BadRequestKeyError('Could not parse all fields, {}'.
-                                     format(original_data))
+            raise BadRequestKeyError(
+                "Could not parse all fields, {}".format(original_data)
+            )
         for index in range(0, len(data)):
             self.check_unknown_field(data[index], original_data[index])
 
@@ -71,7 +73,7 @@ class JobArgumentArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class JobPatchArgs(ma.Schema):
@@ -85,6 +87,7 @@ class JobPatchArgs(ma.Schema):
         """
 
         strict = True
+
     name = Str()
     description = Str()
     values = Nested(JobArgumentArgs, many=True)
@@ -96,7 +99,7 @@ class JobPatchArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class PaginationArgs(ma.Schema):
@@ -110,6 +113,7 @@ class PaginationArgs(ma.Schema):
         """
 
         strict = True
+
     page = Int(missing=1, strict=True, validate=lambda p: p > 0)
     per_page = Int(missing=10, strict=True, validate=lambda p: p > 0)
 
@@ -120,7 +124,7 @@ class PaginationArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if len(unknown) > 0:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class SearchArgs(ma.Schema):
@@ -134,6 +138,7 @@ class SearchArgs(ma.Schema):
         """
 
         strict = True
+
     name = Str(missing=None, strict=True)
 
     @validates_schema(pass_original=True)
@@ -143,7 +148,7 @@ class SearchArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if len(unknown) > 0:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class StatusPatchSchema(ma.Schema):
@@ -157,8 +162,8 @@ class StatusPatchSchema(ma.Schema):
         """
 
         strict = True
-    status = Str(validate=lambda s: s.upper() in
-                 JobStatus.__members__.keys())
+
+    status = Str(validate=lambda s: s.upper() in JobStatus.__members__.keys())
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
@@ -167,7 +172,7 @@ class StatusPatchSchema(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if len(unknown) > 0:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class OutputArgs(ma.Schema):
@@ -193,4 +198,4 @@ class OutputArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field', unknown)
+            raise BadRequestKeyError("Unknown field", unknown)

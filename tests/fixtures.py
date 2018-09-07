@@ -14,15 +14,15 @@ from routes import set_up_routes
 from .create_and_mint_case_using_stores import set_up_test_database
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def demo_app():
     """
     Setup the flask app context I hope
     """
     app = Flask(__name__)
 
-    app.config.from_json('config.testing.json')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.from_json("config.testing.json")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     app.testing = True
 
@@ -37,21 +37,20 @@ def demo_app():
     return app
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def test_job_id(demo_app):
     """
     Create a test job with a known job_id and add it to the db
     """
     job_id = str(uuid4())
-    job = Job(id=job_id, case_id='3',
-              name='bob', user='bob2')
-    job.description = 'this is a test job'
-    length = JobParameter(name='length', value='3')
-    width = JobParameter(name='width', value='3')
-    f1_density = JobParameter(name='Fluid1_density', value='1000')
-    f2_density = JobParameter(name='Fluid2_density', value='1000')
-    f1_viscosity = JobParameter(name='Fluid1_viscosity', value='1')
-    f2_viscosity = JobParameter(name='Fluid2_viscosity', value='1')
+    job = Job(id=job_id, case_id="3", name="bob", user="bob2")
+    job.description = "this is a test job"
+    length = JobParameter(name="length", value="3")
+    width = JobParameter(name="width", value="3")
+    f1_density = JobParameter(name="Fluid1_density", value="1000")
+    f2_density = JobParameter(name="Fluid2_density", value="1000")
+    f1_viscosity = JobParameter(name="Fluid1_viscosity", value="1")
+    f2_viscosity = JobParameter(name="Fluid2_viscosity", value="1")
     job.values.append(length)
     job.values.append(width)
     job.values.append(f1_density)
@@ -66,16 +65,15 @@ def test_job_id(demo_app):
     return job_id
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def test_job_id_no_values(demo_app):
     """
     Create a test job with a known job_id but not values set,
     and add it to the db
     """
     job_id = str(uuid4())
-    job = Job(id=job_id, case_id='1',
-              name='bob_no_val', user='bob2')
-    job.description = 'this is another test job'
+    job = Job(id=job_id, case_id="1", name="bob_no_val", user="bob2")
+    job.description = "this is another test job"
     job.status = JobStatus.NOT_STARTED.value
     with demo_app.app_context():
         session = db.session
