@@ -225,7 +225,7 @@ class OutputApi(Resource):
     """
 
     @use_kwargs(OutputListArgs())
-    def post(self, job_id, outputs):
+    def put(self, job_id, outputs):
         # def post(self, job_id):
         """
         Persist job outputs.
@@ -242,7 +242,7 @@ class OutputApi(Resource):
             )
             job.outputs.append(output)
             db.session.commit()
-        return {"foo": outputs}
+        return make_response()
 
     @token_required
     def get(self, job_id):
