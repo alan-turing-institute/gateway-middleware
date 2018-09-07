@@ -15,6 +15,7 @@ from connection.api_schemas import (
     JobArgs,
     JobPatchArgs,
     OutputArgs,
+    OutputListArgs,
     PaginationArgs,
     StatusPatchSchema,
     SearchArgs,
@@ -223,19 +224,25 @@ class OutputApi(Resource):
     returned to the frontend.
     """
 
-    @use_kwargs(OutputArgs())
-    def post(self, job_id, output_type, destination_path):
+    @use_kwargs(OutputListArgs())
+    def post(self, job_id, outputs):
+        # def post(self, job_id):
         """
-        Create an output and add it to the job.
+        Persist job outputs.
         """
         job = Job.query.get(job_id)
         if job is None:
             abort(404, message="Sorry, job {} not found".format(job_id))
-        output = Output(
-            job_id=job_id, output_type=output_type, destination_path=destination_path
-        )
-        job.outputs.append(output)
-        db.session.commit()
+        for output in outputs:
+            output = Output(
+                destination=output.get("destination"),
+                name=output.get("name"),
+                type=output.get("type"),
+                label=output.get("label"),
+            )
+            job.outputs.append(output)
+            db.session.commit()
+        return {"foo": outputs}
 
     @token_required
     def get(self, job_id):

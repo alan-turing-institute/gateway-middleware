@@ -204,7 +204,7 @@ class OutputSchema(ma.ModelSchema):
         """
 
         model = Output
-        fields = ("destination_path", "output_type")
+        fields = ("destination", "type", "name", "label")
 
 
 def init_marshmallow(app):

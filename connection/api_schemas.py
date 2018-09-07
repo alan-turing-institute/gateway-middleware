@@ -187,9 +187,37 @@ class OutputArgs(ma.Schema):
 
         strict = True
 
-    job_id = Str(required=True)
-    output_type = Str(required=True)
-    destination_path = Str(required=True)
+    destination = Str(required=True)
+    type = Str(required=True)
+    name = Str(required=True)
+    label = Str(required=True)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        """
+        Ensure no additional fields are passed
+        """
+
+        unknown = set()
+        for output in original_data:
+            unknown = set(unknown).union(set(output)) - set(data)
+        if unknown:
+            raise BadRequestKeyError("Unknown field", unknown)
+
+
+class OutputListArgs(ma.Schema):
+    """
+    List of job outputs
+    """
+
+    class Meta:
+        """
+        Ensure that other fields are not provided
+        """
+
+        strict = True
+
+    outputs = Nested(OutputArgs, many=True)
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
@@ -198,4 +226,4 @@ class OutputArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError("Unknown field", unknown)
+            raise BadRequestKeyError("Unknown field {}".format(unknown))

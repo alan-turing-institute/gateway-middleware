@@ -374,8 +374,11 @@ class Output(db.Model):
     """
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    destination_path = db.Column(db.String)
-    output_type = db.Column(db.String)
+    destination = db.Column(db.String)
+    name = db.Column(db.String)
+    label = db.Column(db.String)
+    type = db.Column(db.String)
+
     job_id = db.Column(db.String, db.ForeignKey("job.id"))
     job = db.relationship("Job", back_populates="outputs")
 
