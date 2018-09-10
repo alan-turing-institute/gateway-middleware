@@ -18,10 +18,10 @@ payload = {
             "label": "Metrics (json)",
         },
         {
-            "destination": f"https://simulate.blob.core.windows.net/openfoam-test-output/{job_id}/outputs.zip",
+            "destination": f"https://simulate.blob.core.windows.net/openfoam-test-output/{job_id}/output.zip",
             "type": "zip",
             "name": "output",
-            "label": "Outputs (zip)",
+            "label": "Output (zip)",
         },
     ]
 }
