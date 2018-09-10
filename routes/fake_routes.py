@@ -2,6 +2,7 @@
 Make some fake routes for testing purposes
 """
 from flask_restful import Resource
+
 from tests.create_cavity_case import set_up_cavity_testdata
 from tests.create_damBreak_case import set_up_dambreak_testdata
 
