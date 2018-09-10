@@ -1,7 +1,7 @@
 """
 Defintions of routes for the app
 """
-import json
+
 from uuid import uuid4
 
 from flask import current_app
@@ -14,7 +14,6 @@ from webargs.flaskparser import use_kwargs
 from connection.api_schemas import (
     JobArgs,
     JobPatchArgs,
-    OutputArgs,
     OutputListArgs,
     PaginationArgs,
     StatusPatchSchema,
