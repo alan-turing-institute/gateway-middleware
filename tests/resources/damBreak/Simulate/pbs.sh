@@ -63,9 +63,6 @@ chmod u+x $METRICS_SCRIPT
 echo "INFO: Calling $METRICS_SCRIPT"
 $METRICS_SCRIPT
 
-
-
-
 # Run the storage script, giving it the current directory as an argument
 STORAGE_SCRIPT="$SIMULATE/store.sh"
 
@@ -75,8 +72,8 @@ $STORAGE_SCRIPT $TMPDIR
 
 OUTPUTS_SCRIPT="$SIMULATE/outputs.py"
 chmod u+x $OUTPUTS_SCRIPT
-# echo "INFO: Calling $OUTPUTS_SCRIPT"
-# $OUTPUTS_SCRIPT
+echo "INFO: Calling $OUTPUTS_SCRIPT"
+$OUTPUTS_SCRIPT
 
 # artificial delay, useful for testing front-end features
 sleep 1
