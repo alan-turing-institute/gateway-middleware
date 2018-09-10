@@ -198,7 +198,6 @@ class OutputArgs(ma.Schema):
         """
         Ensure no additional fields are passed
         """
-
         unknown = set()
         for output in original_data:
             unknown = set(unknown).union(set(output)) - set(data)

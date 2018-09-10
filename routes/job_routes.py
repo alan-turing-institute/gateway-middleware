@@ -16,8 +16,8 @@ from connection.api_schemas import (
     JobPatchArgs,
     OutputListArgs,
     PaginationArgs,
-    StatusPatchSchema,
     SearchArgs,
+    StatusPatchSchema,
 )
 from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output

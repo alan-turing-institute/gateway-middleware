@@ -4,8 +4,8 @@ Routes module
 
 from connection.constants import StatusConverter
 from .case_routes import CaseApi, CasesApi
-from .job_routes import JobApi, JobsApi, JobsSearchApi, OutputApi, StatusApi
 from .fake_routes import TestData
+from .job_routes import JobApi, JobsApi, JobsSearchApi, OutputApi, StatusApi
 
 
 def set_up_routes(app, api):
