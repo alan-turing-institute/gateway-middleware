@@ -26,12 +26,6 @@ BLOB="$JOB_ID/$FNAME"
 # # remove lock directory
 # trap "rmdir $LOCKDIR" EXIT INT KILL TERM
 
-# update metrics
-METRICS="$SIMULATE/metrics.py"
-chmod +x $METRICS
-echo "INFO: Updating metrics.json"
-./$METRICS
-
 # transfer files to cloud storage
 CMD="az storage blob upload \
 --container-name $CONTAINER \
@@ -39,6 +33,9 @@ CMD="az storage blob upload \
 --account-name $ACCOUNT \
 --sas-token '$JOB_STORAGE_TOKEN' \
 --name '$BLOB' "
+
+
+
 
 # HACK wrap command in bash (otherwise not working)
 echo $CMD > $STATE/metrics_cmd.sh
