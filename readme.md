@@ -7,7 +7,7 @@ primarily as a persistent store of state (but not of data).
 ## Configuration
 
 In order to run the system you must setup the `config.json` file with the correct
-urls for the database and job manager. An example configuration is:
+urls for the database and job manager. An example configuration is: 
 
 ```json
 {
