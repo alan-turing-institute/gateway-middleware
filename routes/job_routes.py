@@ -1,7 +1,7 @@
 """
 Defintions of routes for the app
 """
-import json
+
 from uuid import uuid4
 
 from flask import current_app
@@ -11,8 +11,14 @@ from sqlalchemy.exc import IntegrityError
 from webargs import missing
 from webargs.flaskparser import use_kwargs
 
-from connection.api_schemas import (JobArgs, JobPatchArgs, OutputArgs,
-                                    PaginationArgs, StatusPatchSchema)
+from connection.api_schemas import (
+    JobArgs,
+    JobPatchArgs,
+    OutputListArgs,
+    PaginationArgs,
+    SearchArgs,
+    StatusPatchSchema,
+)
 from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
@@ -30,23 +36,19 @@ class JobsApi(Resource):
     """
 
     @token_required
-    @use_kwargs(JobArgs(), locations=('json',))
+    @use_kwargs(JobArgs(), locations=("json",))
     def post(self, case_id, name, author):
         """
         Create a new job based on a case
         """
         try:
-            new_job = Job(id=str(uuid4()),
-                          name=name,
-                          user=author,
-                          case_id=case_id)
+            new_job = Job(id=str(uuid4()), name=name, user=author, case_id=case_id)
             db.session.add(new_job)
             db.session.commit()
         except IntegrityError as e:
             print(e)
-            abort(404,
-                  message='Sorry, these parameters have already been used')
-        return {'job_id': new_job.id}
+            abort(404, message="Sorry, these parameters have already been used")
+        return {"job_id": new_job.id}
 
     @token_required
     @use_kwargs(PaginationArgs())
@@ -54,9 +56,23 @@ class JobsApi(Resource):
         """
         Get all the jobs that are in the requested range
         """
-        return job_header_schema.dump(Job.query.paginate(page, per_page,
-                                                         False).items,
-                                      many=True)
+        return job_header_schema.dump(
+            Job.query.paginate(page, per_page, False).items, many=True
+        )
+
+
+class JobsSearchApi(Resource):
+    """
+    Endpoint for searching for jobs and cases
+    """
+
+    @token_required
+    @use_kwargs(SearchArgs())
+    def get(self, name):
+        """
+        Search jobs that match the incoming query
+        """
+        return job_header_schema.dump(Job.query.filter_by(name=name), many=True)
 
 
 class JobApi(Resource):
@@ -73,12 +89,12 @@ class JobApi(Resource):
             job_id = job_id
         except ValueError as e:
             print(e)
-            abort(404, message='Sorry no job id {}'. format(job_id))
+            abort(404, message="Sorry no job id {}".format(job_id))
         job = Job.query.get(job_id)
         if job is not None:
             return job_schema.dump(job)
         else:
-            abort(404, message='Sorry, jobs {} not found'.format(job_id))
+            abort(404, message="Sorry, jobs {} not found".format(job_id))
             return None
 
     @token_required
@@ -92,23 +108,19 @@ class JobApi(Resource):
         status = RequestStatus.SUCCESS.value
         if name is missing and values is missing and description is missing:
             # You don't actually need to change anything
-            return {
-                'status': status,
-                'changed': changed,
-                'errors': error_log
-            }
+            return {"status": status, "changed": changed, "errors": error_log}
         job = Job.query.get(job_id)
         if job is None:
-            abort(404, message='Sorry, job {} not found'.format(job_id))
+            abort(404, message="Sorry, job {} not found".format(job_id))
         if name is not missing:
             if job.set_name(name, error_log):
-                changed.append('name')
+                changed.append("name")
         if description is not missing:
             if job.set_description(description, error_log):
-                changed.append('description')
+                changed.append("description")
         if values is not missing:
             if job.set_value_list(values, error_log):
-                changed.append('values')
+                changed.append("values")
         try:
             if len(error_log) == 0:
                 db.session.commit()
@@ -118,12 +130,8 @@ class JobApi(Resource):
                 status = RequestStatus.FAILED.value
         except IntegrityError as e:
             print(e)
-            abort(404, message='Sorry. Failed to commit your request')
-        return {
-            'status': status,
-            'changed': changed,
-            'errors': error_log
-        }
+            abort(404, message="Sorry. Failed to commit your request")
+        return {"status": status, "changed": changed, "errors": error_log}
 
     @token_required
     def post(self, job_id):
@@ -132,26 +140,28 @@ class JobApi(Resource):
         """
         job = Job.query.get(job_id)
         if job is None:
-            abort(404, message='Sorry, job {} not found'.format(job_id))
+            abort(404, message="Sorry, job {} not found".format(job_id))
         if job.status != JobStatus.NOT_STARTED.value:
-            return make_response(RequestStatus.FAILED,
-                                 errors=['Job already started'])
+            return make_response(RequestStatus.FAILED, errors=["Job already started"])
         if not job.fully_configured():
-            return make_response(RequestStatus.FAILED,
-                                 errors=['You must set all parameters '
-                                         'before starting a job'])
+            return make_response(
+                RequestStatus.FAILED,
+                errors=["You must set all parameters " "before starting a job"],
+            )
         params = {
-            'fields_to_patch': job.field_list(),
-            'scripts': job.script_list(),
-            'username': job.user
+            "fields_to_patch": job.field_list(),
+            "scripts": job.script_list(),
+            "username": job.user,
         }
-        JOB_MANAGER_URL = current_app.config['JOB_MANAGER_URL']
-        response = requests.post('{}/{}/start'.format(JOB_MANAGER_URL, job_id),
-                                 json=params)
+        JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+        response = requests.post(
+            "{}/{}/start".format(JOB_MANAGER_URL, job_id), json=params
+        )
         if response.status_code != 200:
-            return make_response(RequestStatus.FAILED,
-                                 errors=['Job Manager returned HTTP {}'
-                                         .format(response.status_code)])
+            return make_response(
+                RequestStatus.FAILED,
+                errors=["Job Manager returned HTTP {}".format(response.status_code)],
+            )
 
         # TODO: do something with: result = response.json
         # TODO: Handle non http errors - but they haven't been implemented
@@ -173,22 +183,30 @@ class StatusApi(Resource):
         try:
             status = JobStatus[status.upper()]
         except KeyError:
-            abort(400, message='Unknown status {}'.format(status))
+            abort(400, message="Unknown status {}".format(status))
 
         job = Job.query.get(job_id)
         if job is None:
-            abort(404, message='Sorry, job {} not found'.format(job_id))
+            abort(404, message="Sorry, job {} not found".format(job_id))
         if job.status == JobStatus.NOT_STARTED.value:
             if status is JobStatus.QUEUED.value:
-                return make_response(RequestStatus.FAILED,
-                                     errors=['Cannot set state \
-                                              of not started job'])
+                return make_response(
+                    RequestStatus.FAILED,
+                    errors=[
+                        "Cannot set state \
+                                              of not started job"
+                    ],
+                )
         if not job.fully_configured():
-            return make_response(RequestStatus.FAILED,
-                                 errors=['You must set all \
+            return make_response(
+                RequestStatus.FAILED,
+                errors=[
+                    "You must set all \
                                           parameters \
                                           before \
-                                          working with a job'])
+                                          working with a job"
+                ],
+            )
         job.status = status.value
         db.session.commit()
         return make_response()
@@ -199,25 +217,32 @@ class OutputApi(Resource):
     This class deals with job outputs.
     The POST endpoint is called by the job manager to
     specify an Output {"type": x,"destination_path" : y}
-    The GET endpoint is called by the frontend when an output
+    The GET endpoint is called by the front end when an output
     is to actually be retrieved, and in turn calls the job_manager
     to get an authorization token.  The URL including this token is
     returned to the frontend.
     """
 
-    @use_kwargs(OutputArgs())
-    def post(self, job_id, output_type, destination_path):
+    @use_kwargs(OutputListArgs())
+    def patch(self, job_id, outputs):
+        # def post(self, job_id):
         """
-        Create an output and add it to the job.
+        Persist job outputs.
         """
         job = Job.query.get(job_id)
         if job is None:
-            abort(404, message='Sorry, job {} not found'.format(job_id))
-        output = Output(job_id=job_id,
-                        output_type=output_type,
-                        destination_path=destination_path)
-        job.outputs.append(output)
-        db.session.commit()
+            abort(404, message="Sorry, job {} not found".format(job_id))
+        for output in outputs:
+            output = Output(
+                destination=output.get("destination"),
+                name=output.get("name"),
+                type=output.get("type"),
+                label=output.get("label"),
+                filename=output.get("filename"),
+            )
+            job.outputs.append(output)
+            db.session.commit()
+        return make_response()
 
     @token_required
     def get(self, job_id):
@@ -225,9 +250,8 @@ class OutputApi(Resource):
         When the user wants to download an output, need to get a token or
         similar from the job manager to get the actual URL.
         """
-        JOB_MANAGER_URL = current_app.config['JOB_MANAGER_URL']
-        r = requests.get('{}/{}/output'.format(JOB_MANAGER_URL, job_id))
+        JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+        r = requests.get(f"{JOB_MANAGER_URL}/{job_id}/output")
         if r.status_code != 200:
-            abort(404, message='Unable to get output for {}'.format(job_id))
-        result = json.loads(r.content.decode('utf-8'))
-        return result
+            abort(404, message="Unable to get outputs for {}".format(job_id))
+        return r.json()

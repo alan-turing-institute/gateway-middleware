@@ -31,10 +31,13 @@ class CasesApi(Resource):
         # return case_header_schema.dump(Case.query.paginate(page, per_page,
         #                                                    False).items,
         #                                many=True)
-        return case_header_schema.dump(Case.query.filter_by(visible=True)
-                                       .order_by(Case.id)
-                                       .paginate(page, per_page, False)
-                                       .items, many=True)
+        return case_header_schema.dump(
+            Case.query.filter_by(visible=True)
+            .order_by(Case.id)
+            .paginate(page, per_page, False)
+            .items,
+            many=True,
+        )
 
 
 class CaseApi(Resource):
@@ -51,10 +54,10 @@ class CaseApi(Resource):
             case_id = int(case_id)
         except ValueError as e:
             print(e)
-            abort(404, message='Sorry no such case {}'. format(case_id))
+            abort(404, message="Sorry no such case {}".format(case_id))
         case = Case.query.get(case_id)
         if case is not None:
             return case_schema.dump(case)
         else:
-            abort(404, message='Sorry, case {} not found'.format(case_id))
+            abort(404, message="Sorry, case {} not found".format(case_id))
             return None

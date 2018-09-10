@@ -12,12 +12,8 @@ def make_dambreak():
     """
     The openfoam dambreak case.
     """
-    dambreak = Case(name='dambreak_test')
+    dambreak = Case(name="dambreak_test")
 
-    Script(name='Allrun',
-           url='testopenfoamapi',
-           parent_case=dambreak)
-    Script(name='Allclean',
-           url='testopenfoamapi',
-           parent_case=dambreak)
+    Script(name="Allrun", url="testopenfoamapi", parent_case=dambreak)
+    Script(name="Allclean", url="testopenfoamapi", parent_case=dambreak)
     return dambreak

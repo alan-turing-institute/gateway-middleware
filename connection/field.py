@@ -32,11 +32,11 @@ class Field:
         Ensure that the internal state is valid
         """
         self.process_name = self.display_name
-        label = self.properties.get('label')
+        label = self.properties.get("label")
         if label is not None:
             self.process_name = label
-        prefix = self.properties.get('prefix')
-        suffix = self.properties.get('suffix')
+        prefix = self.properties.get("prefix")
+        suffix = self.properties.get("suffix")
         if prefix is not None:
             self.process_name = prefix + self.process_name
         if suffix is not None:
@@ -54,10 +54,10 @@ class Field:
         new_value = float(new_value)
         if fullname != self.process_name:
             return False
-        min_value = self.properties.get('min')
+        min_value = self.properties.get("min")
         if min_value is not None and float(min_value) > new_value:
             return False
-        max_value = self.properties.get('max')
+        max_value = self.properties.get("max")
         if max_value is not None and float(max_value) < new_value:
             return False
         return True

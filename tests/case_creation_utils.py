@@ -7,8 +7,7 @@ or minted values, but can be called by specific case-building modules.
 """
 from uuid import uuid4
 
-from connection.models import (CaseField, Job,
-                               JobParameter, JobParameterTemplate)
+from connection.models import CaseField, Job, JobParameter, JobParameterTemplate
 
 
 def apply_mintstore_to_case_field(mintstore, case_field):
@@ -22,16 +21,17 @@ def apply_mintstore_to_case_field(mintstore, case_field):
     case_fields_with_specs = recursively_get_case_fields_with_specs(case_field)
     mintstore_vals = mintstore.values
     if len(mintstore_vals) != len(case_fields_with_specs):
-        raise Exception("number of mintstore values doesn't"
-                        'match number of case_fields %i %i' %
-                        (len(mintstore_vals), len(case_fields_with_specs)))
+        raise Exception(
+            "number of mintstore values doesn't"
+            "match number of case_fields %i %i"
+            % (len(mintstore_vals), len(case_fields_with_specs))
+        )
 
     # double loop.... is there not a better way?
     for mv in mintstore_vals:
         for cf in case_fields_with_specs:
             if mv.name == cf.name:
-                minted_value_list.append(
-                    apply_mintstore_value_to_case_field(mv, cf))
+                minted_value_list.append(apply_mintstore_value_to_case_field(mv, cf))
                 break
     return minted_value_list
 
@@ -44,33 +44,31 @@ def apply_mintstore_value_to_case_field(mintstore_value, case_field):
     try:
         mint_param_val = float(mintstore_value.value)
     except TypeError:
-        print("Value of %s doesn't seem to be a number" %
-              mintstore_value.name)
+        print("Value of %s doesn't seem to be a number" % mintstore_value.name)
         return None
     min_val = None
     max_val = None
-    prefix = ''
+    prefix = ""
     for spec in case_field.specs:
         # check mintstore value against min, max
-        if spec.name == 'min':
+        if spec.name == "min":
             try:
                 min_val = float(spec.value)
             except TypeError:
-                print('Min value of %s not a number?' % case_field.name)
-        elif spec.name == 'max':
+                print("Min value of %s not a number?" % case_field.name)
+        elif spec.name == "max":
             try:
                 max_val = float(spec.value)
             except TypeError:
-                print('Max value of %s not a number?' % case_field.name)
-        elif spec.name == 'prefix':
+                print("Max value of %s not a number?" % case_field.name)
+        elif spec.name == "prefix":
             # get prefix - will be prepended to JobParameter name
             prefix = spec.value
     if min_val and max_val:
         if mint_param_val < min_val or mint_param_val > max_val:
-            raise ValueError('Out of range!')
+            raise ValueError("Out of range!")
         else:
-            mv = JobParameter(name=prefix + case_field.name,
-                              value=str(mint_param_val))
+            mv = JobParameter(name=prefix + case_field.name, value=str(mint_param_val))
             return mv
     # something went wrong - maybe something wasn't a number etc.
     # (though we should support non-number parameters!)
@@ -83,8 +81,7 @@ def recursively_get_case_fields_with_specs(case_field):
     """
     output_list = []
     if len(case_field.specs) > 0:
-        if not (len(case_field.specs) == 1 and
-                case_field.specs[0].name == 'prefix'):
+        if not (len(case_field.specs) == 1 and case_field.specs[0].name == "prefix"):
             # ^ what a horrible hack!! we only want to apply
             # MintedStoreValues to those CaseFields
             # that have specs, but even 'top-level' things like
@@ -99,21 +96,22 @@ def mint_case(session, name, case, user, mintstoremap):
     """
     Turn a case into a job by minting it
     """
-    new_minted_case = Job(id=str(uuid4()),
-                          name=name,
-                          user=user,
-                          parent_case=case)
+    new_minted_case = Job(id=str(uuid4()), name=name, user=user, parent_case=case)
 
     for (k, v) in mintstoremap.items():
-        case_field = session.query(CaseField). \
-            filter(CaseField.name == k).first().deep_copy()
+        case_field = (
+            session.query(CaseField).filter(CaseField.name == k).first().deep_copy()
+        )
         if not case_field:
-            raise KeyError('CaseField %s not found in DB' % k)
-        mintstore = session.query(JobParameterTemplate). \
-            filter(JobParameterTemplate.name == v).first().deep_copy()
+            raise KeyError("CaseField %s not found in DB" % k)
+        mintstore = (
+            session.query(JobParameterTemplate)
+            .filter(JobParameterTemplate.name == v)
+            .first()
+            .deep_copy()
+        )
         if not mintstore:
-            raise KeyError('Mintstore %s not found in DB' % v)
-        new_minted_case.values += apply_mintstore_to_case_field(mintstore,
-                                                                case_field)
+            raise KeyError("Mintstore %s not found in DB" % v)
+        new_minted_case.values += apply_mintstore_to_case_field(mintstore, case_field)
 
     return new_minted_case

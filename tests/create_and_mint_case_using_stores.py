@@ -38,7 +38,7 @@ def set_up_test_database():
     for _ in Case.query.all():
         done = True
     if done:
-        print('Data already there!')
+        print("Data already there!")
         exit()
     session.add(tank)
     session.add(fluid)
@@ -51,35 +51,45 @@ def set_up_test_database():
     # create a real case, using the tank from the tank store
     #  and the fluid from the fluid store
 
-    mycase = Case(name='MyCase', visible=True)
+    mycase = Case(name="MyCase", visible=True)
 
-    new_tank_store = session.query(Case). \
-        filter(Case.name == 'tanks_R_us').first()
+    new_tank_store = session.query(Case).filter(Case.name == "tanks_R_us").first()
 
     new_tankA = new_tank_store.fields[0].deep_copy()
-    new_fluid_store = session.query(Case). \
-        filter(Case.name == 'fluids_R_us').first()
+    new_fluid_store = session.query(Case).filter(Case.name == "fluids_R_us").first()
 
     new_fluid1 = new_fluid_store.fields[0].deep_copy()
-    new_fluid1.name = 'fluid 1'
-    new_fluid1.prepend_prefix('Fluid1_')
+    new_fluid1.name = "fluid 1"
+    new_fluid1.prepend_prefix("Fluid1_")
     new_fluid2 = new_fluid_store.fields[0].deep_copy()
-    new_fluid2.name = 'fluid 2'
-    new_fluid2.prepend_prefix('Fluid2_')
+    new_fluid2.name = "fluid 2"
+    new_fluid2.prepend_prefix("Fluid2_")
 
     mycase.fields.append(new_tankA)
     mycase.fields.append(new_fluid1)
     mycase.fields.append(new_fluid2)
 
-    start = Script(parent_case=mycase, action='start',
-                   source='http://the.internet/start',
-                   destination='start', patch=False)
-    run = Script(parent_case=mycase, action='run',
-                 source='http://the.internet/run',
-                 destination='run', patch=False)
-    gofish = Script(parent_case=mycase, action='gofish',
-                    source='http://the.internet/gofish',
-                    destination='gofish', patch=False)
+    start = Script(
+        parent_case=mycase,
+        action="start",
+        source="http://the.internet/start",
+        destination="start",
+        patch=False,
+    )
+    run = Script(
+        parent_case=mycase,
+        action="run",
+        source="http://the.internet/run",
+        destination="run",
+        patch=False,
+    )
+    gofish = Script(
+        parent_case=mycase,
+        action="gofish",
+        source="http://the.internet/gofish",
+        destination="gofish",
+        patch=False,
+    )
 
     # save this to the DB
     session.add(mycase)
@@ -99,23 +109,17 @@ def set_up_test_database():
     # the case names and the mintstore names
     # => i guess the UI will have a better way of doing this in real life!
 
-    mintstoremap = {
-        'tankA': 'TankX',
-        'fluid 1': 'Milk',
-        'fluid 2': 'Water'
-    }
+    mintstoremap = {"tankA": "TankX", "fluid 1": "Milk", "fluid 2": "Water"}
 
-    minted_case = mint_case(session, 'TESTMINT',
-                            mycase, 'testuser', mintstoremap)
+    minted_case = mint_case(session, "TESTMINT", mycase, "testuser", mintstoremap)
 
     session.add(minted_case)
     session.commit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = ('postgres://'
-                                             'sg:sg@localhost:8082/sg')
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://" "sg:sg@localhost:8082/sg"
 
     init_database(app)
 

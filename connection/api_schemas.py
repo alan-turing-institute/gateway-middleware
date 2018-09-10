@@ -16,7 +16,7 @@ class JobArgs(ma.Schema):
     Class to read in arguments to create a new job
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that it can only take the defined arguments
         """
@@ -34,7 +34,7 @@ class JobArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field', unknown)
+            raise BadRequestKeyError("Unknown field", unknown)
 
 
 class JobArgumentArgs(ma.Schema):
@@ -42,12 +42,13 @@ class JobArgumentArgs(ma.Schema):
     Class to read in the arguments for a single Job argument value
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
 
         strict = True
+
     name = Str(required=True)
     value = Str(required=True)
 
@@ -60,8 +61,9 @@ class JobArgumentArgs(ma.Schema):
             self.check_unknown_field(data, original_data)
             return
         if len(data) != len(original_data):
-            raise BadRequestKeyError('Could not parse all fields, {}'.
-                                     format(original_data))
+            raise BadRequestKeyError(
+                "Could not parse all fields, {}".format(original_data)
+            )
         for index in range(0, len(data)):
             self.check_unknown_field(data[index], original_data[index])
 
@@ -71,7 +73,7 @@ class JobArgumentArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class JobPatchArgs(ma.Schema):
@@ -79,12 +81,13 @@ class JobPatchArgs(ma.Schema):
     Read in the arguments for patching a job
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
 
         strict = True
+
     name = Str()
     description = Str()
     values = Nested(JobArgumentArgs, many=True)
@@ -96,7 +99,7 @@ class JobPatchArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class PaginationArgs(ma.Schema):
@@ -104,12 +107,13 @@ class PaginationArgs(ma.Schema):
     Read in arguments for paginating
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
 
         strict = True
+
     page = Int(missing=1, strict=True, validate=lambda p: p > 0)
     per_page = Int(missing=10, strict=True, validate=lambda p: p > 0)
 
@@ -120,22 +124,22 @@ class PaginationArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if len(unknown) > 0:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
-class StatusPatchSchema(ma.Schema):
+class SearchArgs(ma.Schema):
     """
-    Read in arguments for setting a status value
+    Read in arguments for searching
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that other fields are not provided
         """
 
         strict = True
-    status = Str(validate=lambda s: s.upper() in
-                 JobStatus.__members__.keys())
+
+    name = Str(missing=None, strict=True)
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
@@ -144,7 +148,31 @@ class StatusPatchSchema(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if len(unknown) > 0:
-            raise BadRequestKeyError('Unknown field {}'.format(unknown))
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
+
+
+class StatusPatchSchema(ma.Schema):
+    """
+    Read in arguments for setting a status value
+    """
+
+    class Meta:
+        """
+        Ensure that other fields are not provided
+        """
+
+        strict = True
+
+    status = Str(validate=lambda s: s.upper() in JobStatus.__members__.keys())
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        """
+        Ensure no additional fields are passed
+        """
+        unknown = set(original_data) - set(self.fields)
+        if len(unknown) > 0:
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
 
 
 class OutputArgs(ma.Schema):
@@ -152,16 +180,44 @@ class OutputArgs(ma.Schema):
     Check read-in arguments for creating a job Output.
     """
 
-    class Meta(object):
+    class Meta:
         """
         Ensure that it can only take the defined arguments
         """
 
         strict = True
 
-    job_id = Str(required=True)
-    output_type = Str(required=True)
-    destination_path = Str(required=True)
+    destination = Str(required=True)
+    type = Str(required=True)
+    name = Str(required=True)
+    label = Str(required=True)
+    filename = Str(required=True)
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        """
+        Ensure no additional fields are passed
+        """
+        unknown = set()
+        for output in original_data:
+            unknown = set(unknown).union(set(output)) - set(data)
+        if unknown:
+            raise BadRequestKeyError("Unknown field", unknown)
+
+
+class OutputListArgs(ma.Schema):
+    """
+    List of job outputs
+    """
+
+    class Meta:
+        """
+        Ensure that other fields are not provided
+        """
+
+        strict = True
+
+    outputs = Nested(OutputArgs, many=True)
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
@@ -170,4 +226,4 @@ class OutputArgs(ma.Schema):
         """
         unknown = set(original_data) - set(self.fields)
         if unknown:
-            raise BadRequestKeyError('Unknown field', unknown)
+            raise BadRequestKeyError("Unknown field {}".format(unknown))
