@@ -191,6 +191,7 @@ class OutputArgs(ma.Schema):
     type = Str(required=True)
     name = Str(required=True)
     label = Str(required=True)
+    filename = Str(required=True)
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):

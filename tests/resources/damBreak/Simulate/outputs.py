@@ -16,12 +16,14 @@ payload = {
             "type": "metrics",
             "name": "metrics",
             "label": "Metrics (json)",
+            "filename": "metrics.json",
         },
         {
             "destination": f"https://simulate.blob.core.windows.net/openfoam-test-output/{job_id}/output.zip",
             "type": "zip",
             "name": "output",
             "label": "Output (zip)",
+            "filename": "output.zip",
         },
     ]
 }

@@ -378,6 +378,7 @@ class Output(db.Model):
     name = db.Column(db.String)
     label = db.Column(db.String)
     type = db.Column(db.String)
+    filename = db.Column(db.String)
 
     job_id = db.Column(db.String, db.ForeignKey("job.id"))
     job = db.relationship("Job", back_populates="outputs")

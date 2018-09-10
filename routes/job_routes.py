@@ -239,6 +239,7 @@ class OutputApi(Resource):
                 name=output.get("name"),
                 type=output.get("type"),
                 label=output.get("label"),
+                filename=output.get("filename"),
             )
             job.outputs.append(output)
             db.session.commit()
