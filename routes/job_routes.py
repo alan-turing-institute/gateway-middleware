@@ -225,7 +225,7 @@ class OutputApi(Resource):
     """
 
     @use_kwargs(OutputListArgs())
-    def put(self, job_id, outputs):
+    def patch(self, job_id, outputs):
         # def post(self, job_id):
         """
         Persist job outputs.
@@ -251,8 +251,7 @@ class OutputApi(Resource):
         similar from the job manager to get the actual URL.
         """
         JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
-        r = requests.get("{}/{}/output".format(JOB_MANAGER_URL, job_id))
+        r = requests.get(f"{JOB_MANAGER_URL}/{job_id}/output")
         if r.status_code != 200:
-            abort(404, message="Unable to get output for {}".format(job_id))
-        result = json.loads(r.content.decode("utf-8"))
-        return result
+            abort(404, message="Unable to get outputs for {}".format(job_id))
+        return r.json()

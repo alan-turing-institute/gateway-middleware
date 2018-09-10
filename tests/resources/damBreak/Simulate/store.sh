@@ -6,14 +6,13 @@ set -o xtrace
 
 SIMULATE="Simulate"
 STATE="$SIMULATE/state"
-CONFIG="$STATE/store.json"
+CONFIG="$STATE/store.json"  # example: d33aa355-af2a-4a80-b9be-63d63cc836d4
+
 JOB_ID=$(cat $STATE/job_id)
-
-
 JOB_STORAGE_TOKEN=$(cat $CONFIG | jq -r '.data.token')
-ACCOUNT=$(cat $CONFIG | jq -r '.data.account')
-CONTAINER=$(cat $CONFIG | jq -r '.data.container')
-BLOB=$(cat $CONFIG | jq -r '.data.blob')
+ACCOUNT=$(cat $CONFIG | jq -r '.data.account')  # example: simulate
+CONTAINER=$(cat $CONFIG | jq -r '.data.container')  # example: openfoam-test-output
+BLOB=$(cat $CONFIG | jq -r '.data.blob')  # example: d33aa355-af2a-4a80-b9be-63d63cc836d4/output.zip
 
 LOCKDIR='.lock_storage_sync'
 
