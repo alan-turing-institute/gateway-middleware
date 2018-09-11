@@ -37,6 +37,7 @@ selection_list = [
 
 data_raw = {}
 metadata = {}
+names = []
 for selection in selection_list:
     fpath = selection["fpath"]
 
@@ -47,6 +48,7 @@ for selection in selection_list:
 
     data_raw[name] = data
     metadata[name] = {"label": label, "units": units}
+    names.append(name)
 
 
 # Use pandas to convert to "record" format
@@ -55,7 +57,7 @@ for selection in selection_list:
 data_records = pd.DataFrame.from_dict(data_raw).to_dict(orient="records")
 
 # write structure to metrics file
-output = {"metadata": metadata, "data": data_records}
+output = {"names": names, "metadata": metadata, "data": data_records}
 with open("metrics.json", "w") as f:
     json.dump(output, f)
 
