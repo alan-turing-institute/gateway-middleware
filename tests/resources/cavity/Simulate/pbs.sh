@@ -1,6 +1,9 @@
 #!/bin/bash
 echo "INFO: Start PBS"
 
+. /opt/conda/etc/profile.d/conda.sh
+conda activate base
+
 set -o xtrace
 
 # kill all child processes on exit
@@ -39,13 +42,26 @@ chmod a+x Allrun
 ./Allrun
 
 # artificial delay, useful for testing front-end features
-sleep 5
+sleep 1
 
 # update job status to FINALIZING - this will get us some json containing Azure
 # details (account name, container name, SAS token) which we put in a json file.
 curl -X PATCH http://manager:5001/job/$JOB_ID/status \
   --data '{"status" : "FINALIZING"}' \
   -H "Content-type: application/json" | tee $STATE/store.json
+
+
+# update metrics
+METRICS="$SIMULATE/metrics.py"
+chmod +x $METRICS
+echo "INFO: Calling $METRICS from $PWD"
+$METRICS
+
+# Run the metrics script
+METRICS_SCRIPT="$SIMULATE/metrics.sh"
+chmod u+x $METRICS_SCRIPT
+echo "INFO: Calling $METRICS_SCRIPT"
+$METRICS_SCRIPT
 
 # Run the storage script, giving it the current directory as an argument
 STORAGE_SCRIPT="$SIMULATE/store.sh"
@@ -54,8 +70,13 @@ chmod u+x $STORAGE_SCRIPT
 echo "INFO: Calling $STORAGE_SCRIPT $TMPDIR"
 $STORAGE_SCRIPT $TMPDIR
 
+OUTPUTS_SCRIPT="$SIMULATE/outputs.py"
+chmod u+x $OUTPUTS_SCRIPT
+echo "INFO: Calling $OUTPUTS_SCRIPT"
+$OUTPUTS_SCRIPT
+
 # artificial delay, useful for testing front-end features
-sleep 5
+sleep 1
 
 # update job status to COMPLETED
 curl -X PATCH http://manager:5001/job/$JOB_ID/status \

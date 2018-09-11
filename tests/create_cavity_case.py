@@ -68,11 +68,11 @@ def set_up_cavity_testdata():
     kinematic_viscosity = CaseField(
         name="kinematic_viscosity", parent_field=fluid, component="slider"
     )
-    ParameterSpec(name="min", value="0.000001", parent_casefield=kinematic_viscosity)
-    ParameterSpec(name="max", value="0.0001", parent_casefield=kinematic_viscosity)
-    ParameterSpec(name="step", value="0.000001", parent_casefield=kinematic_viscosity)
-    ParameterSpec(name="default", value="0.00001", parent_casefield=kinematic_viscosity)
-    ParameterSpec(name="units", value="m/s^2", parent_casefield=kinematic_viscosity)
+    ParameterSpec(name="min", value="0.001", parent_casefield=kinematic_viscosity)
+    ParameterSpec(name="max", value="1.0", parent_casefield=kinematic_viscosity)
+    ParameterSpec(name="step", value="0.001", parent_casefield=kinematic_viscosity)
+    ParameterSpec(name="default", value="0.01", parent_casefield=kinematic_viscosity)
+    ParameterSpec(name="units", value="m^2/s", parent_casefield=kinematic_viscosity)
 
     lid = CaseField(name="lid", parent_case=cavity)
     wall_velocity = CaseField(
