@@ -33,6 +33,12 @@ selection_list = [
         "name": "courantMax_0",
         "units": "",
     },
+    {
+        "fpath": "logs/clockTime_0",
+        "label": "Clock Time",
+        "name": "clockTime_0",
+        "units": "s",
+    },
 ]
 
 data_raw = {}
