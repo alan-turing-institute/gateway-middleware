@@ -1,20 +1,28 @@
 #!/usr/bin/env python
 
-# Example output
-# output = {
-#     "labels": ["Time"],
-#     "names": ["time"],
-#     "units": ["s"],
-#     "metrics": {
-#         "time": [0.00119048, 0.00258503, 0.00422003, 0.00612753, 0.00832115, 0.0109261]
-#     },
-# }
+"""
+Example output:
+{
+  "metadata": { "time": { "label": "Time", "units": "s" }, "courantMax_0": { "label": "Courant Max", "units": "" } },
+  "data": [
+    { "time": 0.005, "courantMax_0": 0.0 },
+    { "time": 0.01, "courantMax_0": 0.595866 },
+    { "time": 0.015, "courantMax_0": 0.768778 },
+    { "time": 0.02, "courantMax_0": 0.806096 },
+    { "time": 0.49, "courantMax_0": 0.85218 },
+    { "time": 0.495, "courantMax_0": 0.85218 },
+    { "time": 0.5, "courantMax_0": 0.85218 }
+  ]
+}
+"""
 
 import subprocess
 
 import json
+import pandas as pd
 import numpy as np
 
+# update latest simulation metrics
 subprocess.call("foamLog -n -quiet log.icoFoam", shell=True)
 
 selection_list = [
@@ -27,19 +35,27 @@ selection_list = [
     },
 ]
 
-output = {"labels": [], "names": [], "units": [], "metrics": {}}
+data_raw = {}
+metadata = {}
 for selection in selection_list:
     fpath = selection["fpath"]
+
     label = selection["label"]
     name = selection["name"]
     units = selection["units"]
-
     data = np.loadtxt(fpath).tolist()
-    output["metrics"][name] = data
-    output["labels"].append(label)
-    output["names"].append(name)
-    output["units"].append(units)
+
+    data_raw[name] = data
+    metadata[name] = {"label": label, "units": units}
 
 
+# Use pandas to convert to "record" format
+# 'records' : list like [{column -> value}, … , {column -> value}]
+# records format is suitable for g2 frontend chart rendering
+data_records = pd.DataFrame.from_dict(data_raw).to_dict(orient="records")
+
+# write structure to metrics file
+output = {"metadata": metadata, "data": data_records}
 with open("metrics.json", "w") as f:
     json.dump(output, f)
+
