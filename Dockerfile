@@ -16,10 +16,10 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 # Set up the application state
-#RUN python create_and_mint_case_using_stores.py
-EXPOSE 5000
 ENV FLASK_APP app.py
 
 # Configure the run command
+# python is invoked in development
+# gunicorn is invoked in production 
+# (via docker-compose.production.yml)
 CMD ["python","app.py"]
-

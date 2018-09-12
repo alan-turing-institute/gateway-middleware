@@ -12,3 +12,4 @@ test.db
 
 # Configuration
 config.development.json
+config.production.json
