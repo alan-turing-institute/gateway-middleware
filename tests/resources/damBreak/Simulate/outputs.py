@@ -7,7 +7,7 @@ fname = "Simulate/state/job_id"
 with open(fname, "r") as f:
     job_id = f.readline()
 
-url = f"http://manager:5001/job/{job_id}/output"
+url = f"http://manager:5010/job/{job_id}/output"
 
 payload = {
     "outputs": [

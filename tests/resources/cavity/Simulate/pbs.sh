@@ -31,7 +31,7 @@ JOB_ID=`cat $STATE/job_id`
 echo $PBS_JOBID > $STATE/pbs_job_id
 
 # update status in manager to RUNNING
-curl -X PATCH http://manager:5001/job/$JOB_ID/status \
+curl -X PATCH http://manager:5010/job/$JOB_ID/status \
   --data '{"status" : "RUNNING"}' \
   -H "Content-type: application/json"
 
@@ -46,7 +46,7 @@ sleep 1
 
 # update job status to FINALIZING - this will get us some json containing Azure
 # details (account name, container name, SAS token) which we put in a json file.
-curl -X PATCH http://manager:5001/job/$JOB_ID/status \
+curl -X PATCH http://manager:5010/job/$JOB_ID/status \
   --data '{"status" : "FINALIZING"}' \
   -H "Content-type: application/json" | tee $STATE/store.json
 
@@ -79,7 +79,7 @@ $OUTPUTS_SCRIPT
 sleep 1
 
 # update job status to COMPLETED
-curl -X PATCH http://manager:5001/job/$JOB_ID/status \
+curl -X PATCH http://manager:5010/job/$JOB_ID/status \
   --data '{"status" : "COMPLETED"}' \
   -H "Content-type: application/json"
 
