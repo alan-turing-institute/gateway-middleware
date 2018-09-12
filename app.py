@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
-
+"""
+The main entry point for this flask app
+"""
 
 import os
 from time import sleep
