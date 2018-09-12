@@ -1,7 +1,7 @@
 version: '3'
 services:
 
-  nginx:
+  middleware_nginx:
     build: ./nginx
     restart: always
     ports: 
@@ -22,7 +22,6 @@ services:
     - middleware_database
     networks:
     - share
-    # add gunicorn to handle internal flask threading
     command: gunicorn -w 1 -b :5001 app:app
   
   middleware_database:
