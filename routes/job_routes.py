@@ -50,8 +50,8 @@ class JobsApi(Resource):
             abort(404, message="Sorry, these parameters have already been used")
         return {"job_id": new_job.id}
 
-    @token_required
     @use_kwargs(PaginationArgs())
+    @token_required
     def get(self, page, per_page, username=None):
         """
         Get all the jobs that are in the requested range
