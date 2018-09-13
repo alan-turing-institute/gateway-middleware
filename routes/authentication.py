@@ -30,7 +30,7 @@ def token_required(f):
                 auth_key = current_app.config["AUTH_KEY"]
                 # strip "Bearer" prefix
                 token_string = token_string.replace("Bearer ", "")
-                payload = jwt.decode(token_string, "my_precious")
+                payload = jwt.decode(token_string, auth_key)
                 kwargs["token_username"] = payload["name"]
                 return f(*args, **kwargs)
             else:
