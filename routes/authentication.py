@@ -2,8 +2,8 @@
 Authentication functions for the routes
 """
 
-import inspect
 from functools import wraps
+import inspect
 
 from flask import current_app, request, Response
 import jwt
