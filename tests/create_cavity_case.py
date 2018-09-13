@@ -19,7 +19,7 @@ def cavity_scripts(parent_case, local_base_dir):
     as necessary for individual scripts.
     """
     scripts = {}
-    uri_base = "https://simulate.blob.core.windows.net/" "openfoam-test-cases/"
+    uri_base = "https://simulate.blob.core.windows.net/openfoam-test-cases/"
 
     for root, _dirs, files in os.walk(local_base_dir):
         files = [f for f in files if not f[0] == "."]  # ignore hidden files
