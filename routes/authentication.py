@@ -2,6 +2,7 @@
 Authentication functions for the routes
 """
 
+import inspect
 from functools import wraps
 
 from flask import current_app, request, Response
@@ -31,7 +32,9 @@ def token_required(f):
                 # strip "Bearer" prefix
                 token_string = token_string.replace("Bearer ", "")
                 payload = jwt.decode(token_string, auth_key)
-                kwargs["token_username"] = payload["name"]
+                username = payload["name"]
+                if "username" in inspect.getfullargspec(f).args:
+                    kwargs["username"] = username
                 return f(*args, **kwargs)
             else:
                 return Response(
