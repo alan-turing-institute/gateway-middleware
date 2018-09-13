@@ -37,7 +37,7 @@ class JobsApi(Resource):
 
     @token_required
     @use_kwargs(JobArgs(), locations=("json",))
-    def post(self, case_id, name, author):
+    def post(self, case_id, name, author, **kwargs):
         """
         Create a new job based on a case
         """
@@ -52,12 +52,16 @@ class JobsApi(Resource):
 
     @token_required
     @use_kwargs(PaginationArgs())
-    def get(self, page, per_page):
+    def get(self, page, per_page, **kwargs):
         """
         Get all the jobs that are in the requested range
         """
+        username = kwargs["token_username"]
         return job_header_schema.dump(
-            Job.query.paginate(page, per_page, False).items, many=True
+            Job.query.filter(Job.user == username)
+            .paginate(page, per_page, False)
+            .items,
+            many=True,
         )
 
 
@@ -68,7 +72,7 @@ class JobsSearchApi(Resource):
 
     @token_required
     @use_kwargs(SearchArgs())
-    def get(self, name):
+    def get(self, name, **kwargs):
         """
         Search jobs that match the incoming query
         """
@@ -81,7 +85,7 @@ class JobApi(Resource):
     """
 
     @token_required
-    def get(self, job_id):
+    def get(self, job_id, **kwargs):
         """
         Get the specified job
         """
@@ -99,7 +103,7 @@ class JobApi(Resource):
 
     @token_required
     @use_kwargs(JobPatchArgs())
-    def patch(self, job_id, name, description, values):
+    def patch(self, job_id, name, description, values, **kwargs):
         """
         Update the given details for this job
         """
@@ -134,7 +138,7 @@ class JobApi(Resource):
         return {"status": status, "changed": changed, "errors": error_log}
 
     @token_required
-    def post(self, job_id):
+    def post(self, job_id, **kwargs):
         """
         Start the given job if it isn't started yet
         """
@@ -245,7 +249,7 @@ class OutputApi(Resource):
         return make_response()
 
     @token_required
-    def get(self, job_id):
+    def get(self, job_id, **kwargs):
         """
         When the user wants to download an output, need to get a token or
         similar from the job manager to get the actual URL.
