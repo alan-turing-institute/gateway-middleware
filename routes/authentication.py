@@ -5,8 +5,8 @@ Authentication functions for the routes
 from functools import wraps
 
 from flask import current_app, request, Response
-import requests
 import jwt
+import requests
 
 
 def token_required(f):
