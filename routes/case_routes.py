@@ -19,9 +19,9 @@ class CasesApi(Resource):
     Api for the list of all cases
     """
 
-    @token_required
+    # @token_required
     @use_kwargs(PaginationArgs())
-    def get(self, page, per_page):
+    def get(self, page, per_page, **kwargs):
         """
         Get all the cases that are in the requested range
         return case_header_schema.dump(Case.query.paginate(page, per_page,
@@ -45,8 +45,8 @@ class CaseApi(Resource):
     End point for dealing with a specific case
     """
 
-    @token_required
-    def get(self, case_id: str):
+    # @token_required
+    def get(self, case_id: str, **kwargs):
         """
         Get all the details for a specific case
         """
