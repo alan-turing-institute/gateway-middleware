@@ -19,7 +19,7 @@ def cavity_scripts(parent_case, local_base_dir):
     as necessary for individual scripts.
     """
     scripts = {}
-    uri_base = "https://simulate.blob.core.windows.net/" "openfoam-test-cases/"
+    uri_base = "https://simulate.blob.core.windows.net/openfoam-test-cases/"
 
     for root, _dirs, files in os.walk(local_base_dir):
         files = [f for f in files if not f[0] == "."]  # ignore hidden files
@@ -72,7 +72,7 @@ def set_up_cavity_testdata():
     ParameterSpec(name="max", value="1.0", parent_casefield=kinematic_viscosity)
     ParameterSpec(name="step", value="0.001", parent_casefield=kinematic_viscosity)
     ParameterSpec(name="default", value="0.01", parent_casefield=kinematic_viscosity)
-    ParameterSpec(name="units", value="m^2/s", parent_casefield=kinematic_viscosity)
+    ParameterSpec(name="units", value="m²/s", parent_casefield=kinematic_viscosity)
 
     lid = CaseField(name="lid", parent_case=cavity)
     wall_velocity = CaseField(

@@ -176,7 +176,7 @@ class JobValueSchema(ma.ModelSchema):
         """
 
         model = JobParameter
-        fields = ("id", "name", "value", "parent_template")
+        fields = ("id", "name", "value", "units", "parent_template")
 
 
 class ScriptSchema(ma.ModelSchema):

@@ -51,6 +51,7 @@ class JobArgumentArgs(ma.Schema):
 
     name = Str(required=True)
     value = Str(required=True)
+    units = Str(required=True)
 
     @validates_schema(pass_original=True, pass_many=True)
     def check_unknown_fields(self, data, original_data, many):

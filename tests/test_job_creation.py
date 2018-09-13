@@ -74,7 +74,7 @@ def test_job_renamed(demo_app, test_job_id):
     "/job/2",
     method="PATCH",
     content_type="application/json",
-    data='{"values": [ { "name": "length", "value": "100" }]}',
+    data='{"values": [ { "name": "length", "value": "100", "units": "kg" }]}',
 )
 def test_revalues_job_2(demo_app, test_job_id):
     """
@@ -91,7 +91,7 @@ def test_revalues_job_2(demo_app, test_job_id):
     "/job/2",
     method="PATCH",
     content_type="application/json",
-    data='{"values": [ { "name": "length", "value": "10" }]}',
+    data='{"values": [ { "name": "length", "value": "10", "units": "kg" }]}',
 )
 def test_good_revalues_job_2(demo_app, test_job_id):
     """

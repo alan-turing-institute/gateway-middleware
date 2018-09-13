@@ -227,7 +227,10 @@ class Job(Base):
         for value in new_values:
             if self.validate_value(value["name"], value["value"]):
                 new_minted_value = JobParameter(
-                    name=value["name"], value=value["value"], parent_job=self
+                    name=value["name"],
+                    value=value["value"],
+                    units=value["units"],
+                    parent_job=self,
                 )
                 self.values.append(new_minted_value)
             else:
@@ -292,6 +295,7 @@ class JobParameter(Base):
     name = db.Column(db.String, nullable=False)
     job_id = db.Column(db.String, db.ForeignKey("job.id"), nullable=False)
     value = db.Column(db.String, nullable=False)
+    units = db.Column(db.String, nullable=True)
     template_id = db.Column(
         db.Integer, db.ForeignKey("job_parameter_template.id"), nullable=True
     )
@@ -348,6 +352,7 @@ class JobParameterTemplateValue(Base):
     )
     name = db.Column(db.String, nullable=False)
     value = db.Column(db.String, nullable=False)
+    units = db.Column(db.String, nullable=True)
 
     parent_template = db.relationship("JobParameterTemplate", back_populates="values")
 
@@ -356,7 +361,7 @@ class JobParameterTemplateValue(Base):
         Create a deep clone
         """
         new_mint_store_val = JobParameterTemplateValue(
-            id=self.id, name=self.name, value=self.value
+            id=self.id, name=self.name, value=self.value, units=self.units
         )
         return new_mint_store_val
 

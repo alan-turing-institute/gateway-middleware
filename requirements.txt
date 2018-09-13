@@ -14,7 +14,7 @@ Flask-SQLAlchemy==2.2
 gunicorn==19.9.0
 idna==2.5
 itsdangerous==0.24
-Jinja2==2.9.6
+Jinja2==2.10
 json-merge-patch==0.1
 Mako==1.0.7
 MarkupSafe==1.0
@@ -36,4 +36,4 @@ six==1.10.0
 SQLAlchemy==1.1.12
 SQLAlchemy-Utils==0.32.14
 webargs==1.8.1
-Werkzeug==0.12.2
+Werkzeug==0.14
