@@ -56,13 +56,18 @@ class JobsApi(Resource):
         """
         Get all the jobs that are in the requested range
         """
-        username = kwargs["token_username"]
-        return job_header_schema.dump(
-            Job.query.filter(Job.user == username)
-            .paginate(page, per_page, False)
-            .items,
-            many=True,
-        )
+        username = kwargs.get("token_username")
+        if username:
+            return job_header_schema.dump(
+                Job.query.filter(Job.user == username)
+                .paginate(page, per_page, False)
+                .items,
+                many=True,
+            )
+        else:
+            return job_header_schema.dump(
+                Job.query.paginate(page, per_page, False).items, many=True
+            )
 
 
 class JobsSearchApi(Resource):
