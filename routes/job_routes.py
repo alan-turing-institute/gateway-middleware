@@ -4,7 +4,7 @@ Defintions of routes for the app
 
 from uuid import uuid4
 
-from flask import current_app
+from flask import current_app, request
 from flask_restful import abort, Resource
 import requests
 from sqlalchemy.exc import IntegrityError
@@ -232,8 +232,8 @@ class OutputApi(Resource):
     """
 
     @use_kwargs(OutputListArgs())
+    @token_required
     def patch(self, job_id, outputs):
-        # def post(self, job_id):
         """
         Persist job outputs.
         """
@@ -259,7 +259,10 @@ class OutputApi(Resource):
         similar from the job manager to get the actual URL.
         """
         JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
-        r = requests.get(f"{JOB_MANAGER_URL}/{job_id}/output")
+        auth_token_string = request.headers.get("Authorization")
+        headers = {"Authorization": auth_token_string}
+        r = requests.get(f"{JOB_MANAGER_URL}/{job_id}/output", headers=headers)
         if r.status_code != 200:
             abort(404, message="Unable to get outputs for {}".format(job_id))
         return r.json()
+
