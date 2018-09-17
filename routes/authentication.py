@@ -44,3 +44,35 @@ def token_required(f):
                 )
 
     return decorated
+
+
+def job_token_required(f):
+    """Injects token content into endpoint."""
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        """Return function for decorator"""
+        auth_string = request.headers.get("Authorization")
+
+        use_authentication = current_app.config["AUTHENTICATE_ROUTES"]
+
+        if not use_authentication:
+            # don't authenticate routes
+            return f(*args, **kwargs)
+        else:
+            auth_key = current_app.config["JOB_KEY"]
+            token_string = auth_string.replace("Bearer ", "")
+            try:
+                payload = jwt.decode(token_string, auth_key)
+                token_job_id = payload.get("job_id", "")
+            except jwt.DecodeError:
+                token_job_id = None
+
+            if "token_job_id" in inspect.getfullargspec(f).args:
+                kwargs["token_job_id"] = token_job_id
+
+            kwargs["token_job_id"] = token_job_id
+
+            return f(*args, **kwargs)
+
+    return decorated
