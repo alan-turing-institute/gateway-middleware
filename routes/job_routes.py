@@ -156,7 +156,7 @@ class JobApi(Resource):
                 RequestStatus.FAILED,
                 errors=["You must set all parameters " "before starting a job"],
             )
-        params = {
+        body = {
             "fields_to_patch": job.field_list(),
             "scripts": job.script_list(),
             "username": job.user,
@@ -166,7 +166,7 @@ class JobApi(Resource):
         headers = {"Authorization": auth_token_string}
 
         response = requests.post(
-            "{}/{}/start".format(JOB_MANAGER_URL, job_id), json=params, headers=headers
+            "{}/{}/start".format(JOB_MANAGER_URL, job_id), headers=headers, json=body
         )
         if response.status_code != 200:
             return make_response(
@@ -181,9 +181,34 @@ class JobApi(Resource):
         return make_response()
 
 
+class StopApi(Resource):
+    """
+    Job stopper.
+    """
+
+    @token_required
+    def post(self, job_id):
+        """
+        Stop a job.
+        """
+
+        job = Job.query.get(job_id)
+
+        body = {"scripts": job.script_list()}
+
+        JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+        auth_token_string = request.headers.get("Authorization")
+        headers = {"Authorization": auth_token_string}
+
+        response = requests.post(
+            f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
+        )
+        return {"message": "placeholder"}
+
+
 class StatusApi(Resource):
     """
-    This class deals with status changes to jobs
+    Job status.
     """
 
     @use_kwargs(StatusPatchSchema())

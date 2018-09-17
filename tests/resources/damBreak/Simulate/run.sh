@@ -1,8 +1,9 @@
 #!/bin/bash
 
-MANAGER="Simulate"
+SIMULATE="Simulate"
+STATE="$SIMULATE/state"
 
 # save PBS_JOBID in state file via tee
-qsub -o $MANAGER/log.qsub.stdout -e $MANAGER/log.qsub.stderr $MANAGER/pbs.sh | tee $MANAGER/log.run
+qsub -o $SIMULATE/log.qsub.stdout -e $SIMULATE/log.qsub.stderr $SIMULATE/pbs.sh | tee $STATE/pbs_job_id
 
 echo "Submitted job"

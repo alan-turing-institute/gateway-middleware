@@ -42,7 +42,7 @@ chmod a+x Allrun
 ./Allrun
 
 # artificial delay, useful for testing front-end features
-sleep 1
+sleep 5
 
 # update job status to FINALIZING - this will get us some json containing Azure
 # details (account name, container name, SAS token) which we put in a json file.
@@ -76,7 +76,7 @@ echo "INFO: Calling $OUTPUTS_SCRIPT"
 $OUTPUTS_SCRIPT
 
 # artificial delay, useful for testing front-end features
-sleep 1
+sleep 5
 
 # update job status to COMPLETED
 curl -X PATCH http://manager:5010/job/$JOB_ID/status \
