@@ -22,7 +22,7 @@ from connection.api_schemas import (
 from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
-from .authentication import token_required, job_token_required
+from .authentication import job_token_required, token_required
 from .helpers import make_response
 
 job_header_schema = JobHeaderSchema()
