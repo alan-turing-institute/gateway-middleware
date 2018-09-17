@@ -22,7 +22,7 @@ from connection.api_schemas import (
 from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
-from .authentication import token_required
+from .authentication import token_required, job_token_required
 from .helpers import make_response
 
 job_header_schema = JobHeaderSchema()
@@ -162,8 +162,11 @@ class JobApi(Resource):
             "username": job.user,
         }
         JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+        auth_token_string = request.headers.get("Authorization")
+        headers = {"Authorization": auth_token_string}
+
         response = requests.post(
-            "{}/{}/start".format(JOB_MANAGER_URL, job_id), json=params
+            "{}/{}/start".format(JOB_MANAGER_URL, job_id), json=params, headers=headers
         )
         if response.status_code != 200:
             return make_response(
@@ -232,11 +235,15 @@ class OutputApi(Resource):
     """
 
     @use_kwargs(OutputListArgs())
-    @token_required
-    def patch(self, job_id, outputs):
+    @job_token_required
+    def patch(self, job_id, outputs, token_job_id):
         """
         Persist job outputs.
         """
+
+        if token_job_id != job_id:
+            abort(404, message="Invalid simulator authentication token")
+
         job = Job.query.get(job_id)
         if job is None:
             abort(404, message="Sorry, job {} not found".format(job_id))
@@ -252,7 +259,7 @@ class OutputApi(Resource):
             db.session.commit()
         return make_response()
 
-    @token_required
+    # @token_required
     def get(self, job_id):
         """
         When the user wants to download an output, need to get a token or

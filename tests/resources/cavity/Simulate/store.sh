@@ -12,7 +12,6 @@ JOB_ID=$(cat $STATE/job_id)
 JOB_STORAGE_TOKEN=$(cat $CONFIG | jq -r '.data.token')
 ACCOUNT=$(cat $CONFIG | jq -r '.data.account')  # example: simulate
 CONTAINER=$(cat $CONFIG | jq -r '.data.container')  # example: openfoam-test-output
-BLOB=$(cat $CONFIG | jq -r '.data.blob')  # example: d33aa355-af2a-4a80-b9be-63d63cc836d4/output.zip
 
 LOCKDIR='.lock_storage_sync'
 
@@ -33,7 +32,7 @@ CMD="az storage blob upload \
 --file /tmp/output_${JOB_ID}.zip \
 --account-name $ACCOUNT \
 --sas-token '$JOB_STORAGE_TOKEN' \
---name '$BLOB' "
+--name $JOB_ID/output.zip"
 
 # HACK wrap command in bash (otherwise not working)
 echo $CMD > $STATE/store_cmd.sh

@@ -61,6 +61,7 @@ def damBreak_scripts(parent_case, local_base_dir):
     # now override the scripts that we do want to patch
     scripts["patch.py"].patch = True
     scripts["job_id"].patch = True
+    scripts["job_token"].patch = True
     scripts["run.sh"].action = "RUN"
 
     return scripts

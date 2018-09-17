@@ -7,6 +7,11 @@ fname = "Simulate/state/job_id"
 with open(fname, "r") as f:
     job_id = f.readline()
 
+fname = "Simulate/state/job_token"
+with open(fname, "r") as f:
+    job_token = f.readline()
+
+
 url = f"http://manager:5010/job/{job_id}/output"
 
 payload = {
@@ -28,10 +33,7 @@ payload = {
     ]
 }
 
-headers = {
-    "Content-Type": "application/json",
-    # 'Authorization': "Bearer fooToken",
-}
+headers = {"Content-Type": "application/json", "Authorization": f"Bearer {job_token}"}
 
 response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
 
