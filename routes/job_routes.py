@@ -272,4 +272,3 @@ class OutputApi(Resource):
         if r.status_code != 200:
             abort(404, message="Unable to get outputs for {}".format(job_id))
         return r.json()
-
