@@ -2,6 +2,8 @@
 Defintions of routes for the app
 """
 
+# pylint: disable=C0330,R1710
+
 from uuid import uuid4
 
 from flask import current_app, request
@@ -23,7 +25,7 @@ from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
 from .authentication import job_token_required, token_required
-from .helpers import make_response
+from .helpers import make_response, ResponseLog
 
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
@@ -102,7 +104,7 @@ class JobApi(Resource):
         if job is not None:
             return job_schema.dump(job)
         else:
-            abort(404, message="Sorry, jobs {} not found".format(job_id))
+            abort(404, message="Sorry, job {} not found".format(job_id))
             return None
 
     @token_required
@@ -154,9 +156,9 @@ class JobApi(Resource):
         if not job.fully_configured():
             return make_response(
                 RequestStatus.FAILED,
-                errors=["You must set all parameters " "before starting a job"],
+                errors=["You must set all parameters before starting a job"],
             )
-        params = {
+        body = {
             "fields_to_patch": job.field_list(),
             "scripts": job.script_list(),
             "username": job.user,
@@ -166,7 +168,7 @@ class JobApi(Resource):
         headers = {"Authorization": auth_token_string}
 
         response = requests.post(
-            "{}/{}/start".format(JOB_MANAGER_URL, job_id), json=params, headers=headers
+            "{}/{}/start".format(JOB_MANAGER_URL, job_id), headers=headers, json=body
         )
         if response.status_code != 200:
             return make_response(
@@ -180,10 +182,110 @@ class JobApi(Resource):
         db.session.commit()
         return make_response()
 
+    @token_required
+    def delete(self, job_id):  # noqa: R1710
+        """
+        Delete a job.
+        """
+
+        try:
+            job_id = job_id
+        except ValueError as e:
+            print(e)
+            abort(404, message="Sorry no job id {}".format(job_id))
+        job = Job.query.get(job_id)
+
+        if job is not None:
+
+            log = ResponseLog()
+
+            # check if we need to stop the job (before deleting)
+            if job.status in [
+                JobStatus.QUEUED.value,
+                JobStatus.RUNNING.value,
+                JobStatus.FINALIZING.value,
+            ]:
+                # REFACTOR use shared internal function for delete/stop
+                JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+                auth_token_string = request.headers.get("Authorization")
+                headers = {"Authorization": auth_token_string}
+                body = {"scripts": job.script_list()}
+                response = requests.post(
+                    f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
+                )
+                # relay messages and errors from manager's response
+                body = response.json()
+                messages = body.get("messages")
+                errors = body.get("errors")
+                log.add_message(messages, as_list=True)
+                log.add_error(errors, as_list=True)
+                if response.status_code != 200:
+                    return make_response(
+                        response=RequestStatus.FAILED,
+                        messages=log.messages,
+                        errors=log.errors,
+                    )
+
+            db.session.delete(job)
+            db.session.commit()
+            log.add_message(f"Job {job_id} deleted.")
+            return make_response(messages=log.messages, errors=log.errors)
+        else:
+            abort(404, message=f"Sorry, job {job_id} not found")
+
+
+class StopApi(Resource):
+    """
+    Job stop endpoints.
+    """
+
+    @token_required
+    def post(self, job_id):  # noqa: R1710
+        """
+        Stop a job.
+        """
+
+        try:
+            job_id = job_id
+        except ValueError as e:
+            print(e)
+            abort(404, message=f"Sorry no job id {job_id}.")
+
+        job = Job.query.get(job_id)
+        if job is not None:
+
+            if job.status in [
+                JobStatus.NOT_STARTED.value,
+                JobStatus.FAILED.value,
+                JobStatus.COMPLETED.value,
+            ]:
+                return make_response(
+                    RequestStatus.FAILED,
+                    errors=[f"Cannot stop job with status {job.status}."],
+                )
+
+            JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+            auth_token_string = request.headers.get("Authorization")
+            headers = {"Authorization": auth_token_string}
+            body = {"scripts": job.script_list()}
+
+            response = requests.post(
+                f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
+            )
+
+            # relay messages and errors from manager's response
+            body = response.json()
+            messages = body.get("messages")
+            errors = body.get("errors")
+            return make_response(messages=messages, errors=errors)
+
+        else:
+            abort(404, message=f"Sorry, job {job_id} not found.")
+
 
 class StatusApi(Resource):
     """
-    This class deals with status changes to jobs
+    Job status endpoints.
     """
 
     @use_kwargs(StatusPatchSchema())
@@ -202,21 +304,12 @@ class StatusApi(Resource):
         if job.status == JobStatus.NOT_STARTED.value:
             if status is JobStatus.QUEUED.value:
                 return make_response(
-                    RequestStatus.FAILED,
-                    errors=[
-                        "Cannot set state \
-                                              of not started job"
-                    ],
+                    RequestStatus.FAILED, errors=["Cannot set state of not started job"]
                 )
         if not job.fully_configured():
             return make_response(
                 RequestStatus.FAILED,
-                errors=[
-                    "You must set all \
-                                          parameters \
-                                          before \
-                                          working with a job"
-                ],
+                errors=["You must set all parameters before working with a job"],
             )
         job.status = status.value
         db.session.commit()

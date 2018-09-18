@@ -33,7 +33,7 @@ requests==2.18.4
 requests-mock==1.4.0
 scp==0.10.2
 six==1.10.0
-SQLAlchemy==1.1.12
+SQLAlchemy==1.2.11
 SQLAlchemy-Utils==0.32.14
 webargs==1.8.1
-Werkzeug==0.14
+Werkzeug==0.14.1

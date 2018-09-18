@@ -46,6 +46,7 @@ def cavity_scripts(parent_case, local_base_dir):
     scripts["job_id"].patch = True
     scripts["job_token"].patch = True
     scripts["run.sh"].action = "RUN"
+    scripts["stop.sh"].action = "STOP"
 
     return scripts
 
