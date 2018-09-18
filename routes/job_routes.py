@@ -2,6 +2,8 @@
 Defintions of routes for the app
 """
 
+# pylint: disable=C0330
+
 from uuid import uuid4
 
 from flask import current_app, request
