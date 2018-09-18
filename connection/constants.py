@@ -18,6 +18,7 @@ class JobStatus(Enum):
     COMPLETED = "Completed"
     NOT_STARTED = "Not Started"
     QUEUED = "Queued"
+    STOPPED = "Stopped"
 
 
 class StatusConverter(BaseConverter):

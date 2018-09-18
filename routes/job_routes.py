@@ -215,7 +215,7 @@ class StopApi(Resource):
             job_id = job_id
         except ValueError as e:
             print(e)
-            abort(404, message="Sorry no job id {}".format(job_id))
+            abort(404, message=f"Sorry no job id {job_id}.")
 
         job = Job.query.get(job_id)
         if job is not None:
@@ -239,10 +239,14 @@ class StopApi(Resource):
                 f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
             )
 
-            return make_response(messages=[f"Job {job_id} stopped."])
+            # relay messages and errors from manager's response
+            body = response.json()
+            messages = body.get("messages")
+            errors = body.get("errors")
+            return make_response(messages=messages, errors=errors)
 
         else:
-            abort(404, message=f"Sorry, job {job_id} not found")
+            abort(404, message=f"Sorry, job {job_id} not found.")
 
 
 class StatusApi(Resource):
