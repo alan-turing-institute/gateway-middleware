@@ -180,6 +180,25 @@ class JobApi(Resource):
         db.session.commit()
         return make_response()
 
+    @token_required
+    def delete(self, job_id):
+        """
+        Delete a job.
+        """
+
+        try:
+            job_id = job_id
+        except ValueError as e:
+            print(e)
+            abort(404, message="Sorry no job id {}".format(job_id))
+        job = Job.query.get(job_id)
+        if job is not None:
+            db.session.delete(job)
+            db.session.commit()
+            return {"message": f"Job {job_id} deleted."}
+        else:
+            abort(404, message=f"Sorry, job {job_id} not found")
+
 
 class StopApi(Resource):
     """
@@ -204,31 +223,6 @@ class StopApi(Resource):
             f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
         )
         return {"message": response.json()}
-
-
-class DeleteApi(Resource):
-    """
-    Job deletion endpoints.
-    """
-
-    @token_required
-    def post(self, job_id):
-        """
-        Stop a job.
-        """
-
-        try:
-            job_id = job_id
-        except ValueError as e:
-            print(e)
-            abort(404, message="Sorry no job id {}".format(job_id))
-        job = Job.query.get(job_id)
-        if job is not None:
-            db.session.delete(job)
-            db.session.commit()
-            return {"message": f"Job {job_id} deleted."}
-        else:
-            abort(404, message=f"Sorry, job {job_id} not found")
 
 
 class StatusApi(Resource):
