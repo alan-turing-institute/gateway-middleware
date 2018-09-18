@@ -23,7 +23,7 @@ from connection.constants import JobStatus, RequestStatus
 from connection.models import db, Job, Output
 from connection.schemas import JobHeaderSchema, JobSchema, OutputSchema
 from .authentication import job_token_required, token_required
-from .helpers import make_response
+from .helpers import make_response, ResponseLog
 
 job_header_schema = JobHeaderSchema()
 job_schema = JobSchema()
@@ -192,10 +192,42 @@ class JobApi(Resource):
             print(e)
             abort(404, message="Sorry no job id {}".format(job_id))
         job = Job.query.get(job_id)
+
         if job is not None:
+
+            log = ResponseLog()
+
+            # check if we need to stop the job (before deleting)
+            if job.status in [
+                JobStatus.QUEUED.value,
+                JobStatus.RUNNING.value,
+                JobStatus.FINALIZING.value,
+            ]:
+                # REFACTOR use shared internal function for delete/stop
+                JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+                auth_token_string = request.headers.get("Authorization")
+                headers = {"Authorization": auth_token_string}
+                body = {"scripts": job.script_list()}
+                response = requests.post(
+                    f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
+                )
+                # relay messages and errors from manager's response
+                body = response.json()
+                messages = body.get("messages")
+                errors = body.get("errors")
+                log.add_message(messages, as_list=True)
+                log.add_error(errors, as_list=True)
+                if response.status_code != 200:
+                    return make_response(
+                        response=RequestStatus.FAILED,
+                        messages=log.messages,
+                        errors=log.errors,
+                    )
+
             db.session.delete(job)
             db.session.commit()
-            return {"message": f"Job {job_id} deleted."}
+            log.add_message(f"Job {job_id} deleted.")
+            return make_response(messages=log.messages, errors=log.errors)
         else:
             abort(404, message=f"Sorry, job {job_id} not found")
 
