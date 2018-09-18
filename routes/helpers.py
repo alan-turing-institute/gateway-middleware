@@ -22,6 +22,9 @@ class ResponseLog:
     """
 
     def __init__(self):
+        """
+        Initialise log.
+        """
         self.messages = []
         self.errors = []
 
