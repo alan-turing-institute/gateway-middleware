@@ -2,7 +2,7 @@
 Defintions of routes for the app
 """
 
-# pylint: disable=C0330
+# pylint: disable=C0330,R1710
 
 from uuid import uuid4
 
@@ -183,7 +183,7 @@ class JobApi(Resource):
         return make_response()
 
     @token_required
-    def delete(self, job_id):
+    def delete(self, job_id):  # noqa: R1710
         """
         Delete a job.
         """
@@ -240,7 +240,7 @@ class StopApi(Resource):
     """
 
     @token_required
-    def post(self, job_id):
+    def post(self, job_id):  # noqa: R1710
         """
         Stop a job.
         """
