@@ -154,7 +154,7 @@ class JobApi(Resource):
         if not job.fully_configured():
             return make_response(
                 RequestStatus.FAILED,
-                errors=["You must set all parameters " "before starting a job"],
+                errors=["You must set all parameters before starting a job"],
             )
         body = {
             "fields_to_patch": job.field_list(),
@@ -211,18 +211,38 @@ class StopApi(Resource):
         Stop a job.
         """
 
+        try:
+            job_id = job_id
+        except ValueError as e:
+            print(e)
+            abort(404, message="Sorry no job id {}".format(job_id))
+
         job = Job.query.get(job_id)
+        if job is not None:
 
-        body = {"scripts": job.script_list()}
+            if job.status in [
+                JobStatus.NOT_STARTED.value,
+                JobStatus.FAILED.value,
+                JobStatus.COMPLETED.value,
+            ]:
+                return make_response(
+                    RequestStatus.FAILED,
+                    errors=[f"Cannot stop job with status {job.status}."],
+                )
 
-        JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
-        auth_token_string = request.headers.get("Authorization")
-        headers = {"Authorization": auth_token_string}
+            JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
+            auth_token_string = request.headers.get("Authorization")
+            headers = {"Authorization": auth_token_string}
+            body = {"scripts": job.script_list()}
 
-        response = requests.post(
-            f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
-        )
-        return {"message": response.json()}
+            response = requests.post(
+                f"{JOB_MANAGER_URL}/{job_id}/stop", headers=headers, json=body
+            )
+
+            return make_response(messages=[f"Job {job_id} stopped."])
+
+        else:
+            abort(404, message=f"Sorry, job {job_id} not found")
 
 
 class StatusApi(Resource):
@@ -246,21 +266,12 @@ class StatusApi(Resource):
         if job.status == JobStatus.NOT_STARTED.value:
             if status is JobStatus.QUEUED.value:
                 return make_response(
-                    RequestStatus.FAILED,
-                    errors=[
-                        "Cannot set state \
-                                              of not started job"
-                    ],
+                    RequestStatus.FAILED, errors=["Cannot set state of not started job"]
                 )
         if not job.fully_configured():
             return make_response(
                 RequestStatus.FAILED,
-                errors=[
-                    "You must set all \
-                                          parameters \
-                                          before \
-                                          working with a job"
-                ],
+                errors=["You must set all parameters before working with a job"],
             )
         job.status = status.value
         db.session.commit()
