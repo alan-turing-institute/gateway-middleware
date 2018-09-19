@@ -11,5 +11,5 @@ __pycache__/
 test.db
 
 # Configuration
-config.development.json
-config.production.json
+config.dev.json
+config.prod.json
