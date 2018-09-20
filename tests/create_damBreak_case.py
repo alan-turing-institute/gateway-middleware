@@ -21,10 +21,10 @@ def create_phase_store():
 
     exists = session.query(Case).filter(Case.name == "phases").all()
     if len(exists) > 0:
-        print("PhaseStore already there!")
-        exit()
+        return "Case already exists: phases."
     session.add(phases)
     session.commit()
+    return "Added case: phases."
 
 
 def damBreak_scripts(parent_case, local_base_dir):
@@ -73,11 +73,15 @@ def set_up_dambreak_testdata():
     Make a real case, using phases from the 'phase store',
     and commit it to the database
     """
-    create_phase_store()
+    phase_store_message = create_phase_store()
+
+    session = db.session
+    exists = session.query(Case).filter(Case.name == "damBreak").first()
+    if exists:
+        return f"{phase_store_message} Case already exists: damBreak."
 
     uri_base = "https://simulate.blob.core.windows.net/"
 
-    session = db.session
     # make damBreak case
     damBreak = Case(
         name="damBreak",
@@ -109,3 +113,4 @@ def set_up_dambreak_testdata():
         session.add(script)
     session.add(damBreak)
     session.commit()
+    return f"{phase_store_message} Added case: damBreak."

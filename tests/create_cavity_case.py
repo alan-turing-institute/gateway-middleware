@@ -58,6 +58,11 @@ def set_up_cavity_testdata():
     uri_base = "https://simulate.blob.core.windows.net/"
 
     session = db.session
+
+    exists = session.query(Case).filter(Case.name == "cavity").first()
+
+    if exists:
+        return f"Case already exists: cavity."
     # make damBreak case
     cavity = Case(
         name="cavity",
@@ -96,3 +101,4 @@ def set_up_cavity_testdata():
         session.add(script)
     session.add(cavity)
     session.commit()
+    return "Added case: cavity."

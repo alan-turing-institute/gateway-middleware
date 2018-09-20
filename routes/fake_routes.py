@@ -17,5 +17,12 @@ class TestData(Resource):
         Create the default fake data
         """
         # set_up_test_database()
-        set_up_dambreak_testdata()
-        set_up_cavity_testdata()
+        messages = []
+        errors = []
+        message = set_up_dambreak_testdata()
+        messages.append(message)
+
+        message = set_up_cavity_testdata()
+        messages.append(message)
+
+        return {"status": "success", "messages": messages, "errors": []}
