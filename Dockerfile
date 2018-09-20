@@ -21,5 +21,5 @@ ENV FLASK_APP app.py
 # Configure the run command
 # python is invoked in development
 # gunicorn is invoked in production 
-# (via docker-compose.production.yml)
+# (via docker-compose.prod.yml)
 CMD ["python","app.py"]
