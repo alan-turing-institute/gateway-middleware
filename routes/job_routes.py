@@ -73,16 +73,30 @@ class JobsApi(Resource):
 
 class JobsSearchApi(Resource):
     """
-    Endpoint for searching for jobs and cases
+    Endpoint for searching for jobs and cases.
     """
 
     @token_required
     @use_kwargs(SearchArgs())
-    def get(self, name):
+    def get(self, name, exact):
         """
-        Search jobs that match the incoming query
+        Searches jobs that *exactly* match the incoming query name
+
+        Args:
+            name (str): Job name.
+            name (bool): Return job names if exact match only, otherwise return job
+                names if partial match.
+
+        Returns:
+            A list of jobs.
         """
-        return job_header_schema.dump(Job.query.filter_by(name=name), many=True)
+
+        if exact:
+            return job_header_schema.dump(Job.query.filter_by(name=name), many=True)
+        else:
+            return job_header_schema.dump(
+                Job.query.filter(Job.name.contains(name)), many=True
+            )
 
 
 class JobApi(Resource):

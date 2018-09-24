@@ -4,7 +4,7 @@ Set up marshmallow classes for serialising data
 # pylint: disable=I0011, W0613
 
 from marshmallow import validates_schema
-from webargs.fields import Int, Nested, Str
+from webargs.fields import Int, Str, Bool, Nested
 from werkzeug.exceptions import BadRequestKeyError
 
 from .constants import JobStatus
@@ -141,6 +141,7 @@ class SearchArgs(ma.Schema):
         strict = True
 
     name = Str(missing=None, strict=True)
+    exact = Bool(missing=False, strict=True, required=False)
 
     @validates_schema(pass_original=True)
     def check_unknown_fields(self, data, original_data):
