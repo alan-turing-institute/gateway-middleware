@@ -25,4 +25,4 @@ class TestData(Resource):
         message = set_up_cavity_testdata()
         messages.append(message)
 
-        return {"status": "success", "messages": messages, "errors": []}
+        return {"status": "success", "messages": messages, "errors": errors}
