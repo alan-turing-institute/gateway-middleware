@@ -4,7 +4,7 @@ Set up marshmallow classes for serialising data
 # pylint: disable=I0011, W0613
 
 from marshmallow import validates_schema
-from webargs.fields import Int, Str, Bool, Nested
+from webargs.fields import Bool, Int, Nested, Str
 from werkzeug.exceptions import BadRequestKeyError
 
 from .constants import JobStatus

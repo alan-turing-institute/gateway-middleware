@@ -89,6 +89,7 @@ class JobsSearchApi(Resource):
 
         Returns:
             A list of jobs.
+
         """
 
         if exact:
