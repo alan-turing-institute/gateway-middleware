@@ -7,7 +7,7 @@ import os
 from posixpath import join
 import re
 
-from connection.models import Case, db, Script
+from connection.models import Case, db, Repository, Script
 from .create_case_store import make_phases
 
 
@@ -82,11 +82,18 @@ def set_up_dambreak_testdata():
 
     uri_base = "https://simulate.blob.core.windows.net/"
 
+    repository = Repository(
+        url="https://github.com/alan-turing-institute/simulate-damBreak.git",
+        branch=None,
+        commit=None,
+    )
+
     # make damBreak case
     damBreak = Case(
         name="damBreak",
         thumbnail=uri_base + "openfoam-thumbnails/damBreak.png",
         description="interFoam damBreak tutorial",
+        repository=repository,
         visible=True,
     )
     # retrieve the phase store from the database

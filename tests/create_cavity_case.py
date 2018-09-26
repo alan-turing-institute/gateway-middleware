@@ -7,7 +7,7 @@ import os
 from posixpath import join
 import re
 
-from connection.models import Case, CaseField, db, ParameterSpec, Script
+from connection.models import Case, CaseField, db, ParameterSpec, Repository, Script
 
 
 def cavity_scripts(parent_case, local_base_dir):
@@ -63,11 +63,18 @@ def set_up_cavity_testdata():
 
     if exists:
         return f"Case already exists: cavity."
+
+    repository = Repository(
+        url="https://github.com/alan-turing-institute/simulate-cavity.git",
+        branch=None,
+        commit=None,
+    )
     # make damBreak case
     cavity = Case(
         name="cavity",
         thumbnail=join(uri_base, "openfoam-thumbnails/cavity.png"),
         description="icoFoam cavity tutorial",
+        repository=repository,
         visible=True,
     )
 

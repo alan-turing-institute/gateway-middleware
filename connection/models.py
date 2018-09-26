@@ -21,9 +21,14 @@ class Case(Base):
     __tablename__ = "case"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
     name = db.Column(db.String, nullable=False)
     thumbnail = db.Column(db.String, nullable=True)
     description = db.Column(db.String, nullable=True)
+
+    repository_id = db.Column(db.Integer, db.ForeignKey("repository.id"))
+    repository = db.relationship("Repository", back_populates="parent_case")
+
     visible = db.Column(db.Boolean, nullable=False)
     flat_fields = None
 
@@ -394,7 +399,7 @@ class Script(Base):
     A table of scripts for a case
     """
 
-    __tablename = "script"
+    __tablename__ = "script"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     case_id = db.Column(db.Integer, db.ForeignKey("case.id"), nullable=False)
@@ -409,6 +414,24 @@ class Script(Base):
 Case.scripts = db.relationship(
     "Script", back_populates="parent_case", cascade="all, delete-orphan"
 )
+
+
+class Repository(Base):
+    """
+    A repository for the case.
+    """
+
+    __tablename__ = "repository"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    parent_case = db.relationship(
+        "Case", back_populates="repository", uselist=False, cascade="all, delete-orphan"
+    )
+
+    url = db.Column(db.String, nullable=False)
+    commit = db.Column(db.String, nullable=True)
+    branch = db.Column(db.String, nullable=True)
 
 
 def init_database(app):
