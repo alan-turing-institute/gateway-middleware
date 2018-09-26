@@ -3,38 +3,37 @@
 import requests
 import json
 
-fname = "Simulate/state/job_id"
-with open(fname, "r") as f:
-    job_id = f.readline()
-
-fname = "Simulate/state/job_token"
-with open(fname, "r") as f:
-    job_token = f.readline()
+from config import CONFIG, ENDPOINTS
 
 
-url = f"http://manager:5010/job/{job_id}/output"
+JOB_ID = CONFIG["JOB_ID"]
+OUTPUTS_URL = f"{ENDPOINTS['MANAGER_URL']}/job/{JOB_ID}/output"
 
 payload = {
     "outputs": [
         {
-            "destination": f"https://simulate.blob.core.windows.net/openfoam-test-output/{job_id}/metrics.json",
+            "destination": f"https://simulate.blob.core.windows.net/openfoam-test-output/{JOB_ID}/metrics.json",
             "type": "metrics",
             "name": "metrics",
             "label": "Metrics (json)",
             "filename": "metrics.json",
         },
         {
-            "destination": f"https://simulate.blob.core.windows.net/openfoam-test-output/{job_id}/output.zip",
+            "destination": f"https://simulate.blob.core.windows.net/openfoam-test-output/{JOB_ID}/cavity.zip",
             "type": "zip",
-            "name": "output",
-            "label": "Output (zip)",
-            "filename": "output.zip",
+            "name": "cavity",
+            "label": "cavity (zip)",
+            "filename": "cavity.zip",
         },
     ]
 }
 
-headers = {"Content-Type": "application/json", "Authorization": f"Bearer {job_token}"}
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {CONFIG['JOB_TOKEN']}",
+}
 
-response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
+res = requests.request("POST", OUTPUTS_URL, json=payload, headers=headers)
 
-print(response.text)
+print("INFO: Posting new output files.")
+print(res.text)

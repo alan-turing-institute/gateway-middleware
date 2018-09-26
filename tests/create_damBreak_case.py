@@ -36,7 +36,7 @@ def damBreak_scripts(parent_case, local_base_dir):
     as necessary for individual scripts.
     """
     scripts = {}
-    uri_base = "https://simulate.blob.core.windows.net/" "openfoam-test-cases/"
+    uri_base = "https://simulate.blob.core.windows.net/openfoam-test-cases/"
 
     for root, _dirs, files in os.walk(local_base_dir):
         files = [f for f in files if not f[0] == "."]  # ignore hidden files
@@ -59,7 +59,7 @@ def damBreak_scripts(parent_case, local_base_dir):
             )
 
     # now override the scripts that we do want to patch
-    scripts["patch.py"].patch = True
+    # scripts["constants.yml"].patch = True
     scripts["job_id"].patch = True
     scripts["job_token"].patch = True
     scripts["run.sh"].action = "RUN"
