@@ -41,6 +41,7 @@ selection_list = [
     },
 ]
 
+
 data_raw = {}
 metadata = {}
 names = []
