@@ -208,12 +208,12 @@ class ScriptSchema(ma.ModelSchema):
         """
 
         model = Script
-        fields = ("source", "destination", "action")
+        fields = ("source", "destination", "action", "patch")
 
 
 class RepositorySchema(ma.ModelSchema):
     """
-    Serialize scripts
+    Serialize repository
     """
 
     class Meta:

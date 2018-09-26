@@ -173,29 +173,29 @@ class JobApi(Resource):
                 RequestStatus.FAILED,
                 errors=["You must set all parameters before starting a job"],
             )
+
         body = {
             "fields_to_patch": job.field_list(),
             "scripts": job.script_list(),
             "username": job.user,
+            "repository": job.repository_dict(),
         }
+
         JOB_MANAGER_URL = current_app.config["JOB_MANAGER_URL"]
         auth_token_string = request.headers.get("Authorization")
         headers = {"Authorization": auth_token_string}
 
         response = requests.post(
-            "{}/{}/start".format(JOB_MANAGER_URL, job_id), headers=headers, json=body
+            f"{JOB_MANAGER_URL}/{job_id}/start", headers=headers, json=body
         )
         if response.status_code != 200:
             return make_response(
-                RequestStatus.FAILED,
-                errors=["Job Manager returned HTTP {}".format(response.status_code)],
+                RequestStatus.FAILED, errors=response.json().get("errors")
             )
 
-        # TODO: do something with: result = response.json
-        # TODO: Handle non http errors - but they haven't been implemented
         job.status = JobStatus.QUEUED.value
         db.session.commit()
-        return make_response()
+        return make_response(messages=response.json().get("messages"))
 
     @token_required
     def delete(self, job_id):  # noqa: R1710

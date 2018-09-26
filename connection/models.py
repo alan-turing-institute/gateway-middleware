@@ -274,7 +274,7 @@ class Job(Base):
 
     def script_list(self):
         """
-        Get the list of scripts as a dictionary
+        Get the list of scripts as a list of dictionaries
         """
         scripts = []
         for script in self.parent_case.scripts:
@@ -287,6 +287,21 @@ class Job(Base):
                 }
             )
         return scripts
+
+    def repository_dict(self):
+        """
+        Get the repository information as a dictionary
+        """
+        if self.parent_case.repository:
+            repository = {}
+            repository["url"] = self.parent_case.repository.url
+            if self.parent_case.repository.branch:
+                repository["branch"] = self.parent_case.repository.branch
+            if self.parent_case.repository.commit:
+                repository["commit"] = self.parent_case.repository.commit
+            return repository
+        else:
+            return None
 
 
 class JobParameter(Base):
@@ -403,10 +418,10 @@ class Script(Base):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     case_id = db.Column(db.Integer, db.ForeignKey("case.id"), nullable=False)
-    source = db.Column(db.String, nullable=False)
+    source = db.Column(db.String, nullable=True)
     destination = db.Column(db.String, nullable=False)
-    action = db.Column(db.String, nullable=False)
-    patch = db.Column(db.Boolean, nullable=False)
+    action = db.Column(db.String, nullable=True)
+    patch = db.Column(db.Boolean, nullable=True)
 
     parent_case = db.relationship("Case", back_populates="scripts")
 
