@@ -49,10 +49,8 @@ def test_start_job(demo_app, test_job_id):
     Test that you can start a job
     """
     with Mocker() as m:
-        start_url = "{}/{}/start".format(
-            demo_app.config["JOB_MANAGER_URL"], test_job_id
-        )
-        m.post(start_url, json="data")
+        start_url = f"{demo_app.config['JOB_MANAGER_URL']}/{test_job_id}/start"
+        m.post(start_url, json={"messages": ["foo"]})
         result = JobApi().dispatch_request(test_job_id)
     assert result["status"] == RequestStatus.SUCCESS.value
     assert Job.query.get(test_job_id).status == JobStatus.QUEUED.value

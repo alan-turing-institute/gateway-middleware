@@ -44,7 +44,8 @@ def set_up_dambreak_testdata():
     # make damBreak case
     damBreak = Case(
         name="damBreak",
-        thumbnail="https://raw.githubusercontent.com/alan-turing-institute/simulate-damBreak/master/thumbnail.png",
+        thumbnail="https://raw.githubusercontent.com/alan-turing-institute/"
+        "simulate-damBreak/master/thumbnail.png",
         description="interFoam damBreak tutorial",
         repository=repository,
         visible=True,

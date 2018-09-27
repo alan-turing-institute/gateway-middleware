@@ -25,7 +25,8 @@ def set_up_cavity_testdata():
     # make cavity case
     cavity = Case(
         name="cavity",
-        thumbnail="https://raw.githubusercontent.com/alan-turing-institute/simulate-cavity/master/thumbnail.png",
+        thumbnail="https://raw.githubusercontent.com/alan-turing-institute/"
+        "simulate-cavity/master/thumbnail.png",
         description="icoFoam cavity tutorial",
         repository=repository,
         visible=True,
