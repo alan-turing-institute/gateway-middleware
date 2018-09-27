@@ -93,6 +93,15 @@ def set_up_dambreak_testdata():
 
     script = Script(
         parent_case=damBreak,
+        source="simulate/state/manager_url",
+        destination="simulate/state/manager_url",
+        action=None,
+        patch=True,
+    )
+    session.add(script)
+
+    script = Script(
+        parent_case=damBreak,
         source=None,
         destination="simulate/run.sh",
         action="RUN",

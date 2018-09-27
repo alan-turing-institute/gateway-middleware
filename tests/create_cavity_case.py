@@ -80,6 +80,15 @@ def set_up_cavity_testdata():
 
     script = Script(
         parent_case=cavity,
+        source="simulate/state/manager_url",
+        destination="simulate/state/manager_url",
+        action=None,
+        patch=True,
+    )
+    session.add(script)
+
+    script = Script(
+        parent_case=cavity,
         source=None,
         destination="simulate/run.sh",
         action="RUN",
