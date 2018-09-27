@@ -1,61 +1,14 @@
 """
-Create a test icoFoam cavity case,
-using components from the "phase store".
+Create a test icoFoam cavity case.
 """
 
-import os
-from posixpath import join
-import re
-
-from connection.models import Case, CaseField, db, ParameterSpec, Script
-
-
-def cavity_scripts(parent_case, local_base_dir):
-    """
-    Start by getting all the scripts in a local directory,
-    and adding them to a dict (while modifiying source location with the
-    prefix on Azure blob storage).   First apply default settings
-    (destination same as location, no patching, no action), then override
-    as necessary for individual scripts.
-    """
-    scripts = {}
-    uri_base = "https://simulate.blob.core.windows.net/openfoam-test-cases/"
-
-    for root, _dirs, files in os.walk(local_base_dir):
-        files = [f for f in files if not f[0] == "."]  # ignore hidden files
-        for filename in files:
-            full_filepath = os.path.join(root, filename)
-            rel_filepath = re.search(r"cavity\/([\S]+)", full_filepath).groups()[0]
-
-            # assume that relevant files aleady exist at source_filepath
-            # (no files are transferred to cloud storage here)
-            source_filepath = join(uri_base, "cavity", rel_filepath)
-            destination_filepath = rel_filepath
-
-            # assume unique filenames for test case
-            scripts[filename] = Script(
-                parent_case=parent_case,
-                source=source_filepath,
-                destination=destination_filepath,
-                action="",
-                patch=False,
-            )
-
-    # now override the scripts that we do want to patch
-    scripts["patch.py"].patch = True
-    scripts["job_id"].patch = True
-    scripts["job_token"].patch = True
-    scripts["run.sh"].action = "RUN"
-    scripts["stop.sh"].action = "STOP"
-
-    return scripts
+from connection.models import Case, CaseField, db, ParameterSpec, Repository, Script
 
 
 def set_up_cavity_testdata():
     """
     Make a cavity case and commit it to the database
     """
-    uri_base = "https://simulate.blob.core.windows.net/"
 
     session = db.session
 
@@ -63,11 +16,19 @@ def set_up_cavity_testdata():
 
     if exists:
         return f"Case already exists: cavity."
-    # make damBreak case
+
+    repository = Repository(
+        url="https://github.com/alan-turing-institute/simulate-cavity.git",
+        branch=None,
+        commit=None,
+    )
+    # make cavity case
     cavity = Case(
         name="cavity",
-        thumbnail=join(uri_base, "openfoam-thumbnails/cavity.png"),
+        thumbnail="https://raw.githubusercontent.com/alan-turing-institute/"
+        "simulate-cavity/master/thumbnail.png",
         description="icoFoam cavity tutorial",
+        repository=repository,
         visible=True,
     )
 
@@ -91,14 +52,60 @@ def set_up_cavity_testdata():
     ParameterSpec(name="default", value="0.5", parent_casefield=wall_velocity)
     ParameterSpec(name="units", value="m/s", parent_casefield=wall_velocity)
 
-    # get the list of necessary scripts by scanning this local directory,
-    # even though the actual scripts are on Azure blob storage
-    # NOTE: this requires a manual sync between local scripts and azure scripts
-    scripts = cavity_scripts(cavity, "tests/resources/cavity")
+    script = Script(
+        parent_case=cavity,
+        source="constants.template.yml",
+        destination="constants.yml",
+        action=None,
+        patch=True,
+    )
+    session.add(script)
 
-    # add everything to the database
-    for script in scripts.values():
-        session.add(script)
+    script = Script(
+        parent_case=cavity,
+        source="simulate/state/job_id",
+        destination="simulate/state/job_id",
+        action=None,
+        patch=True,
+    )
+    session.add(script)
+
+    script = Script(
+        parent_case=cavity,
+        source="simulate/state/job_token",
+        destination="simulate/state/job_token",
+        action=None,
+        patch=True,
+    )
+    session.add(script)
+
+    script = Script(
+        parent_case=cavity,
+        source="simulate/state/manager_url",
+        destination="simulate/state/manager_url",
+        action=None,
+        patch=True,
+    )
+    session.add(script)
+
+    script = Script(
+        parent_case=cavity,
+        source=None,
+        destination="simulate/run.sh",
+        action="RUN",
+        patch=False,
+    )
+    session.add(script)
+
+    Script(
+        parent_case=cavity,
+        source=None,
+        destination="simulate/stop.sh",
+        action="STOP",
+        patch=False,
+    )
+    session.add(script)
+
     session.add(cavity)
     session.commit()
     return "Added case: cavity."

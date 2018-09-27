@@ -3,7 +3,16 @@ Set up marshmallow classes for serialising data
 """
 from flask_marshmallow import Marshmallow
 
-from .models import Case, CaseField, Job, JobParameter, Output, ParameterSpec, Script
+from .models import (
+    Case,
+    CaseField,
+    Job,
+    JobParameter,
+    Output,
+    ParameterSpec,
+    Repository,
+    Script,
+)
 
 
 ma = Marshmallow()
@@ -79,10 +88,19 @@ class CaseSchema(ma.ModelSchema):
         """
 
         model = Case
-        fields = ("id", "name", "fields", "thumbnail", "description", "scripts")
+        fields = (
+            "id",
+            "name",
+            "repository",
+            "fields",
+            "thumbnail",
+            "description",
+            "scripts",
+        )
 
     fields = ma.List(ma.Nested("CaseFieldSchema"))
     scripts = ma.List(ma.Nested("ScriptSchema"))
+    repository = ma.Nested("RepositorySchema")
 
     def make_case(self, data):
         """
@@ -190,7 +208,21 @@ class ScriptSchema(ma.ModelSchema):
         """
 
         model = Script
-        fields = ("source", "destination", "action")
+        fields = ("source", "destination", "action", "patch")
+
+
+class RepositorySchema(ma.ModelSchema):
+    """
+    Serialize repository
+    """
+
+    class Meta:
+        """
+        Specification of what to use from the original class
+        """
+
+        model = Repository
+        fields = ("url", "branch", "commit")
 
 
 class OutputSchema(ma.ModelSchema):
