@@ -190,12 +190,19 @@ class JobApi(Resource):
         )
         if response.status_code != 200:
             return make_response(
-                RequestStatus.FAILED, errors=response.json().get("errors")
+                RequestStatus.FAILED,
+                messages=response.json().get("messages"),
+                errors=response.json().get("errors"),
+                data=response.json().get("data"),
             )
 
         job.status = JobStatus.QUEUED.value
         db.session.commit()
-        return make_response(messages=response.json().get("messages"))
+        return make_response(
+            messages=response.json().get("messages"),
+            errors=response.json().get("errors"),
+            data=response.json().get("data"),
+        )
 
     @token_required
     def delete(self, job_id):  # noqa: R1710
