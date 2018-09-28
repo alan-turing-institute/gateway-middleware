@@ -1,7 +1,7 @@
-FROM base/archlinux:latest
+FROM base/archlinux:2018.09.01
 
 # Install a bunch of extra packages
-RUN pacman -Sy --noconfirm python python-pip
+RUN pacman -Sy --noconfirm python python-pip gcc git vim python-psycopg2
 
 # Set up a UTF 8 locale
 RUN sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
