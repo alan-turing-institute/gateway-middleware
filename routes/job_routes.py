@@ -188,16 +188,13 @@ class JobApi(Resource):
         response = requests.post(
             f"{JOB_MANAGER_URL}/{job_id}/start", headers=headers, json=body
         )
-        if response.status_code != 200:
-            return make_response(
-                RequestStatus.FAILED,
-                messages=response.json().get("messages"),
-                errors=response.json().get("errors"),
-                data=response.json().get("data"),
-            )
 
-        job.status = JobStatus.QUEUED.value
-        db.session.commit()
+        if response.status_code != 200:
+            return make_response(RequestStatus.FAILED)
+
+        # job.status = JobStatus.STARTED.value
+        # db.session.commit()
+
         return make_response(
             messages=response.json().get("messages"),
             errors=response.json().get("errors"),
