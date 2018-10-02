@@ -34,10 +34,10 @@ def set_up_flushout_testdata():
 
     config = CaseField(name="config", parent_case=flushout)
     run_count = CaseField(name="run_count", parent_field=config, component="slider")
-    ParameterSpec(name="min", value="10", parent_casefield=run_count)
+    ParameterSpec(name="min", value="2", parent_casefield=run_count)
     ParameterSpec(name="max", value="30", parent_casefield=run_count)
     ParameterSpec(name="step", value="1", parent_casefield=run_count)
-    ParameterSpec(name="default", value="15", parent_casefield=run_count)
+    ParameterSpec(name="default", value="10", parent_casefield=run_count)
     ParameterSpec(name="units", value="", parent_casefield=run_count)
 
     script = Script(
