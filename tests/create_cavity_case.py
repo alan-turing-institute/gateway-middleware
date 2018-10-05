@@ -41,6 +41,9 @@ def set_up_cavity_testdata():
     ParameterSpec(name="step", value="0.001", parent_casefield=kinematic_viscosity)
     ParameterSpec(name="default", value="0.01", parent_casefield=kinematic_viscosity)
     ParameterSpec(name="units", value="m²/s", parent_casefield=kinematic_viscosity)
+    ParameterSpec(
+        name="title", value="Kinematic viscosity", parent_casefield=kinematic_viscosity
+    )
 
     lid = CaseField(name="lid", parent_case=cavity)
     wall_velocity = CaseField(
@@ -51,6 +54,7 @@ def set_up_cavity_testdata():
     ParameterSpec(name="step", value="0.01", parent_casefield=wall_velocity)
     ParameterSpec(name="default", value="0.5", parent_casefield=wall_velocity)
     ParameterSpec(name="units", value="m/s", parent_casefield=wall_velocity)
+    ParameterSpec(name="title", value="Wall velocity", parent_casefield=wall_velocity)
 
     script = Script(
         parent_case=cavity,
